@@ -226,8 +226,8 @@
 }
 
 .admin-tab-btn.active {
-  background: #0f172a;
-  border-color: #0f172a;
+  background: #111111;
+  border-color: #111111;
   color: #ffffff;
 }
 
@@ -332,7 +332,7 @@
 .table-badge {
   display: inline-block;
   font-size: 0.62rem;
-  background: #0f172a;
+  background: #111111;
   color: #ffffff;
   padding: 2px 5px;
   border-radius: 2px;

@@ -43,7 +43,7 @@
 }
 
 .carousel-tab-btn.active {
-  background: #0f172a;
+  background: #111111;
   color: #ffffff;
 }
 
@@ -66,8 +66,8 @@
 }
 
 .carousel-nav-arrows button:hover {
-  background: #0f172a;
-  border-color: #0f172a;
+  background: #111111;
+  border-color: #111111;
   color: #ffffff;
 }
 

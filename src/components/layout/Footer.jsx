@@ -128,11 +128,26 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="footer__bottom">
-          <p>© {new Date().getFullYear()} AzkabanStore. Indumentaria Deportiva y Urbana. Todos los derechos reservados.</p>
-          <div className="footer__badges">
-            <span className="footer__badge-pill">Envíos Andreani & Vía Cargo</span>
-            <span className="footer__badge-pill">Retiro gratis en San Martín</span>
-            <span className="footer__badge-pill">Compras 100% Seguras</span>
+          <div className="footer__bottom-inner">
+            <p className="footer__copyright">
+              © {new Date().getFullYear()} AzkabanStore. Indumentaria Deportiva y Urbana. Todos los derechos reservados.
+            </p>
+            <div className="footer__badges">
+              <span className="footer__badge-pill">Envíos Andreani & Vía Cargo</span>
+              <span className="footer__badge-pill">Retiro en San Martín</span>
+              <span className="footer__badge-pill">Compras 100% Seguras</span>
+            </div>
+            <p className="footer__author">
+              Desarrollado por{' '}
+              <a
+                href="https://agustinpollan.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer__author-link"
+              >
+                Agustín Pollán
+              </a>
+            </p>
           </div>
         </div>
       </div>

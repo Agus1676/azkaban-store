@@ -4,6 +4,7 @@ import CategoryBubbles from '../components/home/CategoryBubbles'
 import ProductCarousel from '../components/home/ProductCarousel'
 import FeaturedGrid from '../components/home/FeaturedGrid'
 import TrustFeatures from '../components/home/TrustFeatures'
+import CustomerReviewsSection from '../components/home/CustomerReviewsSection'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
 import { SEED_PRODUCTS } from '../data/seedProducts'
 import './HomePage.css'
@@ -49,6 +50,9 @@ const HomePage = () => {
 
       {/* 5. Franja de Beneficios & Envíos */}
       <TrustFeatures />
+
+      {/* 6. Opiniones de Clientes Verificadas */}
+      <CustomerReviewsSection />
 
       {/* Modal de Detalle de Prenda */}
       {selectedProduct && (
