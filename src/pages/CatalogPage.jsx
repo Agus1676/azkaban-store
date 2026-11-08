@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FiSearch, FiSliders, FiX, FiCheck } from 'react-icons/fi'
+import { FiSearch, FiX } from 'react-icons/fi'
 import ProductCard from '../components/catalog/ProductCard'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
 import { SEED_PRODUCTS, CATEGORIES } from '../data/seedProducts'
@@ -26,7 +26,7 @@ const CatalogPage = () => {
   const [products, setProducts] = useState(loadCatalogProducts)
   const [selectedProduct, setSelectedProduct] = useState(null)
 
-  const initialSearch = searchParams.get('search') || ''
+  const initialSearch = searchParams.get('search') || searchParams.get('q') || ''
   const initialCategory = searchParams.get('category') || 'todos'
 
   const [searchTerm, setSearchTerm] = useState(initialSearch)
@@ -36,9 +36,9 @@ const CatalogPage = () => {
 
   useEffect(() => {
     const paramCat = searchParams.get('category')
-    const paramSearch = searchParams.get('search')
+    const paramSearch = searchParams.get('search') || searchParams.get('q')
     if (paramCat) setSelectedCategory(paramCat)
-    if (paramSearch) setSearchTerm(paramSearch)
+    if (paramSearch !== null) setSearchTerm(paramSearch)
   }, [searchParams])
 
   useEffect(() => {
@@ -74,7 +74,12 @@ const CatalogPage = () => {
         const cat = (p.category || '').toLowerCase()
         const catName = (p.categoryName || '').toLowerCase()
         const target = selectedCategory.toLowerCase()
-        return cat === target || catName.includes(target) || (target === 'bermudas' && cat.includes('bermuda')) || (target === 'buzos' && cat.includes('buzo'))
+        return (
+          cat === target ||
+          catName.includes(target) ||
+          (target === 'bermudas' && cat.includes('bermuda')) ||
+          (target === 'buzos' && cat.includes('buzo'))
+        )
       })
     }
 
@@ -112,98 +117,85 @@ const CatalogPage = () => {
   const hasActiveFilters = searchTerm || selectedCategory !== 'todos' || onlyInStock
 
   return (
-    <div className="catalog-page">
+    <div className="catalog-view">
       <div className="container">
-        {/* Page Header */}
-        <div className="catalog-header">
-          <span className="section-badge">CATÁLOGO ONLINE</span>
-          <h1 className="section-title">
-            Nuestra <span className="text-orange">Colección</span>
-          </h1>
-          <p className="section-subtitle">
-            Explorá todas las prendas disponibles para retiro en San Martín o envíos por Andreani y Vía Cargo.
-          </p>
-        </div>
+        {/* Breadcrumb & Header */}
+        <div className="catalog-top-header">
+          <div className="catalog-heading">
+            <h1 className="catalog-title">Catálogo de Indumentaria</h1>
+            <span className="catalog-count-pill">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'prenda' : 'prendas'}
+            </span>
+          </div>
 
-        {/* Search & Sort Controls Bar */}
-        <div className="catalog-controls">
-          <div className="catalog-search-box">
+          {/* Search Input */}
+          <div className="catalog-search-wrapper">
             <FiSearch className="catalog-search-icon" />
             <input
               type="text"
-              placeholder="Buscar por prenda, marca (BMW, Jordan, Nike, etc)..."
+              placeholder="Buscar por prenda, modelo o marca..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <button
-                className="clear-search-btn"
-                onClick={() => setSearchTerm('')}
-                aria-label="Limpiar búsqueda"
-              >
-                <FiX size={16} />
+              <button className="catalog-clear-btn" onClick={() => setSearchTerm('')} aria-label="Limpiar">
+                <FiX size={15} />
               </button>
             )}
           </div>
+        </div>
 
-          <div className="catalog-filters-row">
-            {/* Sort Select */}
-            <div className="sort-box">
-              <label htmlFor="sort-select">Ordenar por:</label>
-              <select
-                id="sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="featured">⭐ Destacados</option>
-                <option value="price-asc">💵 Menor precio</option>
-                <option value="price-desc">💎 Mayor precio</option>
-                <option value="name-asc">🔤 Nombre A - Z</option>
-              </select>
-            </div>
+        {/* Categories Bar */}
+        <div className="catalog-categories-bar">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              className={`cat-tab ${selectedCategory === cat.id ? 'active' : ''}`}
+              onClick={() => handleCategoryChange(cat.id)}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
 
-            {/* In Stock Toggle */}
-            <label className="stock-toggle-label">
+        {/* Filter Toolbar (Sort & Stock) */}
+        <div className="catalog-toolbar">
+          <div className="toolbar-left">
+            <label className="filter-checkbox-label">
               <input
                 type="checkbox"
                 checked={onlyInStock}
                 onChange={(e) => setOnlyInStock(e.target.checked)}
               />
-              <span>Solo con stock</span>
+              <span>Solo prendas con stock</span>
             </label>
 
             {hasActiveFilters && (
-              <button className="btn-clear-filters" onClick={handleClearFilters}>
-                <FiX size={14} /> Limpiar filtros
+              <button className="clear-filters-link" onClick={handleClearFilters}>
+                <FiX size={13} /> Limpiar filtros
               </button>
             )}
           </div>
-        </div>
 
-        {/* Category Pills */}
-        <div className="catalog-category-pills">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className={`cat-pill ${selectedCategory === cat.id ? 'active' : ''}`}
-              onClick={() => handleCategoryChange(cat.id)}
+          <div className="toolbar-right">
+            <label htmlFor="catalog-sort">Ordenar:</label>
+            <select
+              id="catalog-sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="catalog-sort-select"
             >
-              <span>{cat.icon}</span>
-              <span>{cat.name}</span>
-            </button>
-          ))}
+              <option value="featured">Destacados</option>
+              <option value="price-asc">Menor precio</option>
+              <option value="price-desc">Mayor precio</option>
+              <option value="name-asc">Nombre A - Z</option>
+            </select>
+          </div>
         </div>
 
-        {/* Products Count */}
-        <div className="catalog-results-info">
-          <span>
-            Mostrando <strong>{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'producto' : 'productos'}
-          </span>
-        </div>
-
-        {/* Products Grid */}
+        {/* Products Grid (2 columns on mobile, 4 on desktop) */}
         {filteredProducts.length > 0 ? (
-          <div className="catalog-grid">
+          <div className="catalog-products-grid">
             {filteredProducts.map((prod) => (
               <ProductCard
                 key={prod.id}
@@ -213,12 +205,11 @@ const CatalogPage = () => {
             ))}
           </div>
         ) : (
-          <div className="catalog-no-results">
-            <div className="no-results-icon">🔍</div>
-            <h3>No encontramos productos para tu búsqueda</h3>
-            <p>Probá cambiando las palabras clave o seleccionando otra categoría.</p>
+          <div className="catalog-empty">
+            <h3>No encontramos prendas con esos filtros</h3>
+            <p>Probá buscando con otro término o seleccioná otra categoría.</p>
             <button className="btn-primary" onClick={handleClearFilters}>
-              Ver todos los productos
+              Ver todas las prendas
             </button>
           </div>
         )}

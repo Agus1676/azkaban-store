@@ -7,7 +7,7 @@ import ProductDetailModal from '../components/catalog/ProductDetailModal'
 import { SEED_PRODUCTS, STORE_INFO } from '../data/seedProducts'
 import { getWhatsAppChannelUrl } from '../utils/whatsapp'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiInstagram } from 'react-icons/fi'
+import { FiInstagram, FiArrowRight } from 'react-icons/fi'
 import './HomePage.css'
 
 const loadProducts = () => {
@@ -38,35 +38,35 @@ const HomePage = () => {
   const channelUrl = getWhatsAppChannelUrl()
 
   return (
-    <div className="home-page">
-      {/* 1. Hero Promo Banner */}
+    <div className="home-view">
+      {/* 1. Hero Lookbook Banner */}
       <HeroBanner />
 
       {/* 2. Categorías Rápidas */}
       <CategoryChips />
 
-      {/* 3. Productos Destacados */}
+      {/* 3. Productos Destacados (Grid 2 col mobile) */}
       <FeaturedGrid products={products} onOpenDetail={setSelectedProduct} />
 
-      {/* 4. Banner Comunidad WhatsApp & Instagram */}
-      <section className="community-cta-section">
+      {/* 4. Banner Comunidad Oficial */}
+      <section className="community-strip">
         <div className="container">
-          <div className="community-cta-box">
-            <div className="community-cta__text">
-              <span className="section-badge">COMUNIDAD AZKABAN</span>
-              <h2>¿Querés ver los ingresos antes que nadie?</h2>
+          <div className="community-strip__box">
+            <div className="community-strip__text">
+              <span className="community-tag">CANALES OFICIALES</span>
+              <h2>Enterate de los nuevos ingresos antes de que se agoten</h2>
               <p>
-                Sumate a nuestro canal exclusivo de WhatsApp y seguinos en Instagram para enterarte de nuevos drops, reposiciones y promociones relámpago.
+                Sumate a nuestro canal de WhatsApp para ver drops exclusivos y seguinos en Instagram para consultar talles y fotos reales.
               </p>
             </div>
-            <div className="community-cta__buttons">
+            <div className="community-strip__actions">
               <a
                 href={channelUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-whatsapp community-btn"
               >
-                <FaWhatsapp size={20} />
+                <FaWhatsapp size={18} />
                 <span>Unirme al Canal</span>
               </a>
               <a
@@ -75,7 +75,7 @@ const HomePage = () => {
                 rel="noopener noreferrer"
                 className="btn-secondary community-btn"
               >
-                <FiInstagram size={18} />
+                <FiInstagram size={17} />
                 <span>Instagram @azkabanstore</span>
               </a>
             </div>
@@ -83,7 +83,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. Trust Features */}
+      {/* 5. Trust Features Strip */}
       <TrustFeatures />
 
       {/* Product Detail Modal */}

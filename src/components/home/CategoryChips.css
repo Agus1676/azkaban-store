@@ -1,54 +1,41 @@
 .category-chips-section {
-  padding: 40px 0 20px;
-}
-
-.category-chips-header {
-  text-align: center;
-  margin-bottom: 24px;
+  padding: 24px 0 12px;
+  background: #f8f9fa;
 }
 
 .category-chips-scroll {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 10px 4px 16px;
-  scrollbar-width: thin;
+  padding: 4px 2px 10px;
+  scrollbar-width: none;
 }
 
 .category-chips-scroll::-webkit-scrollbar {
-  height: 4px;
+  display: none;
 }
 
 .category-chip-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #15151c;
+  background: #ffffff;
   border: 1px solid var(--color-border);
-  padding: 10px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
   color: var(--color-text-secondary);
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.85rem;
   white-space: nowrap;
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
 
 .category-chip-btn:hover {
-  background: #1c1c27;
-  color: #fff;
-  border-color: rgba(255, 85, 0, 0.4);
-  transform: translateY(-2px);
+  background: #f1f5f9;
+  color: var(--color-text-primary);
+  border-color: #cbd5e1;
 }
 
 .category-chip-btn.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(255, 85, 0, 0.35);
-}
-
-.category-chip-icon {
-  font-size: 1.1rem;
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
 }

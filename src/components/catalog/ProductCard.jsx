@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FiShoppingBag, FiEye, FiCheck } from 'react-icons/fi'
+import { FiShoppingBag, FiCheck } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
@@ -30,13 +30,13 @@ const ProductCard = ({ product, onOpenDetail }) => {
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
 
   return (
-    <div className={`product-card ${isOutOfStock ? 'product-card--out' : ''}`} onClick={() => onOpenDetail(product)}>
-      {/* Image & Badges */}
-      <div className="product-card__image-box">
+    <article className="product-card" onClick={() => onOpenDetail(product)}>
+      {/* Product Image */}
+      <div className="product-card__media">
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="product-card__image"
+          className="product-card__img"
           loading="lazy"
           onError={(e) => {
             e.target.src = '/logo.jpg'
@@ -47,85 +47,67 @@ const ProductCard = ({ product, onOpenDetail }) => {
           <span className="product-card__badge">{product.badge}</span>
         )}
 
-        {product.brand && (
-          <span className="product-card__brand-pill">{product.brand}</span>
-        )}
-
         {isOutOfStock && (
-          <div className="out-of-stock-overlay">
-            <span>SIN STOCK</span>
+          <div className="product-card__stock-out">
+            <span>Agotado</span>
           </div>
         )}
-
-        <button
-          className="product-card__quick-view"
-          onClick={(e) => {
-            e.stopPropagation()
-            onOpenDetail(product)
-          }}
-          aria-label="Ver detalle"
-        >
-          <FiEye size={18} />
-        </button>
       </div>
 
-      {/* Info */}
-      <div className="product-card__body">
-        <span className="product-card__category">{product.categoryName || 'Indumentaria'}</span>
-        <h3 className="product-card__name" title={product.name}>
+      {/* Product Info */}
+      <div className="product-card__info">
+        {product.brand && (
+          <span className="product-card__brand">{product.brand}</span>
+        )}
+
+        <h3 className="product-card__title" title={product.name}>
           {product.name}
         </h3>
 
-        {/* Sizes Selector Chips */}
+        {/* Sizes Selector */}
         {product.sizes && product.sizes.length > 0 && (
           <div className="product-card__sizes" onClick={(e) => e.stopPropagation()}>
-            <span className="sizes-label">Talles:</span>
-            <div className="sizes-chips">
-              {product.sizes.map((size) => (
+            <span className="sizes-title">Talles:</span>
+            <div className="sizes-list">
+              {product.sizes.map((s) => (
                 <button
-                  key={size}
+                  key={s}
                   type="button"
-                  className={`size-chip ${selectedSize === size ? 'active' : ''}`}
-                  onClick={() => setSelectedSize(size)}
+                  className={`size-btn ${selectedSize === s ? 'active' : ''}`}
+                  onClick={() => setSelectedSize(s)}
                 >
-                  {size}
+                  {s}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Price & Stock info */}
-        <div className="product-card__price-row">
-          <div className="price-tag">
-            <span className="price-current">{formatPrice(price)}</span>
-            {product.priceOffer && (
-              <span className="price-original">{formatPrice(product.price)}</span>
-            )}
-          </div>
-          <span className="stock-hint">
-            {typeof product.stock === 'number' && product.stock <= 3 && product.stock > 0
-              ? `¡Últimas ${product.stock} un.!`
-              : 'En Stock'}
-          </span>
+        {/* Pricing */}
+        <div className="product-card__pricing">
+          <span className="current-price">{formatPrice(price)}</span>
+          {product.priceOffer && (
+            <span className="old-price">{formatPrice(product.price)}</span>
+          )}
         </div>
+        <span className="payment-hint">Efectivo o Transferencia</span>
 
         {/* Action Buttons */}
-        <div className="product-card__footer" onClick={(e) => e.stopPropagation()}>
+        <div className="product-card__actions" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            className={`btn-card-add ${addedAnim ? 'btn-card-add--success' : ''}`}
+            className={`btn-add-cart ${addedAnim ? 'btn-add-cart--added' : ''}`}
             onClick={handleQuickAdd}
             disabled={isOutOfStock}
           >
             {addedAnim ? (
               <>
-                <FiCheck size={16} />
-                <span>¡Sumado!</span>
+                <FiCheck size={15} />
+                <span>Agregado</span>
               </>
             ) : (
               <>
-                <FiShoppingBag size={16} />
+                <FiShoppingBag size={15} />
                 <span>Agregar</span>
               </>
             )}
@@ -133,15 +115,16 @@ const ProductCard = ({ product, onOpenDetail }) => {
 
           <button
             type="button"
-            className="btn-card-wa"
+            className="btn-wa-inquire"
             onClick={handleWhatsApp}
             title="Consultar por WhatsApp"
+            aria-label="WhatsApp"
           >
-            <FaWhatsapp size={17} />
+            <FaWhatsapp size={16} />
           </button>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 

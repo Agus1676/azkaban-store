@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FiX, FiTrash2, FiPlus, FiMinus, FiShoppingBag, FiTruck, FiMapPin, FiUser, FiPhone, FiDollarSign } from 'react-icons/fi'
+import { FiX, FiTrash2, FiPlus, FiMinus, FiShoppingBag, FiTruck, FiUser, FiPhone, FiCreditCard } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
@@ -21,7 +21,7 @@ const CartDrawer = () => {
   const [customer, setCustomer] = useState({
     name: '',
     phone: '',
-    shippingMethod: 'Retiro en San Martín (Dr. marcos zimmermann 3339)',
+    shippingMethod: 'Retiro en persona (San Martín)',
     city: '',
     address: '',
     paymentMethod: 'Transferencia Bancaria',
@@ -46,12 +46,12 @@ const CartDrawer = () => {
     }
 
     if (!customer.phone.trim()) {
-      toast.error('Por favor ingresá tu número de teléfono / WhatsApp')
+      toast.error('Por favor ingresá tu teléfono o WhatsApp')
       return
     }
 
     if (isDelivery && !customer.city.trim()) {
-      toast.error('Por favor ingresá tu localidad o provincia para el despacho')
+      toast.error('Por favor indicá tu localidad o provincia para el despacho')
       return
     }
 
@@ -59,89 +59,80 @@ const CartDrawer = () => {
   }
 
   return (
-    <div className="cart-drawer-overlay" onClick={() => setIsOpen(false)}>
-      <div className="cart-drawer-panel" onClick={(e) => e.stopPropagation()}>
+    <div className="cart-overlay" onClick={() => setIsOpen(false)}>
+      <aside className="cart-drawer" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="cart-drawer-header">
-          <div className="cart-drawer-header__title">
-            <FiShoppingBag className="icon-cart text-orange" />
+        <div className="cart-header">
+          <div className="cart-header-title">
+            <FiShoppingBag size={20} className="text-orange" />
             <div>
               <h3>Tu Carrito</h3>
-              <span>{totalItems} {totalItems === 1 ? 'producto' : 'productos'}</span>
+              <span>{totalItems} {totalItems === 1 ? 'prenda' : 'prendas'}</span>
             </div>
           </div>
-          <button
-            className="cart-drawer-close"
-            onClick={() => setIsOpen(false)}
-            aria-label="Cerrar carrito"
-          >
-            <FiX size={22} />
+          <button className="cart-close-btn" onClick={() => setIsOpen(false)} aria-label="Cerrar">
+            <FiX size={20} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="cart-drawer-body">
+        {/* Body */}
+        <div className="cart-body">
           {cart.length === 0 ? (
-            <div className="cart-drawer-empty">
-              <div className="empty-cart-icon">🛒</div>
+            <div className="cart-empty-state">
+              <FiShoppingBag size={48} className="empty-bag-icon" />
               <h4>Tu carrito está vacío</h4>
-              <p>Mirá nuestro catálogo y sumá tus prendas favoritas para armar tu pedido.</p>
-              <button
-                className="btn-primary"
-                onClick={() => setIsOpen(false)}
-              >
-                Explorar Catálogo
+              <p>Mirá nuestro catálogo y sumá las prendas que más te gusten.</p>
+              <button className="btn-primary" onClick={() => setIsOpen(false)}>
+                Ver Catálogo
               </button>
             </div>
           ) : (
             <>
-              {/* Product List */}
-              <div className="cart-items-list">
+              {/* Items List */}
+              <div className="cart-items-group">
                 {cart.map((item) => {
                   const unitPrice = item.product.priceOffer || item.product.price || 0
                   return (
-                    <div key={item.cartItemId} className="cart-item">
+                    <div key={item.cartItemId} className="cart-row">
                       <img
                         src={item.product.imageUrl}
                         alt={item.product.name}
-                        className="cart-item__image"
-                        onError={(e) => {
-                          e.target.src = '/logo.jpg'
-                        }}
+                        className="cart-row-img"
+                        onError={(e) => { e.target.src = '/logo.jpg' }}
                       />
-                      <div className="cart-item__details">
-                        <h4 className="cart-item__name">{item.product.name}</h4>
-                        <div className="cart-item__size-badge">
+                      <div className="cart-row-details">
+                        <h4 className="cart-row-title">{item.product.name}</h4>
+                        <span className="cart-row-size">
                           Talle: <strong>{item.selectedSize}</strong>
-                        </div>
-                        <div className="cart-item__price">
-                          {formatPrice(unitPrice)}
-                        </div>
+                        </span>
+                        <span className="cart-row-price">{formatPrice(unitPrice)}</span>
 
-                        {/* Quantity Controls */}
-                        <div className="cart-item__actions">
-                          <div className="cart-qty-control">
+                        <div className="cart-row-bottom">
+                          <div className="cart-stepper">
                             <button
+                              type="button"
                               onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
-                              aria-label="Disminuir"
+                              aria-label="Menos"
                             >
-                              <FiMinus size={14} />
+                              <FiMinus size={12} />
                             </button>
                             <span>{item.quantity}</span>
                             <button
+                              type="button"
                               onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                              aria-label="Aumentar"
+                              aria-label="Más"
                             >
-                              <FiPlus size={14} />
+                              <FiPlus size={12} />
                             </button>
                           </div>
 
                           <button
-                            className="cart-item__remove"
+                            type="button"
+                            className="cart-remove-btn"
                             onClick={() => removeFromCart(item.cartItemId)}
-                            title="Eliminar producto"
+                            title="Eliminar prenda"
                           >
-                            <FiTrash2 size={16} />
+                            <FiTrash2 size={15} />
                           </button>
                         </div>
                       </div>
@@ -151,23 +142,23 @@ const CartDrawer = () => {
               </div>
 
               {/* Order Form */}
-              <form className="cart-checkout-form" onSubmit={handleCheckoutSubmit}>
-                <h4 className="form-section-title">
-                  <FiUser className="text-orange" /> Datos para el Pedido
+              <form className="cart-order-form" onSubmit={handleCheckoutSubmit}>
+                <h4 className="order-form-title">
+                  <FiUser size={16} /> Datos para el Pedido
                 </h4>
 
-                <div className="form-group">
+                <div className="form-field">
                   <label>Nombre y Apellido *</label>
                   <input
                     type="text"
                     required
-                    placeholder="Ej: Martín Rodríguez"
+                    placeholder="Ej: Lucas Martínez"
                     value={customer.name}
                     onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-field">
                   <label>Teléfono / WhatsApp *</label>
                   <input
                     type="tel"
@@ -178,14 +169,14 @@ const CartDrawer = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-field">
                   <label>Método de Entrega *</label>
                   <select
                     value={customer.shippingMethod}
                     onChange={(e) => setCustomer({ ...customer, shippingMethod: e.target.value })}
                   >
-                    <option value="Retiro en San Martín (Dr. marcos zimmermann 3339)">
-                      🚶 Retiro en persona (San Martín - Sin cargo)
+                    <option value="Retiro en persona (San Martín)">
+                      🚶 Retiro gratis en San Martín (Dr. marcos zimmermann 3339)
                     </option>
                     <option value="Envío por Andreani">
                       📦 Envío por Andreani (A domicilio o sucursal)
@@ -198,22 +189,22 @@ const CartDrawer = () => {
 
                 {isDelivery && (
                   <>
-                    <div className="form-group">
+                    <div className="form-field">
                       <label>Localidad / Provincia / CP *</label>
                       <input
                         type="text"
                         required={isDelivery}
-                        placeholder="Ej: Córdoba Capital - CP 5000"
+                        placeholder="Ej: Rosario, Santa Fe - CP 2000"
                         value={customer.city}
                         onChange={(e) => setCustomer({ ...customer, city: e.target.value })}
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>Dirección de Entrega / Sucursal deseada</label>
+                    <div className="form-field">
+                      <label>Dirección de Entrega o Sucursal</label>
                       <input
                         type="text"
-                        placeholder="Ej: San Martín 450 piso 2B o Sucursal Andreani Centro"
+                        placeholder="Ej: Av. Pellegrini 1250 o Sucursal Andreani Centro"
                         value={customer.address}
                         onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
                       />
@@ -221,52 +212,52 @@ const CartDrawer = () => {
                   </>
                 )}
 
-                <div className="form-group">
-                  <label>Forma de Pago Preferida</label>
+                <div className="form-field">
+                  <label>Forma de Pago</label>
                   <select
                     value={customer.paymentMethod}
                     onChange={(e) => setCustomer({ ...customer, paymentMethod: e.target.value })}
                   >
                     <option value="Transferencia Bancaria">💳 Transferencia Bancaria</option>
                     <option value="Efectivo al retirar">💵 Efectivo al retirar (San Martín)</option>
-                    <option value="Mercado Pago">📱 Mercado Pago (Dinero en cuenta o tarjetas)</option>
+                    <option value="Mercado Pago">📱 Mercado Pago</option>
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label>Notas adicionales (Opcional)</label>
+                <div className="form-field">
+                  <label>Aclaraciones (Opcional)</label>
                   <input
                     type="text"
-                    placeholder="Aclaraciones de talles, horarios, etc."
+                    placeholder="Horarios de entrega, preferencias..."
                     value={customer.notes}
                     onChange={(e) => setCustomer({ ...customer, notes: e.target.value })}
                   />
                 </div>
 
-                {/* Total and Submit */}
-                <div className="cart-total-box">
-                  <div className="total-row">
+                {/* Subtotal & Total Box */}
+                <div className="cart-summary-box">
+                  <div className="summary-row">
                     <span>Subtotal:</span>
                     <strong>{formatPrice(totalPrice)}</strong>
                   </div>
-                  <div className="total-row total-highlight">
+                  <div className="summary-row total-row">
                     <span>Total Estimado:</span>
-                    <span className="total-number">{formatPrice(totalPrice)}</span>
+                    <span className="total-highlight-price">{formatPrice(totalPrice)}</span>
                   </div>
                 </div>
 
-                <button type="submit" className="btn-primary btn-checkout-whatsapp">
-                  <FaWhatsapp size={20} />
-                  <span>FINALIZAR PEDIDO POR WHATSAPP</span>
+                <button type="submit" className="btn-whatsapp checkout-btn">
+                  <FaWhatsapp size={19} />
+                  <span>Finalizar Pedido por WhatsApp</span>
                 </button>
-                <p className="checkout-hint">
-                  Al hacer click se abrirá WhatsApp con el detalle completo de tu pedido para coordinar pago y entrega directamente.
+                <p className="checkout-disclaimer">
+                  Se abrirá WhatsApp con el resumen de tu pedido para coordinar pago y entrega directamente.
                 </p>
               </form>
             </>
           )}
         </div>
-      </div>
+      </aside>
     </div>
   )
 }

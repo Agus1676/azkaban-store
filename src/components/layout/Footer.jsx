@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FiInstagram, FiMail, FiPhone, FiMapPin, FiClock, FiShield, FiArrowRight } from 'react-icons/fi'
+import { FiInstagram, FiMail, FiPhone, FiMapPin, FiClock, FiLock, FiArrowRight } from 'react-icons/fi'
 import { FaWhatsapp, FaTruck } from 'react-icons/fa'
 import { STORE_INFO } from '../../data/seedProducts'
 import { getWhatsAppChannelUrl, generateGeneralInquiryLink } from '../../utils/whatsapp'
@@ -10,136 +10,110 @@ const Footer = () => {
   const whatsappChatUrl = generateGeneralInquiryLink()
 
   return (
-    <footer className="footer">
-      <div className="container footer-container">
-        {/* Col 1: Brand & Bio */}
+    <footer className="footer-main">
+      <div className="container footer-grid">
+        {/* Col 1: Brand */}
         <div className="footer-col footer-col--brand">
           <div className="footer-brand">
             <img src="/logo.jpg" alt="AzkabanStore" className="footer-logo" />
-            <span className="footer-brand-title">AZKABAN<span className="text-orange">STORE</span></span>
+            <span className="footer-title">AZKABAN<span className="text-orange">STORE</span></span>
           </div>
-          <p className="footer-bio">
-            Indumentaria deportiva y urbana seleccionada. Buzos frizados, bermudas, remeras y conjuntos de alta calidad con envíos a todo el país.
+          <p className="footer-desc">
+            Tienda oficial de indumentaria deportiva y urbana. Buzos frizados, bermudas, remeras y conjuntos seleccionados con envíos a toda la Argentina.
           </p>
-          <div className="footer-socials">
+          <div className="footer-social-row">
             <a
               href={STORE_INFO.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="social-btn social-btn--ig"
+              className="footer-social-btn"
               title="Instagram"
             >
-              <FiInstagram size={18} />
+              <FiInstagram size={17} />
             </a>
             <a
               href={channelUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="social-btn social-btn--wa"
+              className="footer-social-btn"
               title="Canal de WhatsApp"
             >
-              <FaWhatsapp size={18} />
+              <FaWhatsapp size={17} />
             </a>
             <a
               href={`mailto:${STORE_INFO.email}`}
-              className="social-btn social-btn--mail"
+              className="footer-social-btn"
               title="Email"
             >
-              <FiMail size={18} />
+              <FiMail size={17} />
             </a>
           </div>
         </div>
 
-        {/* Col 2: Navigation Links */}
+        {/* Col 2: Navigation */}
         <div className="footer-col">
           <h4 className="footer-heading">Navegación</h4>
-          <ul className="footer-links">
-            <li>
-              <Link to="/"><FiArrowRight className="link-arrow" /> Inicio</Link>
-            </li>
-            <li>
-              <Link to="/catalogo"><FiArrowRight className="link-arrow" /> Catálogo Completo</Link>
-            </li>
-            <li>
-              <Link to="/nosotros"><FiArrowRight className="link-arrow" /> Punto de Retiro & Envíos</Link>
-            </li>
-            <li>
-              <a href={STORE_INFO.treintaCatalogUrl} target="_blank" rel="noopener noreferrer">
-                <FiArrowRight className="link-arrow" /> Ver en Treinta.co
-              </a>
-            </li>
-            <li>
-              <Link to="/admin"><FiShield className="link-arrow text-orange" /> Acceso Administración</Link>
-            </li>
+          <ul className="footer-nav-list">
+            <li><Link to="/">Inicio</Link></li>
+            <li><Link to="/catalogo">Catálogo Completo</Link></li>
+            <li><Link to="/nosotros">Punto de Retiro & Envíos</Link></li>
+            <li><a href={STORE_INFO.treintaCatalogUrl} target="_blank" rel="noopener noreferrer">Catálogo en Treinta</a></li>
+            <li><Link to="/admin"><FiLock size={12} /> Administración</Link></li>
           </ul>
         </div>
 
-        {/* Col 3: Envíos y Despacho */}
+        {/* Col 3: Despachos */}
         <div className="footer-col">
-          <h4 className="footer-heading">Despachos & Envíos</h4>
-          <div className="footer-shipping-info">
-            <div className="shipping-badge">
-              <FaTruck className="text-orange" />
-              <div>
-                <strong>Andreani</strong>
-                <p>Envíos a domicilio y sucursal en todo el país con código de seguimiento.</p>
-              </div>
+          <h4 className="footer-heading">Logística & Envíos</h4>
+          <div className="footer-carrier-card">
+            <FaTruck className="text-orange" />
+            <div>
+              <strong>Andreani</strong>
+              <p>A domicilio y sucursales en todo el país con número de guía.</p>
             </div>
-            <div className="shipping-badge">
-              <FaTruck className="text-orange" />
-              <div>
-                <strong>Vía Cargo</strong>
-                <p>Despachos rápidos a terminales y agencias de toda la Argentina.</p>
-              </div>
+          </div>
+          <div className="footer-carrier-card">
+            <FaTruck className="text-orange" />
+            <div>
+              <strong>Vía Cargo</strong>
+              <p>Despachos a agencias y terminales de toda la Argentina.</p>
             </div>
           </div>
         </div>
 
-        {/* Col 4: Contacto & Retiro */}
+        {/* Col 4: Atención & Ubicación */}
         <div className="footer-col">
-          <h4 className="footer-heading">Atención & Retiros</h4>
-          <ul className="footer-contact">
+          <h4 className="footer-heading">Punto de Retiro & Contacto</h4>
+          <ul className="footer-contact-list">
             <li>
-              <FiMapPin className="contact-icon text-orange" />
-              <div>
-                <strong>Retiro en persona:</strong>
-                <span>Dr. marcos zimmermann 3339 (Entre av JM campos y pasaje 86). San Martín, Prov. Buenos Aires.</span>
-              </div>
+              <FiMapPin className="text-orange contact-ico" />
+              <span>Dr. marcos zimmermann 3339 (Entre av JM campos y pasaje 86), San Martín, Prov. Buenos Aires.</span>
             </li>
             <li>
-              <FiClock className="contact-icon text-orange" />
-              <div>
-                <strong>Horario de atención:</strong>
-                <span>Lunes a Viernes de 10:00 a 20:00 hs</span>
-              </div>
+              <FiClock className="text-orange contact-ico" />
+              <span>Lunes a Viernes de 10:00 a 20:00 hs</span>
             </li>
             <li>
-              <FiPhone className="contact-icon text-orange" />
-              <div>
-                <strong>WhatsApp Pedidos:</strong>
-                <a href={whatsappChatUrl} target="_blank" rel="noopener noreferrer" className="phone-link">
-                  {STORE_INFO.phoneDisplay}
-                </a>
-              </div>
+              <FiPhone className="text-orange contact-ico" />
+              <a href={whatsappChatUrl} target="_blank" rel="noopener noreferrer" className="footer-wa-link">
+                WhatsApp: {STORE_INFO.phoneDisplay}
+              </a>
             </li>
             <li>
-              <FiMail className="contact-icon text-orange" />
-              <div>
-                <strong>Email:</strong>
-                <span>{STORE_INFO.email}</span>
-              </div>
+              <FiMail className="text-orange contact-ico" />
+              <span>{STORE_INFO.email}</span>
             </li>
           </ul>
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <div className="footer-bottom">
         <div className="container footer-bottom__inner">
-          <p>© {new Date().getFullYear()} AzkabanStore. Todos los derechos reservados.</p>
-          <div className="footer-bottom__badges">
-            <span className="safe-badge">🔒 Compras 100% Seguras</span>
-            <span className="safe-badge">⚡ Envíos Andreani & Vía Cargo</span>
+          <p>© {new Date().getFullYear()} AzkabanStore. Indumentaria Deportiva y Urbana.</p>
+          <div className="footer-safe-tags">
+            <span>Envíos Andreani & Vía Cargo</span>
+            <span>•</span>
+            <span>Retiro sin cargo en San Martín</span>
           </div>
         </div>
       </div>

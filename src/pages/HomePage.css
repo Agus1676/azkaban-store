@@ -1,63 +1,54 @@
-.home-page {
+.home-view {
   display: flex;
   flex-direction: column;
 }
 
-.community-cta-section {
-  padding: 40px 0 60px;
+.community-strip {
+  padding: 30px 0 50px;
 }
 
-.community-cta-box {
-  background: linear-gradient(135deg, #181822 0%, #1a161f 50%, #15151c 100%);
-  border: 1px solid rgba(255, 85, 0, 0.3);
-  border-radius: var(--radius-xl);
-  padding: 40px;
+.community-strip__box {
+  background: #0f172a;
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 30px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  position: relative;
-  overflow: hidden;
+  color: #ffffff;
 }
 
-.community-cta-box::before {
-  content: '';
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(37, 211, 102, 0.2) 0%, transparent 70%);
-  filter: blur(40px);
-  pointer-events: none;
-}
-
-.community-cta__text {
-  max-width: 600px;
-}
-
-.community-cta__text h2 {
-  font-family: var(--font-heading);
-  font-size: 1.8rem;
+.community-tag {
+  display: inline-block;
+  font-size: 0.7rem;
   font-weight: 800;
-  color: #fff;
-  margin: 10px 0;
-  line-height: 1.2;
+  letter-spacing: 1.5px;
+  color: var(--color-primary);
+  margin-bottom: 8px;
 }
 
-.community-cta__text p {
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
+.community-strip__text h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.community-strip__text p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  max-width: 540px;
   line-height: 1.5;
 }
 
-.community-cta__buttons {
+.community-strip__actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
-  width: 260px;
+  width: 250px;
 }
 
 .community-btn {
@@ -65,13 +56,18 @@
 }
 
 @media (max-width: 860px) {
-  .community-cta-box {
+  .community-strip__box {
     flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
+    text-align: left;
+    padding: 24px 20px;
   }
-  .community-cta__buttons {
+  .community-strip__actions {
     width: 100%;
-    max-width: 320px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .community-btn {
+    flex: 1;
+    min-width: 160px;
   }
 }

@@ -37,65 +37,65 @@ const ProductDetailModal = ({ product, onClose }) => {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Cerrar modal">
-          <FiX size={24} />
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar ventana">
+          <FiX size={20} />
         </button>
 
-        <div className="modal-grid">
-          {/* Image Column */}
-          <div className="modal-image-col">
+        <div className="modal-layout">
+          {/* Media */}
+          <div className="modal-media">
             <img
               src={product.imageUrl}
               alt={product.name}
-              className="modal-image"
-              onError={(e) => {
-                e.target.src = '/logo.jpg'
-              }}
+              className="modal-img"
+              onError={(e) => { e.target.src = '/logo.jpg' }}
             />
-            {product.badge && (
-              <span className="modal-badge">{product.badge}</span>
-            )}
+            {product.badge && <span className="modal-tag">{product.badge}</span>}
           </div>
 
-          {/* Details Column */}
-          <div className="modal-details-col">
-            <div className="modal-header">
-              {product.brand && <span className="modal-brand">{product.brand}</span>}
-              <h2 className="modal-title">{product.name}</h2>
-              <span className="modal-category">{product.categoryName || 'Indumentaria'}</span>
+          {/* Info */}
+          <div className="modal-content">
+            <div className="modal-heading">
+              {product.brand && <span className="modal-brand-label">{product.brand}</span>}
+              <h2 className="modal-prod-title">{product.name}</h2>
+              <span className="modal-cat-label">{product.categoryName || 'Indumentaria'}</span>
             </div>
 
-            <div className="modal-price-box">
-              <span className="modal-price">{formatPrice(price)}</span>
+            <div className="modal-pricing-row">
+              <span className="modal-current-price">{formatPrice(price)}</span>
               {product.priceOffer && (
-                <span className="modal-price-old">{formatPrice(product.price)}</span>
+                <span className="modal-old-price">{formatPrice(product.price)}</span>
               )}
-              <span className="modal-stock-status">
-                {isOutOfStock ? '❌ Agotado' : `✅ En Stock (${product.stock} un. disponibles)`}
+              <span className="modal-stock-indicator">
+                {isOutOfStock ? 'Agotado' : `Stock disponible: ${product.stock} un.`}
               </span>
             </div>
 
+            <p className="modal-payment-note">
+              💳 Pago por transferencia bancaria, Mercado Pago o efectivo al retirar.
+            </p>
+
             {/* Description */}
-            <div className="modal-description">
-              <h4>Descripción:</h4>
-              <p>{product.description || 'Prenda de alta calidad con excelente confección y materiales de primera línea.'}</p>
+            <div className="modal-desc-box">
+              <h4>Descripción de la prenda:</h4>
+              <p>{product.description}</p>
             </div>
 
-            {/* Size Selector */}
+            {/* Sizes */}
             {product.sizes && product.sizes.length > 0 && (
-              <div className="modal-sizes-box">
-                <h4>Seleccioná tu Talle:</h4>
-                <div className="modal-sizes-list">
-                  {product.sizes.map((size) => (
+              <div className="modal-sizes-container">
+                <h4>Seleccionar Talle:</h4>
+                <div className="modal-sizes-group">
+                  {product.sizes.map((s) => (
                     <button
-                      key={size}
+                      key={s}
                       type="button"
-                      className={`modal-size-btn ${selectedSize === size ? 'active' : ''}`}
-                      onClick={() => setSelectedSize(size)}
+                      className={`modal-size-chip ${selectedSize === s ? 'active' : ''}`}
+                      onClick={() => setSelectedSize(s)}
                     >
-                      {size}
+                      {s}
                     </button>
                   ))}
                 </div>
@@ -103,15 +103,15 @@ const ProductDetailModal = ({ product, onClose }) => {
             )}
 
             {/* Quantity */}
-            <div className="modal-qty-box">
+            <div className="modal-qty-container">
               <h4>Cantidad:</h4>
-              <div className="modal-qty-control">
+              <div className="modal-qty-selector">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={quantity <= 1}
                 >
-                  <FiMinus size={16} />
+                  <FiMinus size={14} />
                 </button>
                 <span>{quantity}</span>
                 <button
@@ -119,46 +119,46 @@ const ProductDetailModal = ({ product, onClose }) => {
                   onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
                   disabled={quantity >= (product.stock || 99)}
                 >
-                  <FiPlus size={16} />
+                  <FiPlus size={14} />
                 </button>
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="modal-actions">
+            {/* CTAs */}
+            <div className="modal-cta-buttons">
               <button
                 type="button"
-                className="btn-primary modal-btn-add"
+                className="btn-primary modal-cta-add"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
-                <FiShoppingBag size={20} />
+                <FiShoppingBag size={18} />
                 <span>Agregar al Carrito</span>
               </button>
 
               <button
                 type="button"
-                className="btn-whatsapp modal-btn-wa"
+                className="btn-whatsapp modal-cta-wa"
                 onClick={handleWhatsApp}
               >
-                <FaWhatsapp size={20} />
-                <span>Comprar por WhatsApp</span>
+                <FaWhatsapp size={18} />
+                <span>Consultar por WhatsApp</span>
               </button>
             </div>
 
-            {/* Store Highlights */}
-            <div className="modal-trust-pills">
-              <div className="trust-pill">
-                <FiTruck className="text-orange" />
+            {/* Assurances */}
+            <div className="modal-assurances">
+              <div className="assurance-card">
+                <FiTruck className="assurance-icon" />
                 <span>Envíos Andreani & Vía Cargo</span>
               </div>
-              <div className="trust-pill">
-                <FiMapPin className="text-orange" />
+              <div className="assurance-card">
+                <FiMapPin className="assurance-icon" />
                 <span>Retiro en San Martín</span>
               </div>
-              <div className="trust-pill">
-                <FiShield className="text-orange" />
-                <span>Calidad Garantizada</span>
+              <div className="assurance-card">
+                <FiShield className="assurance-icon" />
+                <span>Prenda 100% Original</span>
               </div>
             </div>
           </div>

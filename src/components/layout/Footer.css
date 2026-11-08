@@ -1,16 +1,16 @@
-.footer {
-  background: #09090d;
-  border-top: 1px solid var(--color-border);
-  margin-top: 60px;
-  color: var(--color-text-secondary);
+.footer-main {
+  background: #0f172a;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.footer-container {
+.footer-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1.2fr 1.4fr;
-  gap: 40px;
-  padding-top: 60px;
-  padding-bottom: 50px;
+  grid-template-columns: 1.3fr 0.9fr 1.1fr 1.3fr;
+  gap: 36px;
+  padding-top: 50px;
+  padding-bottom: 40px;
 }
 
 .footer-col {
@@ -18,192 +18,156 @@
   flex-direction: column;
 }
 
-/* Brand Col */
+/* Brand */
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .footer-logo {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 2px solid var(--color-primary);
+  border: 1.5px solid var(--color-primary);
 }
 
-.footer-brand-title {
+.footer-title {
   font-family: var(--font-heading);
-  font-size: 1.3rem;
-  font-weight: 900;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: #ffffff;
 }
 
-.text-orange {
-  color: var(--color-primary);
+.footer-desc {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #94a3b8;
+  margin-bottom: 16px;
 }
 
-.footer-bio {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  color: #9ca3af;
-}
-
-.footer-socials {
+.footer-social-row {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
-.social-btn {
+.footer-social-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--color-border);
-  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
   transition: all var(--transition-fast);
 }
 
-.social-btn:hover {
-  transform: translateY(-2px);
-}
-
-.social-btn--ig:hover {
-  background: var(--color-instagram);
-  border-color: var(--color-instagram);
-}
-
-.social-btn--wa:hover {
-  background: var(--color-whatsapp);
-  border-color: var(--color-whatsapp);
-}
-
-.social-btn--mail:hover {
+.footer-social-btn:hover {
   background: var(--color-primary);
-  border-color: var(--color-primary);
+  color: #ffffff;
 }
 
-/* Heading */
+/* Headings */
 .footer-heading {
   font-family: var(--font-heading);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #ffffff;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* Links */
-.footer-links {
+/* Nav */
+.footer-nav-list {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.footer-links a {
+.footer-nav-list a {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  transition: color var(--transition-fast);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-  transition: all var(--transition-fast);
+  gap: 4px;
 }
 
-.footer-links a:hover {
+.footer-nav-list a:hover {
   color: #ffffff;
-  transform: translateX(4px);
 }
 
-.link-arrow {
-  font-size: 0.8rem;
-  color: var(--color-primary);
-}
-
-/* Shipping */
-.footer-shipping-info {
+/* Carriers */
+.footer-carrier-card {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.shipping-badge {
-  display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-start;
-  padding: 12px;
+  padding: 10px 12px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-xs);
+  margin-bottom: 8px;
 }
 
-.shipping-badge svg {
-  font-size: 1.3rem;
+.footer-carrier-card svg {
+  font-size: 1.1rem;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.shipping-badge strong {
+.footer-carrier-card strong {
   display: block;
-  font-size: 0.95rem;
-  color: #fff;
-  margin-bottom: 2px;
+  font-size: 0.85rem;
+  color: #ffffff;
 }
 
-.shipping-badge p {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  line-height: 1.4;
+.footer-carrier-card p {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.35;
 }
 
 /* Contact */
-.footer-contact {
+.footer-contact-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
-.footer-contact li {
+.footer-contact-list li {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-start;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
-.contact-icon {
-  font-size: 1.1rem;
-  margin-top: 3px;
+.contact-ico {
+  margin-top: 2px;
   flex-shrink: 0;
+  font-size: 0.95rem;
 }
 
-.footer-contact strong {
-  display: block;
-  color: #ffffff;
-  font-size: 0.85rem;
-}
-
-.phone-link {
-  color: var(--color-whatsapp);
+.footer-wa-link {
+  color: #4ade80;
   font-weight: 700;
 }
 
-.phone-link:hover {
+.footer-wa-link:hover {
   text-decoration: underline;
 }
 
-/* Bottom Bar */
+/* Bottom */
 .footer-bottom {
+  background: #020617;
+  padding: 16px 0;
+  font-size: 0.78rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 20px 0;
-  background: #060608;
-  font-size: 0.85rem;
 }
 
 .footer-bottom__inner {
@@ -211,31 +175,27 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
-.footer-bottom__badges {
+.footer-safe-tags {
   display: flex;
-  gap: 16px;
+  gap: 10px;
+  color: #64748b;
 }
 
-.safe-badge {
-  color: #9ca3af;
-  font-size: 0.8rem;
-}
-
-@media (max-width: 992px) {
-  .footer-container {
+@media (max-width: 900px) {
+  .footer-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 28px;
   }
 }
 
-@media (max-width: 600px) {
-  .footer-container {
+@media (max-width: 580px) {
+  .footer-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
-    padding-top: 40px;
+    gap: 24px;
+    padding-top: 36px;
   }
   .footer-bottom__inner {
     flex-direction: column;

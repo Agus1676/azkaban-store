@@ -1,79 +1,69 @@
 .announcement-bar {
-  background: linear-gradient(90deg, #121217 0%, #1a1512 50%, #121217 100%);
-  border-bottom: 1px solid rgba(255, 85, 0, 0.2);
-  color: #e5e7eb;
-  font-size: 0.8rem;
+  background: #0f172a;
+  color: #f1f5f9;
+  font-size: 0.78rem;
   font-weight: 500;
-  height: var(--header-announcement-h);
-  overflow: hidden;
+  height: var(--announcement-h);
   display: flex;
   align-items: center;
   position: relative;
-  z-index: 50;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.announcement-bar__marquee {
-  width: 100%;
+.announcement-bar__inner {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.announcement-bar__text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.announcement-bar__content {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 16px;
-}
-
-.announcement-bar__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.announcement-bar__item strong {
+.announcement-bar__text strong {
   color: #ffffff;
+  font-weight: 700;
 }
 
-.icon-orange {
+.ann-icon {
   color: var(--color-primary);
-  font-size: 0.9rem;
+  margin-right: 4px;
 }
 
-.icon-whatsapp {
-  color: #25d366;
-  font-size: 0.95rem;
-}
-
-.announcement-bar__divider {
-  color: rgba(255, 85, 0, 0.5);
-  font-weight: bold;
+.ann-dot {
+  color: #64748b;
 }
 
 .announcement-bar__link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #25d366;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: #4ade80;
+  font-weight: 700;
+  white-space: nowrap;
   transition: opacity var(--transition-fast);
+  margin-left: 12px;
 }
 
 .announcement-bar__link:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 @media (max-width: 768px) {
-  .announcement-bar__content {
-    animation: marquee 25s linear infinite;
+  .announcement-bar__inner {
+    justify-content: center;
   }
-}
-
-@keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  .announcement-bar__link {
+    display: none;
+  }
+  .announcement-bar__text {
+    font-size: 0.74rem;
+  }
 }

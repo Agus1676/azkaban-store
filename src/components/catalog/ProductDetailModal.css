@@ -1,47 +1,43 @@
-.modal-overlay {
+.modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 210;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  animation: fadeIn 0.2s ease;
+  padding: 16px;
+  animation: modalFadeIn 0.2s ease;
 }
 
-.modal-container {
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-dialog {
   width: 100%;
-  max-width: 900px;
-  background: #14141a;
-  border: 1px solid rgba(255, 85, 0, 0.3);
-  border-radius: var(--radius-xl);
+  max-width: 860px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-dropdown);
   position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 85, 0, 0.2);
-  animation: modalScale 0.25s ease;
-  max-height: 90vh;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
 }
 
-@keyframes modalScale {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.modal-close-btn {
+.modal-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: #f1f5f9;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,252 +45,240 @@
   transition: all var(--transition-fast);
 }
 
-.modal-close-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  transform: rotate(90deg);
+.modal-close:hover {
+  background: #e2e8f0;
+  color: var(--color-text-primary);
 }
 
-.modal-grid {
+.modal-layout {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1fr 1.25fr;
   overflow-y: auto;
 }
 
-/* Image */
-.modal-image-col {
+/* Media */
+.modal-media {
   position: relative;
-  background: #0d0d11;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 420px;
   border-right: 1px solid var(--color-border);
 }
 
-.modal-image {
+.modal-img {
   width: 100%;
   height: 100%;
+  max-height: 520px;
   object-fit: cover;
-  max-height: 540px;
+  display: block;
 }
 
-.modal-badge {
+.modal-tag {
   position: absolute;
-  top: 18px;
-  left: 18px;
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 0.75rem;
+  top: 16px;
+  left: 16px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.7rem;
   font-weight: 800;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
   letter-spacing: 0.5px;
 }
 
-/* Details */
-.modal-details-col {
-  padding: 36px 32px;
+/* Content */
+.modal-content {
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-.modal-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.modal-brand {
+.modal-brand-label {
   display: inline-block;
-  background: rgba(255, 85, 0, 0.15);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1px;
   color: var(--color-primary);
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  width: fit-content;
+  text-transform: uppercase;
+  margin-bottom: 4px;
 }
 
-.modal-title {
+.modal-prod-title {
   font-family: var(--font-heading);
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  color: #fff;
-  line-height: 1.2;
+  color: var(--color-text-primary);
+  line-height: 1.25;
 }
 
-.modal-category {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
+.modal-cat-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
 
-/* Price Box */
-.modal-price-box {
+/* Pricing */
+.modal-pricing-row {
   display: flex;
   align-items: baseline;
   gap: 12px;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
 }
 
-.modal-price {
+.modal-current-price {
   font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 900;
-  color: var(--color-primary);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
 }
 
-.modal-price-old {
-  font-size: 1.1rem;
+.modal-old-price {
+  font-size: 1rem;
   color: var(--color-text-muted);
   text-decoration: line-through;
 }
 
-.modal-stock-status {
-  font-size: 0.82rem;
+.modal-stock-indicator {
+  font-size: 0.8rem;
+  color: #16a34a;
   font-weight: 600;
-  color: #10b981;
   margin-left: auto;
 }
 
-/* Description */
-.modal-description h4,
-.modal-sizes-box h4,
-.modal-qty-box h4 {
-  font-size: 0.88rem;
-  font-weight: 700;
+.modal-payment-note {
+  font-size: 0.82rem;
   color: var(--color-text-secondary);
-  margin-bottom: 8px;
 }
 
-.modal-description p {
-  font-size: 0.95rem;
-  color: #e5e7eb;
-  white-space: pre-line;
-  line-height: 1.6;
+/* Description */
+.modal-desc-box h4,
+.modal-sizes-container h4,
+.modal-qty-container h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.modal-desc-box p {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 
 /* Sizes */
-.modal-sizes-list {
+.modal-sizes-group {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.modal-size-btn {
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  background: #0f0f14;
+.modal-size-chip {
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  background: #f8fafc;
   border: 1px solid var(--color-border);
-  color: #fff;
+  color: var(--color-text-primary);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: all var(--transition-fast);
 }
 
-.modal-size-btn:hover,
-.modal-size-btn.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 14px rgba(255, 85, 0, 0.35);
+.modal-size-chip:hover,
+.modal-size-chip.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
 }
 
-/* Quantity */
-.modal-qty-control {
+/* Qty */
+.modal-qty-selector {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  background: #0f0f14;
+  gap: 12px;
+  background: #f8fafc;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
 }
 
-.modal-qty-control button {
+.modal-qty-selector button {
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
 }
 
-.modal-qty-control button:hover:not(:disabled) {
-  color: #fff;
-}
-
-.modal-qty-control button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.modal-qty-control span {
-  font-weight: 800;
-  font-size: 1rem;
-  color: #fff;
-  min-width: 24px;
+.modal-qty-selector span {
+  font-weight: 700;
+  font-size: 0.92rem;
+  min-width: 20px;
   text-align: center;
 }
 
 /* Actions */
-.modal-actions {
+.modal-cta-buttons {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 6px;
   flex-wrap: wrap;
 }
 
-.modal-btn-add {
+.modal-cta-add {
   flex: 1;
-  min-width: 180px;
+  min-width: 170px;
 }
 
-.modal-btn-wa {
+.modal-cta-wa {
   flex: 1;
-  min-width: 180px;
+  min-width: 170px;
 }
 
-/* Trust Pills */
-.modal-trust-pills {
+/* Assurances */
+.modal-assurances {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid var(--color-border);
 }
 
-.trust-pill {
+.assurance-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--color-border);
-  padding: 10px 8px;
-  border-radius: var(--radius-md);
-  font-size: 0.75rem;
-  color: #9ca3af;
+  gap: 4px;
+  padding: 8px;
+  border-radius: var(--radius-xs);
+  background: #f8fafc;
+  font-size: 0.72rem;
   font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
-.trust-pill svg {
-  font-size: 1.2rem;
+.assurance-icon {
+  font-size: 1.1rem;
+  color: var(--color-primary);
 }
 
 @media (max-width: 768px) {
-  .modal-grid {
+  .modal-layout {
     grid-template-columns: 1fr;
   }
-  .modal-image-col {
-    min-height: 280px;
+  .modal-media {
     border-right: none;
     border-bottom: 1px solid var(--color-border);
+    max-height: 280px;
   }
-  .modal-details-col {
-    padding: 24px 20px;
+  .modal-content {
+    padding: 20px 16px;
   }
-  .modal-actions {
+  .modal-cta-buttons {
     flex-direction: column;
   }
 }

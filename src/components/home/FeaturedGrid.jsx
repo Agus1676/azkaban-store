@@ -11,19 +11,19 @@ const FeaturedGrid = ({ products, onOpenDetail }) => {
       <div className="container">
         <div className="featured-section__header">
           <div>
-            <span className="section-badge">LO MÁS BUSCADO</span>
-            <h2 className="section-title">Productos <span className="text-orange">Destacados</span></h2>
+            <span className="section-badge">DESTACADOS</span>
+            <h2 className="section-title">Prendas en Tendencia</h2>
             <p className="section-subtitle">
-              Selección exclusiva de buzos frizados, bermudas y prendas de alta rotación.
+              Los buzos y bermudas más elegidos de nuestra colección.
             </p>
           </div>
-          <Link to="/catalogo" className="btn-secondary view-all-btn">
-            <span>Ver todo el catálogo</span>
+          <Link to="/catalogo" className="btn-secondary featured-all-btn">
+            <span>Ver Todo el Catálogo</span>
             <FiArrowRight size={16} />
           </Link>
         </div>
 
-        <div className="featured-grid">
+        <div className="products-grid-responsive">
           {featured.map((prod) => (
             <ProductCard key={prod.id} product={prod} onOpenDetail={onOpenDetail} />
           ))}

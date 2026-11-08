@@ -2,39 +2,39 @@ import { FiTruck, FiMapPin, FiClock, FiCreditCard } from 'react-icons/fi'
 import './TrustFeatures.css'
 
 const TrustFeatures = () => {
-  const features = [
+  const items = [
     {
       icon: <FiTruck />,
-      title: 'Envíos a Todo el País',
-      desc: 'Despachamos por Andreani y Vía Cargo con código de seguimiento en tiempo real.',
+      title: 'Envíos Nacionales',
+      text: 'Despachos por Andreani y Vía Cargo con código de seguimiento en tiempo real.',
     },
     {
       icon: <FiMapPin />,
-      title: 'Punto de Retiro San Martín',
-      desc: 'Dr. marcos zimmermann 3339 (Entre JM campos y pje 86). Coordiná y retirá sin costo.',
+      title: 'Punto de Retiro',
+      text: 'Dr. marcos zimmermann 3339, San Martín. Retirá tu pedido gratis en nuestro local.',
     },
     {
       icon: <FiClock />,
       title: 'Atención 10 a 20hs',
-      desc: 'Lunes a Viernes asesoramiento continuo en talles y stock por WhatsApp.',
+      text: 'Lunes a Viernes asesoramiento personalizado de talles y stock por WhatsApp.',
     },
     {
       icon: <FiCreditCard />,
-      title: 'Medios de Pago Flexibles',
-      desc: 'Transferencia bancaria, efectivo al retirar o Mercado Pago con total seguridad.',
+      title: 'Medios de Pago',
+      text: 'Aboná por Transferencia bancaria, Efectivo al retirar o Mercado Pago.',
     },
   ]
 
   return (
-    <section className="trust-features-section">
+    <section className="trust-strip">
       <div className="container">
-        <div className="trust-features-grid">
-          {features.map((item, idx) => (
-            <div key={idx} className="trust-feature-card">
-              <div className="trust-feature-card__icon">{item.icon}</div>
-              <div className="trust-feature-card__content">
-                <h4>{item.title}</h4>
-                <p>{item.desc}</p>
+        <div className="trust-grid">
+          {items.map((it, i) => (
+            <div key={i} className="trust-item">
+              <div className="trust-item__icon">{it.icon}</div>
+              <div className="trust-item__info">
+                <h4>{it.title}</h4>
+                <p>{it.text}</p>
               </div>
             </div>
           ))}
