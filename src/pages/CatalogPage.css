@@ -1,0 +1,239 @@
+.catalog-page {
+  padding: 40px 0 80px;
+}
+
+.catalog-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+/* Controls */
+.catalog-controls {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.catalog-search-box {
+  position: relative;
+  width: 100%;
+}
+
+.catalog-search-box input {
+  width: 100%;
+  background: #111116;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 40px 12px 42px;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.catalog-search-box input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.15);
+}
+
+.catalog-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  padding: 4px;
+}
+
+.clear-search-btn:hover {
+  color: #fff;
+}
+
+.catalog-filters-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.sort-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-box label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.sort-box select {
+  background: #111116;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.sort-box select:focus {
+  border-color: var(--color-primary);
+}
+
+.stock-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.stock-toggle-label input[type="checkbox"] {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.btn-clear-filters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-border);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+  transition: all var(--transition-fast);
+}
+
+.btn-clear-filters:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Category Pills */
+.catalog-category-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  scrollbar-width: thin;
+}
+
+.cat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #15151c;
+  border: 1px solid var(--color-border);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.cat-pill:hover {
+  background: #1c1c26;
+  color: #fff;
+}
+
+.cat-pill.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 85, 0, 0.3);
+}
+
+/* Results Count */
+.catalog-results-info {
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.catalog-results-info strong {
+  color: var(--color-primary);
+}
+
+/* Grid */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* No Results */
+.catalog-no-results {
+  text-align: center;
+  padding: 80px 20px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.no-results-icon {
+  font-size: 3.5rem;
+}
+
+.catalog-no-results h3 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.catalog-no-results p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+@media (max-width: 1200px) {
+  .catalog-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .catalog-grid {
+    grid-template-columns: 1fr;
+  }
+  .btn-clear-filters {
+    margin-left: 0;
+  }
+}
