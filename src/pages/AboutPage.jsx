@@ -1,14 +1,34 @@
+import { useState, useEffect } from 'react'
 import { FiMapPin, FiClock, FiPhone, FiMail, FiInstagram, FiTruck, FiArrowRight } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { STORE_INFO } from '../data/seedProducts'
 import { getWhatsAppChannelUrl, generateGeneralInquiryLink } from '../utils/whatsapp'
 import './AboutPage.css'
 
+const getStoredConfig = () => {
+  try {
+    const saved = localStorage.getItem('azkaban_store_config')
+    if (saved) return JSON.parse(saved)
+  } catch (e) {
+    console.warn(e)
+  }
+  return STORE_INFO
+}
+
 const AboutPage = () => {
-  const channelUrl = getWhatsAppChannelUrl()
+  const [config, setConfig] = useState(getStoredConfig)
+
+  useEffect(() => {
+    const handleConfig = () => setConfig(getStoredConfig())
+    window.addEventListener('azkaban_config_updated', handleConfig)
+    return () => window.removeEventListener('azkaban_config_updated', handleConfig)
+  }, [])
+
+  const channelUrl = config?.whatsappChannelUrl || getWhatsAppChannelUrl()
   const chatUrl = generateGeneralInquiryLink()
+  const currentAddress = config?.address || STORE_INFO.address
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    'Dr. marcos zimmermann 3339, San Martin, Provincia de Buenos Aires'
+    currentAddress
   )}`
 
   return (
@@ -32,9 +52,7 @@ const AboutPage = () => {
               <h3>Punto de Retiro San Martín</h3>
             </div>
             <p className="about-address-text">
-              <strong>Dr. marcos zimmermann 3339</strong><br />
-              (Entre Av. JM Campos y Pasaje 86)<br />
-              San Martín, Provincia de Buenos Aires
+              <strong>{currentAddress}</strong>
             </p>
             <span className="about-note">
               Podés realizar tu pedido por la web y retirar sin costo de envío coordinando previamente por WhatsApp.
@@ -59,7 +77,7 @@ const AboutPage = () => {
             <div className="about-hours-table">
               <div className="hours-row">
                 <span>Lunes a Viernes:</span>
-                <strong>10:00 a 20:00 hs</strong>
+                <strong>{config?.hours || STORE_INFO.hours}</strong>
               </div>
               <div className="hours-row">
                 <span>Sábados y Domingos:</span>
@@ -98,52 +116,67 @@ const AboutPage = () => {
               </li>
             </ul>
             <div className="about-pill-status">
-              Seguimiento online en tiempo real de cada paquete.
+              <span>🚚 Despachos diarios con código de tracking</span>
             </div>
           </div>
 
-          {/* Card 4: Redes & Canales */}
+          {/* Card 4: Redes & Contacto Directo */}
           <div className="about-info-card">
             <div className="about-card-top">
               <FiPhone className="about-ico" />
-              <h3>Contacto Directo</h3>
+              <h3>Canales Oficiales</h3>
             </div>
-            <ul className="about-channel-list">
-              <li>
-                <FaWhatsapp className="text-whatsapp" />
+            <div className="about-contact-list">
+              <a
+                href={chatUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-contact-row"
+              >
+                <FaWhatsapp className="text-green" />
                 <div>
-                  <span className="channel-lbl">WhatsApp Pedidos:</span>
-                  <a href={chatUrl} target="_blank" rel="noopener noreferrer">
-                    <strong>{STORE_INFO.phoneDisplay}</strong>
-                  </a>
+                  <strong>WhatsApp de Ventas</strong>
+                  <span>{config?.phoneDisplay || STORE_INFO.phoneDisplay}</span>
                 </div>
-              </li>
-              <li>
+              </a>
+
+              <a
+                href={config?.instagramUrl || STORE_INFO.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-contact-row"
+              >
                 <FiInstagram className="text-orange" />
                 <div>
-                  <span className="channel-lbl">Instagram Oficial:</span>
-                  <a href={STORE_INFO.instagramUrl} target="_blank" rel="noopener noreferrer">
-                    <strong>{STORE_INFO.instagram}</strong>
-                  </a>
+                  <strong>Instagram</strong>
+                  <span>{config?.instagram || STORE_INFO.instagram}</span>
                 </div>
-              </li>
-              <li>
-                <FiMail className="text-muted" />
+              </a>
+
+              <a
+                href={channelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-contact-row"
+              >
+                <FaWhatsapp className="text-green" />
                 <div>
-                  <span className="channel-lbl">Email:</span>
-                  <strong>{STORE_INFO.email}</strong>
+                  <strong>Canal de Novedades</strong>
+                  <span>Drops, ingresos y promociones exclusivas</span>
                 </div>
-              </li>
-            </ul>
-            <a
-              href={channelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary about-action-btn"
-            >
-              <FaWhatsapp className="text-whatsapp" />
-              <span>Unirme al Canal Oficial</span>
-            </a>
+              </a>
+
+              <a
+                href={`mailto:${config?.email || STORE_INFO.email}`}
+                className="about-contact-row"
+              >
+                <FiMail />
+                <div>
+                  <strong>Correo Electrónico</strong>
+                  <span>{config?.email || STORE_INFO.email}</span>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -1,12 +1,31 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiInstagram, FiMapPin, FiPhone, FiMail, FiClock, FiLock, FiTruck } from 'react-icons/fi'
+import { FiInstagram, FiMapPin, FiMail, FiClock, FiLock, FiTruck } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { STORE_INFO } from '../../data/seedProducts'
 import { getWhatsAppChannelUrl, generateGeneralInquiryLink } from '../../utils/whatsapp'
 import './Footer.css'
 
+const getStoredConfig = () => {
+  try {
+    const saved = localStorage.getItem('azkaban_store_config')
+    if (saved) return JSON.parse(saved)
+  } catch (e) {
+    console.warn(e)
+  }
+  return STORE_INFO
+}
+
 const Footer = () => {
-  const channelUrl = getWhatsAppChannelUrl()
+  const [config, setConfig] = useState(getStoredConfig)
+
+  useEffect(() => {
+    const handleConfig = () => setConfig(getStoredConfig())
+    window.addEventListener('azkaban_config_updated', handleConfig)
+    return () => window.removeEventListener('azkaban_config_updated', handleConfig)
+  }, [])
+
+  const channelUrl = config?.whatsappChannelUrl || getWhatsAppChannelUrl()
   const whatsappChatUrl = generateGeneralInquiryLink()
 
   const handleLogoClick = () => {
@@ -27,11 +46,11 @@ const Footer = () => {
               </div>
             </Link>
             <p className="footer__desc">
-              Tienda oficial de indumentaria deportiva y urbana. Buzos frizados, bermudas, remeras y conjuntos seleccionados. Retirá en nuestro local de San Martín o recibí tu compra en cualquier punto del país.
+              Tienda oficial de indumentaria deportiva y urbana. Buzos frizados, bermudas, remeras y conjuntos seleccionados. Retirá en nuestro punto de retiro en San Martín o recibí tu compra en cualquier punto del país.
             </p>
             <div className="footer__socials">
               <a
-                href={STORE_INFO.instagramUrl}
+                href={config?.instagramUrl || STORE_INFO.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="footer__social-btn"
@@ -49,7 +68,7 @@ const Footer = () => {
                 <FaWhatsapp size={18} />
               </a>
               <a
-                href={`mailto:${STORE_INFO.email}`}
+                href={`mailto:${config?.email || STORE_INFO.email}`}
                 className="footer__social-btn"
                 title="Email"
               >
@@ -78,7 +97,7 @@ const Footer = () => {
               <Link to="/" className="footer__link">Inicio</Link>
               <Link to="/catalogo" className="footer__link">Catálogo Completo</Link>
               <Link to="/nosotros" className="footer__link">Punto de Retiro & Envíos</Link>
-              <a href={STORE_INFO.treintaCatalogUrl} target="_blank" rel="noopener noreferrer" className="footer__link">
+              <a href={config?.treintaCatalogUrl || STORE_INFO.treintaCatalogUrl} target="_blank" rel="noopener noreferrer" className="footer__link">
                 Ver en Treinta.co
               </a>
               <a href={channelUrl} target="_blank" rel="noopener noreferrer" className="footer__link">
@@ -96,7 +115,7 @@ const Footer = () => {
             <div className="footer__contact">
               <span className="footer__contact-item">
                 <FiMapPin className="text-orange" />
-                <span>Dr. marcos zimmermann 3339 (Entre Av. JM Campos y Pasaje 86). San Martín, Prov. Buenos Aires.</span>
+                <span>{config?.address || STORE_INFO.address}</span>
               </span>
               <span className="footer__contact-item">
                 <FiTruck className="text-orange" />
@@ -104,7 +123,7 @@ const Footer = () => {
               </span>
               <span className="footer__contact-item">
                 <FiClock className="text-orange" />
-                <span>Lunes a Viernes de 10:00 a 20:00 hs</span>
+                <span>{config?.hours || STORE_INFO.hours}</span>
               </span>
               <a
                 href={whatsappChatUrl}
@@ -113,14 +132,14 @@ const Footer = () => {
                 className="footer__contact-item footer__contact-wa"
               >
                 <FaWhatsapp className="text-green" />
-                <span>WhatsApp: <strong>+54 9 11 3793-4198</strong></span>
+                <span>WhatsApp: <strong>{config?.phoneDisplay || STORE_INFO.phoneDisplay}</strong></span>
               </a>
               <a
-                href={`mailto:${STORE_INFO.email}`}
+                href={`mailto:${config?.email || STORE_INFO.email}`}
                 className="footer__contact-item"
               >
                 <FiMail />
-                <span>{STORE_INFO.email}</span>
+                <span>{config?.email || STORE_INFO.email}</span>
               </a>
             </div>
           </div>
