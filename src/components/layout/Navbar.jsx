@@ -1,100 +1,106 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { FiShoppingBag, FiSearch, FiMenu, FiX, FiLock, FiInstagram } from 'react-icons/fi'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { FiShoppingBag, FiSearch, FiMenu, FiX, FiLock, FiInstagram, FiUser } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { STORE_INFO, CATEGORIES } from '../../data/seedProducts'
 import { getWhatsAppChannelUrl } from '../../utils/whatsapp'
 import './Navbar.css'
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [scrolled, setScrolled] = useState(false)
-  const { totalItems, setIsOpen: setCartOpen } = useCart()
+  const { totalItems, setIsOpen: setIsCartOpen } = useCart()
+  const { isAdmin, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
-    setMobileMenuOpen(false)
-    setMobileSearchOpen(false)
-  }, [location.pathname])
+    setIsMobileOpen(false)
+    setIsMobileSearchOpen(false)
+  }, [location])
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/catalogo?search=${encodeURIComponent(searchQuery.trim())}`)
+    const trimmed = searchQuery.trim()
+    if (trimmed) {
+      navigate(`/catalogo?search=${encodeURIComponent(trimmed)}`)
       setSearchQuery('')
-      setMobileSearchOpen(false)
+      setIsMobileSearchOpen(false)
     }
+  }
+
+  const handleLogoClick = () => {
+    setIsMobileOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const channelUrl = getWhatsAppChannelUrl()
 
   return (
-    <header className={`navbar-header ${scrolled ? 'navbar-header--scrolled' : ''}`}>
-      <div className="container navbar-container">
-        {/* Left: Mobile Toggle & Brand */}
-        <div className="navbar-left">
-          <button
-            className="mobile-menu-trigger"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Menú principal"
-          >
-            {mobileMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-          </button>
-
-          <Link to="/" className="navbar-brand">
-            <img
-              src="/logo.jpg"
-              alt="AzkabanStore"
-              className="navbar-brand__logo"
-              onError={(e) => { e.target.style.display = 'none' }}
-            />
-            <div className="navbar-brand__text">
-              <span className="brand-title">AZKABAN<span className="brand-title-accent">STORE</span></span>
-              <span className="brand-subtitle">INDUMENTARIA</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Center: Search Bar (Desktop) */}
-        <form className="navbar-search-desktop" onSubmit={handleSearchSubmit}>
-          <FiSearch className="search-icon" />
-          <input
-            type="text"
-            placeholder="Buscar buzos, bermudas, marcas (BMW, Jordan, Nike)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </form>
-
-        {/* Right: Navigation Links & Actions */}
-        <div className="navbar-right">
-          <nav className="desktop-nav-links">
-            <Link to="/catalogo" className={`nav-item ${location.pathname === '/catalogo' ? 'active' : ''}`}>
-              Catálogo
-            </Link>
-            <Link to="/nosotros" className={`nav-item ${location.pathname === '/nosotros' ? 'active' : ''}`}>
-              Retiros & Envíos
-            </Link>
-          </nav>
-
-          <div className="navbar-actions">
-            {/* Mobile Search Toggle */}
+    <header className={`navbar ${isScrolled ? 'navbar--scrolled' : ''}`}>
+      <div className="container navbar__main-wrapper">
+        {/* Top Row: Search on Left, Centered Brand Logo, Admin + Cart on Right */}
+        <div className="navbar__top-row">
+          <div className="navbar__top-left">
             <button
-              className="action-icon-btn mobile-search-btn"
-              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-              aria-label="Buscar productos"
+              className="navbar__mobile-toggle"
+              onClick={() => setIsMobileOpen(!isMobileOpen)}
+              aria-label="Menú"
+            >
+              {isMobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+            </button>
+
+            <form className="navbar__search-form" onSubmit={handleSearchSubmit}>
+              <FiSearch className="navbar__search-icon" size={16} />
+              <input
+                type="text"
+                className="navbar__search-input"
+                placeholder="Buscar buzos, bermudas, marcas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="navbar__search-clear"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Limpiar"
+                >
+                  <FiX size={14} />
+                </button>
+              )}
+            </form>
+          </div>
+
+          <div className="navbar__top-center">
+            <Link to="/" className="navbar__brand-link" onClick={handleLogoClick}>
+              <div className="navbar__brand-lockup">
+                <img src="/logo.jpg" alt="Logo" className="navbar__brand-logo-img" />
+                <div className="navbar__brand-names">
+                  <span className="navbar__brand-main-text">AZKABAN<span className="text-orange">STORE</span></span>
+                  <span className="navbar__brand-sub-text">INDUMENTARIA DEPORTIVA</span>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          <div className="navbar__top-right">
+            {/* Mobile Search Button */}
+            <button
+              type="button"
+              className="navbar__icon-btn navbar__search-btn-mobile"
+              onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+              aria-label="Buscar"
             >
               <FiSearch size={20} />
             </button>
@@ -104,49 +110,84 @@ const Navbar = () => {
               href={STORE_INFO.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="action-icon-btn"
-              title="Instagram @azkabanstore.indumentaria"
+              className="navbar__icon-btn"
+              title="Instagram"
             >
               <FiInstagram size={19} />
             </a>
 
-            {/* Admin */}
+            {/* Admin Access Link */}
             <Link
               to="/admin"
-              className="action-icon-btn admin-btn"
-              title="Panel Administrador"
+              className={`navbar__icon-btn ${isAdmin ? 'navbar__icon-btn--active' : ''}`}
+              title="Panel de Administración"
             >
-              <FiLock size={18} />
+              <FiLock size={19} />
             </Link>
 
-            {/* Cart Button */}
+            {/* Cart Drawer Trigger Button */}
             <button
-              className="nav-cart-btn"
-              onClick={() => setCartOpen(true)}
-              aria-label="Abrir carrito de compras"
+              onClick={() => setIsCartOpen(true)}
+              className="navbar__cart-btn"
+              title="Ver Carrito"
             >
-              <FiShoppingBag size={18} />
-              <span className="cart-text">Carrito</span>
-              {totalItems > 0 && <span className="cart-count-badge">{totalItems}</span>}
+              <FiShoppingBag size={20} />
+              <span className="navbar__cart-label">Carrito</span>
+              {totalItems > 0 && <span className="navbar__cart-badge">{totalItems}</span>}
             </button>
           </div>
         </div>
+
+        {/* Bottom Row: Desktop Navigation Menu */}
+        <div className="navbar__bottom-row">
+          <nav className="navbar__nav-list">
+            <NavLink to="/" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+              Inicio
+            </NavLink>
+            <NavLink to="/catalogo" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+              Catálogo Completo
+            </NavLink>
+            <NavLink to="/catalogo?category=buzos" className="navbar__nav-item">
+              Buzos
+            </NavLink>
+            <NavLink to="/catalogo?category=bermudas" className="navbar__nav-item">
+              Bermudas
+            </NavLink>
+            <NavLink to="/catalogo?category=remeras" className="navbar__nav-item">
+              Remeras
+            </NavLink>
+            <NavLink to="/catalogo?category=camisetas-futbol" className="navbar__nav-item">
+              Camisetas
+            </NavLink>
+            <NavLink to="/nosotros" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+              Punto de Retiro & Envíos
+            </NavLink>
+            <a
+              href={channelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="navbar__nav-item navbar__nav-item--wa"
+            >
+              <FaWhatsapp /> Canal WhatsApp
+            </a>
+          </nav>
+        </div>
       </div>
 
-      {/* Mobile Search Bar Dropdown */}
-      {mobileSearchOpen && (
-        <div className="mobile-search-bar">
+      {/* Mobile Search Dropdown */}
+      {isMobileSearchOpen && (
+        <div className="navbar__mobile-search-dropdown">
           <form className="container" onSubmit={handleSearchSubmit}>
-            <div className="mobile-search-input-wrap">
-              <FiSearch className="search-icon" />
+            <div className="mobile-search-wrap">
+              <FiSearch size={16} className="mobile-search-icon" />
               <input
                 type="text"
                 autoFocus
-                placeholder="Buscar prenda o marca..."
+                placeholder="Buscar buzos, bermudas, marcas..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="button" className="close-search-btn" onClick={() => setMobileSearchOpen(false)}>
+              <button type="button" onClick={() => setIsMobileSearchOpen(false)}>
                 <FiX size={18} />
               </button>
             </div>
@@ -154,55 +195,43 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="mobile-drawer-overlay" onClick={() => setMobileMenuOpen(false)}>
-          <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
-            <div className="mobile-drawer-header">
+      {/* Mobile Drawer */}
+      {isMobileOpen && (
+        <div className="navbar__drawer-overlay" onClick={() => setIsMobileOpen(false)}>
+          <div className="navbar__drawer-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-top">
               <div className="drawer-brand">
                 <img src="/logo.jpg" alt="Logo" className="drawer-logo" />
-                <span>AZKABAN<strong>STORE</strong></span>
+                <span>AZKABAN<strong className="text-orange">STORE</strong></span>
               </div>
-              <button onClick={() => setMobileMenuOpen(false)} aria-label="Cerrar">
-                <FiX size={22} />
+              <button onClick={() => setIsMobileOpen(false)}>
+                <FiX size={20} />
               </button>
             </div>
 
-            <div className="mobile-drawer-body">
-              <div className="drawer-section">
-                <span className="drawer-section-title">SECCIONES</span>
-                <Link to="/" className="drawer-link">Inicio</Link>
-                <Link to="/catalogo" className="drawer-link drawer-link--highlight">Ver Todo el Catálogo</Link>
-                <Link to="/nosotros" className="drawer-link">Punto de Retiro & Envíos</Link>
-              </div>
+            <div className="drawer-links-scroll">
+              <span className="drawer-section-heading">NAVEGACIÓN</span>
+              <Link to="/" className="drawer-link">Inicio</Link>
+              <Link to="/catalogo" className="drawer-link drawer-link--primary">Catálogo Completo</Link>
+              <Link to="/nosotros" className="drawer-link">Punto de Retiro & Envíos</Link>
 
-              <div className="drawer-section">
-                <span className="drawer-section-title">CATEGORÍAS</span>
-                <div className="drawer-categories">
-                  {CATEGORIES.filter(c => c.id !== 'todos').slice(0, 8).map(c => (
-                    <Link
-                      key={c.id}
-                      to={`/catalogo?category=${c.id}`}
-                      className="drawer-cat-item"
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className="drawer-section">
-                <span className="drawer-section-title">CONTACTO DIRECTO</span>
-                <a href={channelUrl} target="_blank" rel="noopener noreferrer" className="drawer-social-link wa">
-                  <FaWhatsapp /> Canal Oficial de WhatsApp
-                </a>
-                <a href={STORE_INFO.instagramUrl} target="_blank" rel="noopener noreferrer" className="drawer-social-link ig">
-                  <FiInstagram /> @azkabanstore.indumentaria
-                </a>
-                <Link to="/admin" className="drawer-link admin">
-                  <FiLock /> Acceso Administrador
+              <span className="drawer-section-heading">CATEGORÍAS</span>
+              {CATEGORIES.filter(c => c.id !== 'todos').map((c) => (
+                <Link key={c.id} to={`/catalogo?category=${c.id}`} className="drawer-sublink">
+                  {c.name}
                 </Link>
-              </div>
+              ))}
+
+              <span className="drawer-section-heading">CONTACTO DIRECTO</span>
+              <a href={channelUrl} target="_blank" rel="noopener noreferrer" className="drawer-link drawer-link--wa">
+                <FaWhatsapp /> Canal de WhatsApp
+              </a>
+              <a href={STORE_INFO.instagramUrl} target="_blank" rel="noopener noreferrer" className="drawer-link">
+                <FiInstagram /> @azkabanstore.indumentaria
+              </a>
+              <Link to="/admin" className="drawer-link drawer-link--admin">
+                <FiLock /> Panel de Administración
+              </Link>
             </div>
           </div>
         </div>

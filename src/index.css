@@ -1,59 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap');
+/* ============================================
+   AZKABANSTORE - Clean & Modern Streetwear E-Commerce
+   High Energy, Crisp Clean Aesthetics & High Conversion
+   Inspired by Top Argentine E-Commerce Standards
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800;900&display=swap');
 
 :root {
-  /* Brand Orange & Streetwear Aesthetics */
+  /* Clean Modern Palette */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #ffffff;
+  --color-bg-input: #f1f3f5;
+  --color-border: #e9ecef;
+  --color-border-hover: #ced4da;
+
+  /* Brand Accents - Vibrant Athletic Orange */
   --color-primary: #ff5500;
   --color-primary-hover: #e04b00;
   --color-primary-soft: #fff4ed;
-  --color-primary-border: #fed7aa;
-
-  /* Surfaces & Clean Backgrounds */
-  --color-bg-body: #f8f9fa;
-  --color-bg-surface: #ffffff;
-  --color-bg-card: #ffffff;
-  --color-bg-card-hover: #ffffff;
-  --color-bg-input: #f3f4f6;
-  --color-border: #e5e7eb;
-  --color-border-hover: #d1d5db;
-
-  /* Typography Colors */
-  --color-text-primary: #111827;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #9ca3af;
-
-  /* Accents & Status */
-  --color-dark: #0f172a;
-  --color-dark-surface: #1e293b;
-  --color-whatsapp: #25d366;
-  --color-whatsapp-dark: #128c7e;
-  --color-success: #16a34a;
-  --color-danger: #dc2626;
+  --color-primary-border: #ffedd5;
+  --color-accent: #111111;
+  --color-accent-hover: #212529;
+  --color-green: #25d366;
+  --color-green-dark: #128c7e;
 
   /* Typography */
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-text-muted: #888888;
+
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  /* Fonts */
   --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Layout & Sizes */
-  --container-max: 1240px;
-  --announcement-h: 36px;
-  --navbar-h: 70px;
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Radii */
   --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Professional Shadows (Subtle & Crisp, No AI Glow) */
-  --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.09);
-  --shadow-dropdown: 0 12px 32px rgba(0, 0, 0, 0.12);
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+  /* Layout */
+  --container-max: 1320px;
+  --announcement-height: 38px;
+  --navbar-height: 104px;
+  --total-header-height: calc(var(--announcement-height) + var(--navbar-height));
 
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-normal: 200ms ease;
+  --transition-normal: 250ms ease;
 }
 
+@media (max-width: 900px) {
+  :root {
+    --announcement-height: 34px;
+    --navbar-height: 64px;
+    --total-header-height: calc(var(--announcement-height) + var(--navbar-height));
+  }
+}
+
+/* Base Reset */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -65,15 +92,17 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-bg-body);
+  background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   line-height: 1.5;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 a {
@@ -93,40 +122,40 @@ input, textarea, select {
   color: inherit;
 }
 
-/* Container */
 .container {
   width: 100%;
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--spacing-md);
 }
 
 @media (min-width: 768px) {
   .container {
-    padding: 0 24px;
+    padding: 0 var(--spacing-lg);
   }
 }
 
-/* Clean Headings & Badges */
-.section-header {
+/* Headings */
+.section-title-wrap {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: var(--spacing-xl);
 }
 
-.section-badge {
+.section-tag {
   display: inline-block;
-  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
   font-weight: 800;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
   color: var(--color-primary);
   background: var(--color-primary-soft);
-  padding: 4px 10px;
-  border-radius: var(--radius-xs);
-  margin-bottom: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--spacing-xs);
 }
 
-.section-title {
+.section-heading {
   font-family: var(--font-heading);
   font-size: 1.85rem;
   font-weight: 800;
@@ -136,24 +165,20 @@ input, textarea, select {
 }
 
 @media (min-width: 768px) {
-  .section-title {
-    font-size: 2.3rem;
+  .section-heading {
+    font-size: 2.2rem;
   }
 }
 
-.section-title .text-orange {
-  color: var(--color-primary);
-}
-
-.section-subtitle {
-  color: var(--color-text-secondary);
+.section-subheading {
   font-size: 0.95rem;
+  color: var(--color-text-secondary);
   max-width: 580px;
   margin: 8px auto 0;
   line-height: 1.5;
 }
 
-/* Buttons */
+/* Common Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -163,7 +188,7 @@ input, textarea, select {
   color: #ffffff;
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 12px 22px;
+  padding: 12px 24px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
@@ -183,14 +208,14 @@ input, textarea, select {
   border: 1.5px solid var(--color-border);
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 11px 20px;
+  padding: 11px 22px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
 
 .btn-secondary:hover {
-  background: #f3f4f6;
-  border-color: #cbd5e1;
+  background: #f8f9fa;
+  border-color: #ced4da;
 }
 
 .btn-whatsapp {
@@ -198,11 +223,11 @@ input, textarea, select {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: var(--color-whatsapp);
+  background: var(--color-green);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 12px 22px;
+  padding: 12px 24px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
 }
@@ -214,20 +239,4 @@ input, textarea, select {
 
 .text-orange {
   color: var(--color-primary);
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
 }
