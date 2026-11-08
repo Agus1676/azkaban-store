@@ -85,7 +85,7 @@ const Navbar = () => {
           <div className="navbar__top-center">
             <Link to="/" className="navbar__brand-link" onClick={handleLogoClick}>
               <div className="navbar__brand-lockup">
-                <img src="/logo.jpg" alt="Logo" className="navbar__brand-logo-img" />
+                <img src="/logo.png" alt="AzkabanStore" className="navbar__brand-logo-img" />
                 <div className="navbar__brand-names">
                   <span className="navbar__brand-main-text">AZKABAN<span className="text-orange">STORE</span></span>
                   <span className="navbar__brand-sub-text">INDUMENTARIA DEPORTIVA</span>

@@ -39,7 +39,7 @@ const Footer = () => {
           {/* Col 1: Brand Lockup & Bio */}
           <div className="footer__brand">
             <Link to="/" onClick={handleLogoClick} className="footer__brand-lockup">
-              <img src="/logo.jpg" alt="AzkabanStore" className="footer__logo-img" />
+              <img src="/logo.png" alt="AzkabanStore" className="footer__logo-img" />
               <div className="footer__brand-texts">
                 <span className="footer__brand-badge">AZKABAN<span className="text-orange">STORE</span></span>
                 <span className="footer__brand-sub">INDUMENTARIA DEPORTIVA Y URBANA</span>

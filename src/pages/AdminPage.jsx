@@ -369,7 +369,7 @@ const AdminPage = () => {
         <div className="admin-topbar">
           <div className="admin-topbar__title">
             <div className="admin-logo-circle">
-              <img src="/logo.jpg" alt="AzkabanStore" />
+              <img src="/logo.png" alt="AzkabanStore" />
             </div>
             <div>
               <h2>Panel de Administración</h2>

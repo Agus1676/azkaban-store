@@ -34,7 +34,7 @@ const AdminOrderInvoiceModal = ({ isOpen, onClose, order, storeConfig }) => {
           {/* Header */}
           <div className="invoice-header">
             <div className="invoice-brand">
-              <img src="/logo.jpg" alt="AzkabanStore" className="invoice-logo" />
+              <img src="/logo.png" alt="AzkabanStore" className="invoice-logo" />
               <div>
                 <h2 className="invoice-title">AZKABANSTORE</h2>
                 <span className="invoice-subtitle">INDUMENTARIA DEPORTIVA Y URBANA</span>
