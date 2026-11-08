@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { FiTrendingUp, FiX, FiCheck, FiInfo } from 'react-icons/fi'
+import {
+  FiTrendingUp,
+  FiX,
+  FiCheck,
+  FiInfo,
+  FiLayers,
+  FiPercent,
+  FiDollarSign,
+  FiArrowRight,
+} from 'react-icons/fi'
 import { CATEGORIES } from '../../data/seedProducts'
 import { formatPrice } from '../../utils/formatPrice'
 import toast from 'react-hot-toast'
@@ -13,21 +22,28 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
 
   if (!isOpen) return null
 
-  // Calculate target items count
-  const targetProducts = targetCategory === 'all'
-    ? products
-    : products.filter((p) => p.category === targetCategory)
+  // Target count
+  const targetProducts =
+    targetCategory === 'all'
+      ? products
+      : products.filter((p) => p.category === targetCategory)
 
-  // Simulation on a standard item of $35.000
+  // Simulation on a standard $35.000 item
   const sampleOriginal = 35000
   const numAmount = Number(amount) || 0
   let sampleNew = sampleOriginal
 
   if (adjustmentType === 'percent') {
-    const factor = direction === 'increase' ? 1 + numAmount / 100 : Math.max(0, 1 - numAmount / 100)
+    const factor =
+      direction === 'increase'
+        ? 1 + numAmount / 100
+        : Math.max(0, 1 - numAmount / 100)
     sampleNew = sampleOriginal * factor
   } else {
-    sampleNew = direction === 'increase' ? sampleOriginal + numAmount : Math.max(0, sampleOriginal - numAmount)
+    sampleNew =
+      direction === 'increase'
+        ? sampleOriginal + numAmount
+        : Math.max(0, sampleOriginal - numAmount)
   }
 
   if (roundHundreds) {
@@ -64,10 +80,16 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="admin-bulk-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
         <div className="admin-modal-header">
           <div className="admin-modal-header__title">
-            <FiTrendingUp className="text-orange" size={20} />
-            <h3>Ajuste Masivo de Precios</h3>
+            <div className="modal-header-icon-pill">
+              <FiTrendingUp size={20} />
+            </div>
+            <div>
+              <h3>Ajuste Masivo de Precios</h3>
+              <span className="modal-header-sub">Actualización global de catálogo</span>
+            </div>
           </div>
           <button className="modal-close-btn" onClick={onClose} aria-label="Cerrar">
             <FiX size={18} />
@@ -76,26 +98,30 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
 
         <form onSubmit={handleApply} className="admin-bulk-form">
           <p className="admin-bulk-desc">
-            Aumentá o actualizá los precios de todo el catálogo o de una categoría específica en segundos.
+            Aumentá o actualizá los precios de todo el catálogo o de una categoría específica en segundos. Los cambios se sincronizan en vivo en la tienda.
           </p>
 
           {/* 1. Categoría Objetivo */}
           <div className="form-group">
-            <label>Aplicar a:</label>
-            <select
-              value={targetCategory}
-              onChange={(e) => setTargetCategory(e.target.value)}
-            >
-              <option value="all">Todas las prendas ({products.length} productos)</option>
-              {CATEGORIES.filter((c) => c.id !== 'todos').map((c) => {
-                const count = products.filter((p) => p.category === c.id).length
-                return (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({count} productos)
-                  </option>
-                )
-              })}
-            </select>
+            <label htmlFor="bulk-target-cat">Aplicar cambios a:</label>
+            <div className="select-input-container">
+              <FiLayers className="input-field-icon" />
+              <select
+                id="bulk-target-cat"
+                value={targetCategory}
+                onChange={(e) => setTargetCategory(e.target.value)}
+              >
+                <option value="all">Todas las prendas ({products.length} productos)</option>
+                {CATEGORIES.filter((c) => c.id !== 'todos').map((c) => {
+                  const count = products.filter((p) => p.category === c.id).length
+                  return (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({count} productos)
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
           </div>
 
           {/* 2. Dirección: Aumento o Descuento */}
@@ -122,8 +148,9 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
           {/* 3. Tipo y Valor */}
           <div className="form-grid-2">
             <div className="form-group">
-              <label>Modo de Cálculo:</label>
+              <label htmlFor="bulk-mode">Modo de Cálculo:</label>
               <select
+                id="bulk-mode"
                 value={adjustmentType}
                 onChange={(e) => setAdjustmentType(e.target.value)}
               >
@@ -133,18 +160,24 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
             </div>
 
             <div className="form-group">
-              <label>
+              <label htmlFor="bulk-amount">
                 {adjustmentType === 'percent' ? 'Porcentaje a aplicar (%)' : 'Monto en pesos ($ ARS)'}
               </label>
-              <input
-                type="number"
-                min="0.1"
-                step="any"
-                required
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder={adjustmentType === 'percent' ? 'Ej: 10' : 'Ej: 2000'}
-              />
+              <div className="input-with-badge">
+                <input
+                  id="bulk-amount"
+                  type="number"
+                  min="0.1"
+                  step="any"
+                  required
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder={adjustmentType === 'percent' ? 'Ej: 10' : 'Ej: 2000'}
+                />
+                <span className="input-suffix-tag">
+                  {adjustmentType === 'percent' ? '%' : '$'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -156,27 +189,34 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
                 checked={roundHundreds}
                 onChange={(e) => setRoundHundreds(e.target.checked)}
               />
-              <span>Redondear precios finales a centenas (ej: $38.480 ➔ $38.500)</span>
+              <span>
+                Redondear precios finales a centenas (ej: <code>$38.480</code> ➔ <code>$38.500</code>)
+              </span>
             </label>
           </div>
 
-          {/* Preview Card */}
+          {/* Simulation Preview Card */}
           <div className="bulk-preview-box">
             <div className="bulk-preview-header">
-              <FiInfo className="text-orange" />
-              <span>Simulación de Ejemplo:</span>
+              <FiInfo className="text-orange" size={16} />
+              <span>Simulación de Ejemplo en Vivo</span>
             </div>
             <div className="bulk-preview-values">
-              <div>
-                <span className="text-xs text-muted">Precio actual:</span>
-                <strong>{formatPrice(sampleOriginal)}</strong>
+              <div className="preview-val-col">
+                <span className="preview-label">Precio Actual:</span>
+                <span className="preview-price-old">{formatPrice(sampleOriginal)}</span>
               </div>
-              <span className="preview-arrow">➔</span>
-              <div>
-                <span className="text-xs text-muted">Nuevo precio:</span>
-                <strong className="text-orange">{formatPrice(sampleNew)}</strong>
+
+              <div className="preview-arrow-box">
+                <FiArrowRight size={18} />
               </div>
-              <div className="preview-diff">
+
+              <div className="preview-val-col">
+                <span className="preview-label">Nuevo Precio:</span>
+                <span className="preview-price-new">{formatPrice(sampleNew)}</span>
+              </div>
+
+              <div className="preview-diff-box">
                 <span className={direction === 'increase' ? 'diff-tag-pos' : 'diff-tag-neg'}>
                   {direction === 'increase' ? '+' : '-'}
                   {adjustmentType === 'percent' ? `${amount}%` : formatPrice(numAmount)}
@@ -185,7 +225,7 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
             </div>
           </div>
 
-          {/* Action buttons */}
+          {/* Modal Actions */}
           <div className="admin-modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancelar
