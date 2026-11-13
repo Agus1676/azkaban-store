@@ -485,6 +485,7 @@ const AdminPage = () => {
         {activeTab === 'products' && (
           <AdminProductsTab
             products={products}
+            categories={categories}
             onOpenNewProduct={handleOpenNewProduct}
             onOpenEditProduct={handleOpenEditProduct}
             onDuplicateProduct={handleDuplicateProduct}
@@ -548,6 +549,7 @@ const AdminPage = () => {
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
         product={editingProduct}
+        categories={categories}
         onSave={handleSaveProduct}
       />
 
@@ -555,6 +557,7 @@ const AdminPage = () => {
         isOpen={isBulkPriceModalOpen}
         onClose={() => setIsBulkPriceModalOpen(false)}
         products={products}
+        categories={categories}
         onApplyBulkUpdate={handleApplyBulkUpdate}
       />
 

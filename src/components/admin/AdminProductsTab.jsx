@@ -18,6 +18,7 @@ import { formatPrice } from '../../utils/formatPrice'
 
 const AdminProductsTab = ({
   products,
+  categories = [],
   onOpenNewProduct,
   onOpenEditProduct,
   onDuplicateProduct,
@@ -33,6 +34,17 @@ const AdminProductsTab = ({
   const [selectedStockFilter, setSelectedStockFilter] = useState('all') // 'all' | 'in_stock' | 'out_of_stock'
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('all') // 'all' | 'active' | 'inactive'
   const [sortBy, setSortBy] = useState('newest') // 'newest' | 'price_asc' | 'price_desc' | 'stock_asc' | 'stock_desc' | 'name'
+
+  // Dynamic categories with 'todos'
+  const categoryOptions = useMemo(() => {
+    if (categories && categories.length > 0) {
+      const hasTodos = categories.some((c) => c.id === 'todos')
+      return hasTodos
+        ? categories
+        : [{ id: 'todos', name: 'Todas las categorías' }, ...categories]
+    }
+    return CATEGORIES
+  }, [categories])
 
   // Filtered and sorted products
   const filteredProducts = useMemo(() => {
@@ -136,7 +148,7 @@ const AdminProductsTab = ({
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {CATEGORIES.map((c) => (
+            {categoryOptions.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>

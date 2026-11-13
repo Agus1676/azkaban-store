@@ -252,14 +252,6 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Acceso rápido a Buzos (prenda estrella) */}
-            <Link
-              to="/catalogo?category=buzos"
-              className={`navbar__nav-item ${isCatalog && currentCategory === 'buzos' ? 'active' : ''}`}
-            >
-              Buzos
-            </Link>
-
             <Link
               to="/nosotros"
               className={`navbar__nav-item ${location.pathname === '/nosotros' ? 'active' : ''}`}

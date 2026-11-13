@@ -23,7 +23,11 @@ const SAMPLE_IMAGE_PRESETS = [
   { label: 'Hoodie Negro', url: 'https://cdn.treinta.co/web-app/inventory/d10954fe-e7d4-5aa5-986b-d1211ef07d28/6c5fcc88-8047-5596-9bc2-270de9b2a0e8.jpeg' },
 ]
 
-const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
+const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }) => {
+  const availableCategories = (categories && categories.length > 0 ? categories : CATEGORIES).filter(
+    (c) => c.id !== 'todos' && c.active !== false
+  )
+
   const [form, setForm] = useState({
     name: '',
     category: 'buzos',
@@ -86,7 +90,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
   // Category change handler
   const handleCategoryChange = (e) => {
     const slug = e.target.value
-    const found = CATEGORIES.find((c) => c.id === slug)
+    const found = availableCategories.find((c) => c.id === slug)
     setForm({
       ...form,
       category: slug,
@@ -168,7 +172,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <div className="form-group">
                   <label>Categoría *</label>
                   <select value={form.category} onChange={handleCategoryChange}>
-                    {CATEGORIES.filter((c) => c.id !== 'todos').map((c) => (
+                    {availableCategories.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
                       </option>

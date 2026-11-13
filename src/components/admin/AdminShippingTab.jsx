@@ -261,7 +261,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
             {/* 4. Conexión de API Corporativa Andreani (Opcional) */}
             <div className="settings-card-section">
               <div className="settings-card-section__header">
-                <div className="settings-icon-pill" style={{ background: '#f1f5f9', color: '#475569' }}>
+                <div className="settings-icon-pill" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
                   <FiKey size={18} />
                 </div>
                 <div>
@@ -363,9 +363,9 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
 
         {/* Right Column: Live Postal Code Simulator */}
         <div className="settings-side-box">
-          <div className="settings-side-card" style={{ background: '#ffffff' }}>
+          <div className="settings-side-card">
             <div className="settings-card-section__header">
-              <div className="settings-icon-pill" style={{ background: '#111116', color: '#ff5500' }}>
+              <div className="settings-icon-pill">
                 <FiPlay size={18} />
               </div>
               <div>
@@ -406,36 +406,37 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
               </button>
 
               {simulationResult && (
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', marginTop: '6px' }}>
+                <div style={{ background: '#181924', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '14px', marginTop: '6px' }}>
                   {simulationResult.zoneInfo ? (
                     <>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
                         <span>📍 {simulationResult.zoneInfo.location}</span>
                         <span style={{ color: '#ff5500' }}>{simulationResult.zoneInfo.zone}</span>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {simulationResult.quotes.map((q) => (
                           <div
                             key={q.id}
                             style={{
                               display: 'flex',
                               justifyContent: 'space-between',
-                              fontSize: '0.78rem',
-                              padding: '6px 8px',
-                              background: '#ffffff',
-                              border: '1px solid #e2e8f0',
-                              borderRadius: '4px',
+                              fontSize: '0.8rem',
+                              padding: '8px 10px',
+                              background: '#12131b',
+                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              borderRadius: '6px',
+                              color: '#cbd5e1',
                             }}
                           >
                             <span>{q.icon} {q.name}</span>
-                            <strong style={{ color: q.price === 0 ? '#16a34a' : '#0f172a' }}>
-                              {q.price === 0 ? 'GRATIS' : formatPrice(q.price)}
+                            <strong style={{ color: q.price === 0 ? '#4ade80' : '#ffffff' }}>
+                              {q.price === 0 ? '¡GRATIS!' : formatPrice(q.price)}
                             </strong>
                           </div>
                         ))}
                       </div>
                       {simulationResult.isFreeEligible && (
-                        <div style={{ marginTop: '8px', fontSize: '0.75rem', color: '#16a34a', fontWeight: 700, textAlign: 'center' }}>
+                        <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#4ade80', fontWeight: 700, textAlign: 'center', background: 'rgba(74, 222, 128, 0.1)', padding: '6px', borderRadius: '6px' }}>
                           🎉 ¡Aplica Envío Andreani Gratis!
                         </div>
                       )}

@@ -13,12 +13,16 @@ import { CATEGORIES } from '../../data/seedProducts'
 import { formatPrice } from '../../utils/formatPrice'
 import toast from 'react-hot-toast'
 
-const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) => {
+const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate, categories = [] }) => {
   const [targetCategory, setTargetCategory] = useState('all')
   const [direction, setDirection] = useState('increase') // 'increase' | 'decrease'
   const [adjustmentType, setAdjustmentType] = useState('percent') // 'percent' | 'fixed'
   const [amount, setAmount] = useState('10')
   const [roundHundreds, setRoundHundreds] = useState(true)
+
+  const availableCategories = (categories && categories.length > 0 ? categories : CATEGORIES).filter(
+    (c) => c.id !== 'todos'
+  )
 
   if (!isOpen) return null
 
@@ -112,7 +116,7 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate }) =
                 onChange={(e) => setTargetCategory(e.target.value)}
               >
                 <option value="all">Todas las prendas ({products.length} productos)</option>
-                {CATEGORIES.filter((c) => c.id !== 'todos').map((c) => {
+                {availableCategories.map((c) => {
                   const count = products.filter((p) => p.category === c.id).length
                   return (
                     <option key={c.id} value={c.id}>
