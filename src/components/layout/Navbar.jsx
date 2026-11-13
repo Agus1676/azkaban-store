@@ -9,6 +9,8 @@ import {
   FiInstagram,
   FiUser,
   FiChevronDown,
+  FiChevronRight,
+  FiArrowRight,
 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
@@ -215,6 +217,11 @@ const Navbar = () => {
 
               {categoriesDropdownOpen && (
                 <div className="navbar__categories-dropdown">
+                  <div className="dropdown-header-bar">
+                    <span className="dropdown-header-tag">AZKABAN SELECTION</span>
+                    <span className="dropdown-header-title">COLECCIONES</span>
+                  </div>
+
                   <div className="dropdown-grid">
                     {categories
                       .filter((c) => c.id !== 'todos' && c.active !== false)
@@ -225,18 +232,20 @@ const Navbar = () => {
                           className={`dropdown-cat-item ${currentCategory === cat.id ? 'active' : ''}`}
                           onClick={() => setCategoriesDropdownOpen(false)}
                         >
-                          <span className="cat-emoji">{cat.emoji || '👕'}</span>
                           <span className="cat-name">{cat.name}</span>
+                          <FiChevronRight size={12} className="cat-arrow" />
                         </Link>
                       ))}
                   </div>
+
                   <div className="dropdown-footer">
                     <Link
                       to="/catalogo"
                       className="dropdown-all-link"
                       onClick={() => setCategoriesDropdownOpen(false)}
                     >
-                      Explorar todo el catálogo →
+                      <span>Ver todo el catálogo</span>
+                      <FiArrowRight size={13} />
                     </Link>
                   </div>
                 </div>
@@ -318,8 +327,8 @@ const Navbar = () => {
                   key={c.id}
                   to={`/catalogo?category=${c.id}`}
                   className={`drawer-sublink ${isCatalog && currentCategory === c.id ? 'active' : ''}`}
+                  onClick={() => setIsMobileOpen(false)}
                 >
-                  <span style={{ marginRight: '6px' }}>{c.emoji || '👕'}</span>
                   <span>{c.name}</span>
                 </Link>
               ))}

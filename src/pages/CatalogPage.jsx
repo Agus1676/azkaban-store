@@ -160,7 +160,6 @@ const CatalogPage = () => {
               className={`cat-tab ${selectedCategory === cat.id ? 'active' : ''}`}
               onClick={() => handleCategoryChange(cat.id)}
             >
-              {cat.emoji ? <span style={{ marginRight: '6px' }}>{cat.emoji}</span> : null}
               {cat.name}
             </button>
           ))}
