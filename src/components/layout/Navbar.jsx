@@ -214,6 +214,7 @@ const Navbar = () => {
               <Link to="/" className="drawer-link">Inicio</Link>
               <Link to="/catalogo" className="drawer-link drawer-link--primary">Catálogo Completo</Link>
               <Link to="/nosotros" className="drawer-link">Punto de Retiro & Envíos</Link>
+              <Link to="/cambios-y-devoluciones" className="drawer-link">Cambios & Devoluciones</Link>
 
               <span className="drawer-section-heading">CATEGORÍAS</span>
               {CATEGORIES.filter(c => c.id !== 'todos').map((c) => (

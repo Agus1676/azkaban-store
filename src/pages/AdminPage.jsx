@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi'
 import { useAuth } from '../contexts/AuthContext'
 import { SEED_PRODUCTS, STORE_INFO } from '../data/seedProducts'
+import { DEFAULT_RETURN_POLICY_TEXT } from '../data/policies'
 import toast from 'react-hot-toast'
 
 // Modular Admin Components
@@ -66,6 +67,7 @@ const getStoredConfig = () => {
     bankName: 'Mercado Pago / Banco',
     bankAlias: 'AZKABAN.STORE',
     bankCbu: '0000003100012345678901',
+    returnPolicy: DEFAULT_RETURN_POLICY_TEXT,
   }
 }
 
@@ -318,7 +320,7 @@ const AdminPage = () => {
   const handleRestoreTreinta = () => {
     if (
       window.confirm(
-        '¿Deseás restaurar las 12 prendas originales de Treinta? Se sobreescribirán los cambios de productos.'
+        '¿Deseás restaurar las 12 prendas iniciales de Treinta? Se sobreescribirán los cambios de productos.'
       )
     ) {
       setProducts(SEED_PRODUCTS)

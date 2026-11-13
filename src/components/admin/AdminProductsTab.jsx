@@ -11,6 +11,7 @@ import {
   FiEyeOff,
   FiStar,
   FiFilter,
+  FiVideo,
 } from 'react-icons/fi'
 import { CATEGORIES } from '../../data/seedProducts'
 import { formatPrice } from '../../utils/formatPrice'
@@ -248,6 +249,21 @@ const AdminProductsTab = ({
                           </span>
                           {prod.badge && (
                             <span className="table-badge">{prod.badge}</span>
+                          )}
+                          {prod.videoUrl && (
+                            <span
+                              className="table-badge"
+                              style={{
+                                background: 'rgba(255, 85, 0, 0.15)',
+                                color: '#ff5500',
+                                borderColor: 'rgba(255, 85, 0, 0.3)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                              }}
+                              title="Prenda con video interactivo"
+                            >
+                              <FiVideo size={11} style={{ marginRight: 4 }} /> Video
+                            </span>
                           )}
                         </div>
                       </div>

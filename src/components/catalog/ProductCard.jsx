@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { FiShoppingBag, FiCheck } from 'react-icons/fi'
+import { FiShoppingBag, FiCheck, FiPlay } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
 import { generateProductInquiryLink } from '../../utils/whatsapp'
+import { parseVideoUrl } from '../../utils/video'
 import './ProductCard.css'
 
 const ProductCard = ({ product, onOpenDetail }) => {
@@ -28,6 +29,7 @@ const ProductCard = ({ product, onOpenDetail }) => {
 
   const price = product.priceOffer || product.price || 0
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
+  const hasVideo = !!parseVideoUrl(product.videoUrl)
 
   return (
     <article className="product-card" onClick={() => onOpenDetail(product)}>
@@ -45,6 +47,12 @@ const ProductCard = ({ product, onOpenDetail }) => {
 
         {product.badge && (
           <span className="product-card__badge">{product.badge}</span>
+        )}
+
+        {hasVideo && (
+          <span className="product-card__video-pill" title="Esta prenda tiene video">
+            <FiPlay size={11} /> Video
+          </span>
         )}
 
         {isOutOfStock && (

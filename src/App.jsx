@@ -11,6 +11,7 @@ import './App.css'
 
 const CatalogPage = lazy(() => import('./pages/CatalogPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
+const ReturnPolicyPage = lazy(() => import('./pages/ReturnPolicyPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
@@ -54,6 +55,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/catalogo" element={<CatalogPage />} />
             <Route path="/nosotros" element={<AboutPage />} />
+            <Route path="/cambios-y-devoluciones" element={<ReturnPolicyPage />} />
             <Route path="/admin/*" element={<AdminPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

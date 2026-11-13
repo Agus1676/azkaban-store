@@ -54,6 +54,24 @@
   z-index: 2;
 }
 
+.product-card__video-pill {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+
 .product-card__stock-out {
   position: absolute;
   inset: 0;

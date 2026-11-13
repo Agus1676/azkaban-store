@@ -97,6 +97,7 @@ const Footer = () => {
               <Link to="/" className="footer__link">Inicio</Link>
               <Link to="/catalogo" className="footer__link">Catálogo Completo</Link>
               <Link to="/nosotros" className="footer__link">Punto de Retiro & Envíos</Link>
+              <Link to="/cambios-y-devoluciones" className="footer__link">Cambios & Devoluciones</Link>
               <a href={config?.treintaCatalogUrl || STORE_INFO.treintaCatalogUrl} target="_blank" rel="noopener noreferrer" className="footer__link">
                 Ver en Treinta.co
               </a>

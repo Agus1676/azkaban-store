@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { FiX, FiCheck, FiImage, FiTag, FiEye } from 'react-icons/fi'
+import { FiX, FiCheck, FiImage, FiTag, FiEye, FiVideo, FiPlayCircle } from 'react-icons/fi'
 import { CATEGORIES } from '../../data/seedProducts'
 import { formatPrice } from '../../utils/formatPrice'
+import { parseVideoUrl } from '../../utils/video'
 
 const PRESET_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ÚNICO']
 const PRESET_BADGES = [
@@ -36,6 +37,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
     description: '',
     sizes: ['S', 'M', 'L', 'XL'],
     imageUrl: '',
+    videoUrl: '',
     brand: 'Azkaban',
   })
 
@@ -56,6 +58,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
         description: product.description || '',
         sizes: Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ['ÚNICO'],
         imageUrl: product.imageUrl || '',
+        videoUrl: product.videoUrl || '',
         brand: product.brand || 'Azkaban',
       })
     } else {
@@ -72,6 +75,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
         description: '',
         sizes: ['S', 'M', 'L', 'XL'],
         imageUrl: '',
+        videoUrl: '',
         brand: 'Azkaban',
       })
     }
@@ -118,6 +122,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
       price: Number(form.price) || 0,
       priceOffer: form.priceOffer ? Number(form.priceOffer) : null,
       stock: Number(form.stock) || 0,
+      videoUrl: form.videoUrl?.trim() || null,
     })
   }
 
@@ -126,6 +131,8 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
     form.priceOffer && form.price && Number(form.priceOffer) < Number(form.price)
       ? Math.round((1 - Number(form.priceOffer) / Number(form.price)) * 100)
       : null
+
+  const parsedVideo = parseVideoUrl(form.videoUrl)
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -339,6 +346,36 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave }) => {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Video URL Input */}
+              <div className="form-group" style={{ marginTop: '16px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <FiVideo className="text-orange" />
+                  <span>Video de la Prenda (Opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://youtube.com/shorts/... o Instagram Reel, TikTok, Drive, MP4"
+                  value={form.videoUrl}
+                  onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+                />
+                <span className="text-xs text-muted" style={{ display: 'block', marginTop: '4px', lineHeight: 1.4 }}>
+                  Permite a tus clientes ver la prenda en movimiento y caída real. Soporta YouTube, YouTube Shorts, Reels de Instagram, TikTok, Google Drive o archivo .mp4.
+                </span>
+                {form.videoUrl && (
+                  <div style={{ marginTop: '6px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {parsedVideo ? (
+                      <span style={{ color: '#25d366', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <FiPlayCircle /> Link reconocido ({parsedVideo.type.toUpperCase()})
+                      </span>
+                    ) : (
+                      <span style={{ color: '#ff9800', fontWeight: 500 }}>
+                        ⚠ Verificá que el link sea público y comience con https://
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Visibility and Featured Switches */}

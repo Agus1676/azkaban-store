@@ -143,6 +143,7 @@ export const SEED_PRODUCTS = [
     description: 'Hoodie con interior frizado térmico. Capucha amplia con cordones ajustables y logo Jumpman bordado en el pecho.',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     imageUrl: 'https://cdn.treinta.co/web-app/inventory/d10954fe-e7d4-5aa5-986b-d1211ef07d28/770125ad-51c9-5266-a213-a1c3fc6bd468.jpeg',
+    videoUrl: 'https://www.youtube.com/shorts/3i1r6i7G44M',
     brand: 'Jordan',
   },
   {
@@ -175,6 +176,7 @@ export const SEED_PRODUCTS = [
     description: 'Edición 2026 Selección Argentina. Tela semi friza técnica de alto rendimiento, cierre reforzado, escudo y marca bordados con orificio pasapulgar en mangas.',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     imageUrl: 'https://cdn.treinta.co/web-app/inventory/d10954fe-e7d4-5aa5-986b-d1211ef07d28/6c5fcc88-8047-5596-9bc2-270de9b2a0e8.jpeg',
+    videoUrl: 'https://www.youtube.com/shorts/3i1r6i7G44M',
     brand: 'Selección Argentina',
   },
   {

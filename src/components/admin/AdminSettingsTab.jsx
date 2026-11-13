@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import toast from 'react-hot-toast'
+import { DEFAULT_RETURN_POLICY_TEXT } from '../../data/policies'
 
 const AdminSettingsTab = ({
   storeConfig,
@@ -331,6 +332,54 @@ const AdminSettingsTab = ({
                     value={formData.bankCbu || ''}
                     onChange={(e) => setFormData({ ...formData, bankCbu: e.target.value })}
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4: Política de Cambios y Devoluciones */}
+            <div className="settings-card-section">
+              <div className="settings-card-section__header">
+                <div className="settings-icon-pill" style={{ background: 'rgba(255, 85, 0, 0.12)', color: '#ff5500' }}>
+                  <FiShield size={18} />
+                </div>
+                <div>
+                  <h4>4. Condiciones de Cambios y Devoluciones</h4>
+                  <span>Políticas visibles en el detalle de cada prenda, página de políticas y pie de página</span>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="cfg-return-policy">
+                  Cláusulas y Condiciones (Escribí una condición por cada línea)
+                </label>
+                <textarea
+                  id="cfg-return-policy"
+                  rows="5"
+                  placeholder="Una regla por renglón..."
+                  value={formData.returnPolicy !== undefined ? formData.returnPolicy : DEFAULT_RETURN_POLICY_TEXT}
+                  onChange={(e) => setFormData({ ...formData, returnPolicy: e.target.value })}
+                  style={{
+                    lineHeight: '1.6',
+                    fontFamily: 'inherit',
+                    fontSize: '0.9rem',
+                    padding: '12px',
+                  }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                  <span className="text-xs text-muted">
+                    Cada renglón se muestra como un punto en las fichas de producto y en /cambios-y-devoluciones.
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                    onClick={() => {
+                      setFormData({ ...formData, returnPolicy: DEFAULT_RETURN_POLICY_TEXT })
+                      toast.success('Condiciones originales restauradas')
+                    }}
+                  >
+                    Restaurar texto por defecto
+                  </button>
                 </div>
               </div>
             </div>
