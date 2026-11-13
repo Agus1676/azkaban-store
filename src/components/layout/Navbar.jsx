@@ -45,6 +45,8 @@ const Navbar = () => {
   }
 
   const channelUrl = getWhatsAppChannelUrl()
+  const currentCategory = new URLSearchParams(location.search).get('category')
+  const isCatalog = location.pathname === '/catalogo'
 
   return (
     <header className={`navbar ${isScrolled ? 'navbar--scrolled' : ''}`}>
@@ -141,27 +143,48 @@ const Navbar = () => {
         {/* Bottom Row: Desktop Navigation Menu */}
         <div className="navbar__bottom-row">
           <nav className="navbar__nav-list">
-            <NavLink to="/" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+            <Link
+              to="/"
+              className={`navbar__nav-item ${location.pathname === '/' ? 'active' : ''}`}
+            >
               Inicio
-            </NavLink>
-            <NavLink to="/catalogo" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+            </Link>
+            <Link
+              to="/catalogo"
+              className={`navbar__nav-item ${isCatalog && !currentCategory ? 'active' : ''}`}
+            >
               Catálogo Completo
-            </NavLink>
-            <NavLink to="/catalogo?category=buzos" className="navbar__nav-item">
+            </Link>
+            <Link
+              to="/catalogo?category=buzos"
+              className={`navbar__nav-item ${isCatalog && currentCategory === 'buzos' ? 'active' : ''}`}
+            >
               Buzos
-            </NavLink>
-            <NavLink to="/catalogo?category=bermudas" className="navbar__nav-item">
+            </Link>
+            <Link
+              to="/catalogo?category=bermudas"
+              className={`navbar__nav-item ${isCatalog && currentCategory === 'bermudas' ? 'active' : ''}`}
+            >
               Bermudas
-            </NavLink>
-            <NavLink to="/catalogo?category=remeras" className="navbar__nav-item">
+            </Link>
+            <Link
+              to="/catalogo?category=remeras"
+              className={`navbar__nav-item ${isCatalog && currentCategory === 'remeras' ? 'active' : ''}`}
+            >
               Remeras
-            </NavLink>
-            <NavLink to="/catalogo?category=camisetas-futbol" className="navbar__nav-item">
+            </Link>
+            <Link
+              to="/catalogo?category=camisetas-futbol"
+              className={`navbar__nav-item ${isCatalog && currentCategory === 'camisetas-futbol' ? 'active' : ''}`}
+            >
               Camisetas
-            </NavLink>
-            <NavLink to="/nosotros" className={({ isActive }) => `navbar__nav-item ${isActive ? 'active' : ''}`}>
+            </Link>
+            <Link
+              to="/nosotros"
+              className={`navbar__nav-item ${location.pathname === '/nosotros' ? 'active' : ''}`}
+            >
               Punto de Retiro & Envíos
-            </NavLink>
+            </Link>
             <a
               href={channelUrl}
               target="_blank"
@@ -211,14 +234,18 @@ const Navbar = () => {
 
             <div className="drawer-links-scroll">
               <span className="drawer-section-heading">NAVEGACIÓN</span>
-              <Link to="/" className="drawer-link">Inicio</Link>
-              <Link to="/catalogo" className="drawer-link drawer-link--primary">Catálogo Completo</Link>
-              <Link to="/nosotros" className="drawer-link">Punto de Retiro & Envíos</Link>
-              <Link to="/cambios-y-devoluciones" className="drawer-link">Cambios & Devoluciones</Link>
+              <Link to="/" className={`drawer-link ${location.pathname === '/' ? 'active' : ''}`}>Inicio</Link>
+              <Link to="/catalogo" className={`drawer-link ${isCatalog && !currentCategory ? 'active' : ''}`}>Catálogo Completo</Link>
+              <Link to="/nosotros" className={`drawer-link ${location.pathname === '/nosotros' ? 'active' : ''}`}>Punto de Retiro & Envíos</Link>
+              <Link to="/cambios-y-devoluciones" className={`drawer-link ${location.pathname === '/cambios-y-devoluciones' ? 'active' : ''}`}>Cambios & Devoluciones</Link>
 
               <span className="drawer-section-heading">CATEGORÍAS</span>
               {CATEGORIES.filter(c => c.id !== 'todos').map((c) => (
-                <Link key={c.id} to={`/catalogo?category=${c.id}`} className="drawer-sublink">
+                <Link
+                  key={c.id}
+                  to={`/catalogo?category=${c.id}`}
+                  className={`drawer-sublink ${isCatalog && currentCategory === c.id ? 'active' : ''}`}
+                >
                   {c.name}
                 </Link>
               ))}
