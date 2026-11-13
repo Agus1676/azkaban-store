@@ -10,15 +10,21 @@ import {
   FiUpload,
   FiExternalLink,
   FiLayers,
+  FiTruck,
+  FiTag,
 } from 'react-icons/fi'
 import { useAuth } from '../contexts/AuthContext'
 import { SEED_PRODUCTS, STORE_INFO } from '../data/seedProducts'
 import { DEFAULT_RETURN_POLICY_TEXT } from '../data/policies'
+import { getStoredCategories, saveStoredCategories } from '../data/categories'
+import { DEFAULT_SHIPPING_CONFIG } from '../utils/shipping'
 import toast from 'react-hot-toast'
 
 // Modular Admin Components
 import AdminDashboardTab from '../components/admin/AdminDashboardTab'
 import AdminProductsTab from '../components/admin/AdminProductsTab'
+import AdminCategoriesTab from '../components/admin/AdminCategoriesTab'
+import AdminShippingTab from '../components/admin/AdminShippingTab'
 import AdminStockTab from '../components/admin/AdminStockTab'
 import AdminOrdersTab from '../components/admin/AdminOrdersTab'
 import AdminSettingsTab from '../components/admin/AdminSettingsTab'
@@ -68,18 +74,25 @@ const getStoredConfig = () => {
     bankAlias: 'AZKABAN.STORE',
     bankCbu: '0000003100012345678901',
     returnPolicy: DEFAULT_RETURN_POLICY_TEXT,
+    shippingConfig: DEFAULT_SHIPPING_CONFIG,
   }
 }
 
 const AdminPage = () => {
   const { isAdmin, login, logout, changePassword } = useAuth()
   const [passwordInput, setPasswordInput] = useState('')
-  const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard' | 'products' | 'stock' | 'orders' | 'settings'
+  const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard' | 'products' | 'categories' | 'shipping' | 'stock' | 'orders' | 'settings'
 
   // Global store states
   const [products, setProducts] = useState(getStoredProducts)
+  const [categories, setCategories] = useState(getStoredCategories)
   const [orders, setOrders] = useState(getStoredOrders)
   const [storeConfig, setStoreConfig] = useState(getStoredConfig)
+
+  const handleSaveCategories = (updated) => {
+    setCategories(updated)
+    saveStoredCategories(updated)
+  }
 
   // Modals state
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
@@ -423,7 +436,19 @@ const AdminPage = () => {
             className={`admin-tab-btn ${activeTab === 'products' ? 'active' : ''}`}
             onClick={() => setActiveTab('products')}
           >
-            <FiBox size={16} /> Prendas & Catálogo ({products.length})
+            <FiBox size={16} /> Prendas ({products.length})
+          </button>
+          <button
+            className={`admin-tab-btn ${activeTab === 'categories' ? 'active' : ''}`}
+            onClick={() => setActiveTab('categories')}
+          >
+            <FiTag size={16} /> Categorías ({categories.length})
+          </button>
+          <button
+            className={`admin-tab-btn ${activeTab === 'shipping' ? 'active' : ''}`}
+            onClick={() => setActiveTab('shipping')}
+          >
+            <FiTruck size={16} /> Envíos & Andreani
           </button>
           <button
             className={`admin-tab-btn ${activeTab === 'stock' ? 'active' : ''}`}
@@ -435,13 +460,13 @@ const AdminPage = () => {
             className={`admin-tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveTab('orders')}
           >
-            <FiShoppingBag size={16} /> Pedidos & Ventas ({orders.length})
+            <FiShoppingBag size={16} /> Pedidos ({orders.length})
           </button>
           <button
             className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
-            <FiSettings size={16} /> Configuración de Tienda
+            <FiSettings size={16} /> Configuración
           </button>
         </div>
 
@@ -469,6 +494,21 @@ const AdminPage = () => {
             onAdjustStock={handleAdjustStock}
             onOpenBulkPrice={() => setIsBulkPriceModalOpen(true)}
             onRestoreTreinta={handleRestoreTreinta}
+          />
+        )}
+
+        {activeTab === 'categories' && (
+          <AdminCategoriesTab
+            categories={categories}
+            onSaveCategories={handleSaveCategories}
+            products={products}
+          />
+        )}
+
+        {activeTab === 'shipping' && (
+          <AdminShippingTab
+            storeConfig={storeConfig}
+            onSaveConfig={setStoreConfig}
           />
         )}
 

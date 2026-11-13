@@ -19,6 +19,7 @@ import { formatPrice } from '../../utils/formatPrice'
 import { generateProductInquiryLink } from '../../utils/whatsapp'
 import { parseVideoUrl } from '../../utils/video'
 import { getReturnPolicy, RETURN_POLICY_PATH } from '../../data/policies'
+import { calculateShippingQuotes } from '../../utils/shipping'
 import './ProductDetailModal.css'
 
 const ProductVideo = ({ video, title }) => {
@@ -64,7 +65,16 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  if (!product) return null
+  const [shippingCp, setShippingCp] = useState('')
+  const [shippingCalcResult, setShippingCalcResult] = useState(null)
+  const [shippingOpen, setShippingOpen] = useState(false)
+
+  const handleCalcShipping = (e) => {
+    e?.preventDefault()
+    if (!shippingCp || shippingCp.trim().length < 3) return
+    const res = calculateShippingQuotes(shippingCp, (product.priceOffer || product.price || 0) * quantity)
+    setShippingCalcResult(res)
+  }
 
   const price = product.priceOffer || product.price || 0
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
@@ -238,6 +248,61 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 <FiAward className="assurance-icon" />
                 <span>Prendas 100% calidad</span>
               </div>
+            </div>
+
+            {/* Calculador de Envíos Andreani */}
+            <div className={`modal-shipping-calc ${shippingOpen ? 'is-open' : ''}`}>
+              <button
+                type="button"
+                className="modal-shipping-calc__toggle"
+                onClick={() => setShippingOpen(!shippingOpen)}
+                aria-expanded={shippingOpen}
+              >
+                <span className="modal-shipping-calc__title">
+                  <FiTruck size={15} className="text-orange" />
+                  <span>Calculá tu envío Andreani por Código Postal</span>
+                </span>
+                <FiChevronDown size={16} className={`modal-policy__chevron ${shippingOpen ? 'open' : ''}`} />
+              </button>
+
+              {shippingOpen && (
+                <div className="modal-shipping-calc__body">
+                  <form onSubmit={handleCalcShipping} className="modal-shipping-calc__form">
+                    <input
+                      type="text"
+                      maxLength="5"
+                      placeholder="Tu CP (ej: 1650, 1425, 2000)"
+                      value={shippingCp}
+                      onChange={(e) => setShippingCp(e.target.value.replace(/\D/g, ''))}
+                    />
+                    <button type="submit" className="btn-calc-cp">
+                      Calcular
+                    </button>
+                  </form>
+
+                  {shippingCalcResult?.zoneInfo && (
+                    <div className="modal-shipping-calc__results">
+                      <div className="modal-shipping-zone-badge">
+                        📍 <strong>{shippingCalcResult.zoneInfo.location}</strong>
+                      </div>
+                      <div className="modal-shipping-quotes-list">
+                        {shippingCalcResult.quotes
+                          .filter((q) => q.id !== 'pickup')
+                          .map((q) => (
+                            <div key={q.id} className="modal-shipping-quote-row">
+                              <span>{q.icon} {q.name} ({q.estimatedDays})</span>
+                              <strong>{q.price === 0 ? '¡GRATIS!' : formatPrice(q.price)}</strong>
+                            </div>
+                          ))}
+                        <div className="modal-shipping-quote-row">
+                          <span>🚶 Retiro en San Martín</span>
+                          <strong className="text-green">GRATIS</strong>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Return policy */}

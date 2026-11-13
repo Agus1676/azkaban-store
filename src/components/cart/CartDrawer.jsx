@@ -1,8 +1,21 @@
-import { useState } from 'react'
-import { FiX, FiTrash2, FiPlus, FiMinus, FiShoppingBag, FiTruck, FiUser, FiPhone, FiCreditCard } from 'react-icons/fi'
+import { useState, useMemo, useEffect } from 'react'
+import {
+  FiX,
+  FiTrash2,
+  FiPlus,
+  FiMinus,
+  FiShoppingBag,
+  FiTruck,
+  FiUser,
+  FiPhone,
+  FiCreditCard,
+  FiMapPin,
+  FiCheckCircle,
+} from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
+import { calculateShippingQuotes, resolveZoneByPostalCode } from '../../utils/shipping'
 import toast from 'react-hot-toast'
 import './CartDrawer.css'
 
@@ -21,16 +34,55 @@ const CartDrawer = () => {
   const [customer, setCustomer] = useState({
     name: '',
     phone: '',
-    shippingMethod: 'Retiro en persona (San Martín)',
     city: '',
     address: '',
     paymentMethod: 'Transferencia Bancaria',
     notes: '',
   })
 
+  const [postalCode, setPostalCode] = useState('')
+  const [selectedQuoteId, setSelectedQuoteId] = useState('pickup')
+
+  // Calcular cotizaciones de Andreani en base al CP ingresado y el subtotal
+  const shippingCalculation = useMemo(() => {
+    if (!postalCode || postalCode.trim().length < 3) return null
+    return calculateShippingQuotes(postalCode, totalPrice)
+  }, [postalCode, totalPrice])
+
+  const availableQuotes = shippingCalculation?.quotes || [
+    {
+      id: 'pickup',
+      carrier: 'AzkabanStore',
+      type: 'Punto de Retiro',
+      name: 'Retiro en San Martín (Gratis)',
+      price: 0,
+      isFree: true,
+      estimatedDays: 'Inmediato',
+      icon: '🚶',
+      description: 'Dr. marcos zimmermann 3339, San Martín.',
+    },
+    {
+      id: 'andreani_home',
+      carrier: 'Andreani',
+      type: 'Domicilio',
+      name: 'Andreani a Domicilio',
+      price: 5900,
+      isFree: false,
+      estimatedDays: '24 a 72 hs hábiles',
+      icon: '📦',
+      description: 'Ingresá tu código postal para cotizar exacto a tu ciudad.',
+    },
+  ]
+
+  const activeQuote =
+    availableQuotes.find((q) => q.id === selectedQuoteId) || availableQuotes[0]
+
+  const shippingCost = Number(activeQuote?.price) || 0
+  const finalTotal = totalPrice + shippingCost
+
   if (!isOpen) return null
 
-  const isDelivery = customer.shippingMethod.includes('Andreani') || customer.shippingMethod.includes('Vía Cargo')
+  const isDelivery = activeQuote.id !== 'pickup'
 
   const handleCheckoutSubmit = (e) => {
     e.preventDefault()
@@ -51,11 +103,25 @@ const CartDrawer = () => {
     }
 
     if (isDelivery && !customer.city.trim()) {
-      toast.error('Por favor indicá tu localidad o provincia para el despacho')
+      toast.error('Por favor indicá tu localidad y provincia para el despacho')
       return
     }
 
-    checkoutWhatsApp(customer)
+    if (isDelivery && activeQuote.type === 'Domicilio' && !customer.address.trim()) {
+      toast.error('Por favor ingresá la dirección de entrega de tu domicilio')
+      return
+    }
+
+    checkoutWhatsApp(
+      {
+        ...customer,
+        shippingMethod: activeQuote.name,
+      },
+      {
+        ...activeQuote,
+        postalCode: postalCode.trim(),
+      }
+    )
   }
 
   return (
@@ -169,47 +235,124 @@ const CartDrawer = () => {
                   />
                 </div>
 
-                <div className="form-field">
-                  <label>Método de Entrega *</label>
-                  <select
-                    value={customer.shippingMethod}
-                    onChange={(e) => setCustomer({ ...customer, shippingMethod: e.target.value })}
-                  >
-                    <option value="Retiro en persona (San Martín)">
-                      🚶 Retiro gratis en San Martín (Dr. marcos zimmermann 3339)
-                    </option>
-                    <option value="Envío por Andreani">
-                      📦 Envío por Andreani (A domicilio o sucursal)
-                    </option>
-                    <option value="Envío por Vía Cargo">
-                      🚚 Envío por Vía Cargo (A terminal/agencia)
-                    </option>
-                  </select>
+                {/* Métodos de Entrega & Cotizador Andreani */}
+                <div className="cart-shipping-section">
+                  <label className="shipping-section-label">
+                    <FiTruck className="text-orange" size={16} />
+                    <span>Método de Entrega & Envíos</span>
+                  </label>
+
+                  {/* Postal code input for automatic Andreani rate resolution */}
+                  <div className="cart-cp-box">
+                    <div className="cart-cp-input-row">
+                      <FiMapPin size={15} className="cart-cp-icon" />
+                      <input
+                        type="text"
+                        maxLength="5"
+                        placeholder="Ingresá tu CP (ej: 1650, 1425, 2000)"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
+                        className="cart-cp-input"
+                      />
+                    </div>
+                    {shippingCalculation?.zoneInfo && (
+                      <div className="cart-cp-zone-tag">
+                        <span>📍 {shippingCalculation.zoneInfo.location}</span>
+                        <span className="cart-zone-badge">{shippingCalculation.zoneInfo.zone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Free shipping banner / progress if applicable */}
+                  {shippingCalculation?.isFreeEligible ? (
+                    <div className="cart-free-shipping-pill">
+                      🎉 ¡Felicidades! Tenés <strong>ENVÍO ANDREANI GRATIS</strong> en este pedido.
+                    </div>
+                  ) : shippingCalculation?.amountNeededForFreeShipping > 0 && shippingCalculation?.amountNeededForFreeShipping < 60000 ? (
+                    <div className="cart-free-shipping-hint">
+                      💡 ¡Sumá {formatPrice(shippingCalculation.amountNeededForFreeShipping)} más para tener <strong>Envío Andreani Gratis</strong>!
+                    </div>
+                  ) : null}
+
+                  {/* Shipping Options Selector Cards */}
+                  <div className="cart-shipping-cards">
+                    {availableQuotes.map((q) => {
+                      const isSelected = selectedQuoteId === q.id
+                      return (
+                        <div
+                          key={q.id}
+                          className={`cart-shipping-card ${isSelected ? 'active' : ''}`}
+                          onClick={() => setSelectedQuoteId(q.id)}
+                        >
+                          <div className="cart-shipping-card-left">
+                            <input
+                              type="radio"
+                              name="shipping_quote"
+                              checked={isSelected}
+                              onChange={() => setSelectedQuoteId(q.id)}
+                            />
+                            <div>
+                              <div className="cart-shipping-card-name">
+                                <span>{q.icon}</span>
+                                <strong>{q.name}</strong>
+                              </div>
+                              <span className="cart-shipping-card-desc">{q.description}</span>
+                              {q.estimatedDays && (
+                                <span className="cart-shipping-card-eta">
+                                  ⏱️ {q.estimatedDays}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="cart-shipping-card-price">
+                            {q.price === 0 ? (
+                              <span className="free-price-badge">GRATIS</span>
+                            ) : (
+                              <strong>{formatPrice(q.price)}</strong>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
 
                 {isDelivery && (
-                  <>
+                  <div className="cart-delivery-details">
                     <div className="form-field">
-                      <label>Localidad / Provincia / CP *</label>
+                      <label>Localidad y Provincia *</label>
                       <input
                         type="text"
                         required={isDelivery}
-                        placeholder="Ej: Rosario, Santa Fe - CP 2000"
+                        placeholder={
+                          shippingCalculation?.zoneInfo
+                            ? `Ej: ${shippingCalculation.zoneInfo.province}`
+                            : 'Ej: Rosario, Santa Fe'
+                        }
                         value={customer.city}
                         onChange={(e) => setCustomer({ ...customer, city: e.target.value })}
                       />
                     </div>
 
                     <div className="form-field">
-                      <label>Dirección de Entrega o Sucursal</label>
+                      <label>
+                        {activeQuote.type === 'Sucursal'
+                          ? 'Sucursal Andreani preferida (Opcional)'
+                          : 'Dirección de Entrega (Calle y Número) *'}
+                      </label>
                       <input
                         type="text"
-                        placeholder="Ej: Av. Pellegrini 1250 o Sucursal Andreani Centro"
+                        required={isDelivery && activeQuote.type === 'Domicilio'}
+                        placeholder={
+                          activeQuote.type === 'Sucursal'
+                            ? 'Ej: Sucursal San Martín o Centro'
+                            : 'Ej: Av. San Martín 1540 2do B'
+                        }
                         value={customer.address}
                         onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
                       />
                     </div>
-                  </>
+                  </div>
                 )}
 
                 <div className="form-field">
@@ -237,12 +380,18 @@ const CartDrawer = () => {
                 {/* Subtotal & Total Box */}
                 <div className="cart-summary-box">
                   <div className="summary-row">
-                    <span>Subtotal:</span>
+                    <span>Subtotal Prendas:</span>
                     <strong>{formatPrice(totalPrice)}</strong>
                   </div>
+                  <div className="summary-row">
+                    <span>Envío ({activeQuote.name}):</span>
+                    <strong className={shippingCost === 0 ? 'text-green' : ''}>
+                      {shippingCost === 0 ? '¡GRATIS!' : formatPrice(shippingCost)}
+                    </strong>
+                  </div>
                   <div className="summary-row total-row">
-                    <span>Total Estimado:</span>
-                    <span className="total-highlight-price">{formatPrice(totalPrice)}</span>
+                    <span>Total Final:</span>
+                    <span className="total-highlight-price">{formatPrice(finalTotal)}</span>
                   </div>
                 </div>
 

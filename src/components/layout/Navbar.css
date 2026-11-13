@@ -227,6 +227,121 @@
   font-weight: 700;
 }
 
+/* Categorías Dropdown Menu */
+.navbar__categories-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navbar__categories-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.navbar__categories-btn .chevron-icon {
+  transition: transform var(--transition-fast);
+}
+
+.navbar__categories-btn .chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.navbar__categories-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-width: 360px;
+  z-index: 1000;
+  animation: fadeInDown 0.18s ease-out;
+}
+
+.navbar__categories-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-left: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border);
+}
+
+.dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.dropdown-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.dropdown-cat-item:hover {
+  background: rgba(255, 85, 0, 0.08);
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+.dropdown-cat-item.active {
+  background: rgba(255, 85, 0, 0.12);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.dropdown-cat-item .cat-emoji {
+  font-size: 1.1rem;
+}
+
+.dropdown-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.dropdown-all-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.dropdown-all-link:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 /* Mobile Search Dropdown */
 .navbar__mobile-search-dropdown {
   background: #ffffff;

@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { FiSearch, FiX } from 'react-icons/fi'
 import ProductCard from '../components/catalog/ProductCard'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
-import { SEED_PRODUCTS, CATEGORIES } from '../data/seedProducts'
+import { SEED_PRODUCTS } from '../data/seedProducts'
+import { getStoredCategories } from '../data/categories'
 import './CatalogPage.css'
 
 const loadCatalogProducts = () => {
@@ -33,6 +34,7 @@ const CatalogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [sortBy, setSortBy] = useState('featured') // featured, price-asc, price-desc, name-asc
   const [onlyInStock, setOnlyInStock] = useState(false)
+  const [categories, setCategories] = useState(getStoredCategories)
 
   useEffect(() => {
     const paramCat = searchParams.get('category')
@@ -43,8 +45,13 @@ const CatalogPage = () => {
 
   useEffect(() => {
     const handleUpdate = () => setProducts(loadCatalogProducts())
+    const handleCats = () => setCategories(getStoredCategories())
     window.addEventListener('azkaban_products_updated', handleUpdate)
-    return () => window.removeEventListener('azkaban_products_updated', handleUpdate)
+    window.addEventListener('azkaban_categories_updated', handleCats)
+    return () => {
+      window.removeEventListener('azkaban_products_updated', handleUpdate)
+      window.removeEventListener('azkaban_categories_updated', handleCats)
+    }
   }, [])
 
   const handleCategoryChange = (catId) => {
@@ -147,12 +154,13 @@ const CatalogPage = () => {
 
         {/* Categories Bar */}
         <div className="catalog-categories-bar">
-          {CATEGORIES.map((cat) => (
+          {categories.filter((cat) => cat.active !== false).map((cat) => (
             <button
               key={cat.id}
               className={`cat-tab ${selectedCategory === cat.id ? 'active' : ''}`}
               onClick={() => handleCategoryChange(cat.id)}
             >
+              {cat.emoji ? <span style={{ marginRight: '6px' }}>{cat.emoji}</span> : null}
               {cat.name}
             </button>
           ))}

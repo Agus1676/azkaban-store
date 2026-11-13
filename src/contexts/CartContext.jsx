@@ -119,7 +119,7 @@ export const CartProvider = ({ children }) => {
     }, 0)
   }, [cart])
 
-  const checkoutWhatsApp = (customerData) => {
+  const checkoutWhatsApp = (customerData, shippingDetails = null) => {
     if (cart.length === 0) {
       toast.error('El carrito está vacío')
       return
@@ -134,6 +134,9 @@ export const CartProvider = ({ children }) => {
       paymentMethod = 'Transferencia Bancaria',
       notes = '',
     } = customerData
+
+    const shippingPrice = shippingDetails ? (Number(shippingDetails.price) || 0) : 0
+    const finalOrderTotal = totalPrice + shippingPrice
 
     const number = getWhatsAppNumber()
 
@@ -152,10 +155,20 @@ export const CartProvider = ({ children }) => {
     })
 
     message += `──────────────────────\n`
-    message += `💰 *TOTAL A ABONAR: $${totalPrice.toLocaleString('es-AR')} ARS*\n\n`
+    message += `💵 *SUBTOTAL PRENDAS:* $${totalPrice.toLocaleString('es-AR')} ARS\n`
 
-    message += `💳 *FORMA DE PAGO:* ${paymentMethod}\n`
-    message += `🚚 *MÉTODO DE ENTREGA:* ${shippingMethod}\n\n`
+    if (shippingDetails && shippingDetails.id !== 'pickup') {
+      const costText = shippingPrice === 0 ? '¡GRATIS!' : `$${shippingPrice.toLocaleString('es-AR')} ARS`
+      message += `🚚 *ENVÍO:* ${shippingDetails.name || shippingMethod} (${costText})\n`
+      if (shippingDetails.postalCode) message += `   📍 CP Destino: *${shippingDetails.postalCode}*\n`
+      if (shippingDetails.estimatedDays) message += `   ⏱️ Plazo estimado: *${shippingDetails.estimatedDays}*\n`
+    } else {
+      message += `🚶 *MÉTODO DE ENTREGA:* ${shippingMethod}\n`
+    }
+
+    message += `💰 *TOTAL A ABONAR: $${finalOrderTotal.toLocaleString('es-AR')} ARS*\n\n`
+
+    message += `💳 *FORMA DE PAGO:* ${paymentMethod}\n\n`
 
     message += `👤 *DATOS DEL COMPRADOR:*\n`
     message += `• *Nombre:* ${name}\n`
@@ -174,7 +187,10 @@ export const CartProvider = ({ children }) => {
         id: `AZK-${Date.now().toString().slice(-6)}`,
         date: new Date().toISOString(),
         customer: { name, phone, city, address },
-        shippingMethod,
+        shippingMethod: shippingDetails?.name || shippingMethod,
+        shippingCost: shippingPrice,
+        shippingCarrier: shippingDetails?.carrier || 'Andreani',
+        postalCode: shippingDetails?.postalCode || '',
         paymentMethod,
         items: cart.map((i) => ({
           id: i.product.id,
@@ -183,7 +199,8 @@ export const CartProvider = ({ children }) => {
           qty: i.quantity,
           price: i.product.priceOffer || i.product.price,
         })),
-        total: totalPrice,
+        subtotal: totalPrice,
+        total: finalOrderTotal,
         status: 'Pendiente',
       }
       const existingOrders = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]')

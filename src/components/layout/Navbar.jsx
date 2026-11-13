@@ -1,10 +1,20 @@
-import { useState, useEffect } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { FiShoppingBag, FiSearch, FiMenu, FiX, FiLock, FiInstagram, FiUser } from 'react-icons/fi'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  FiShoppingBag,
+  FiSearch,
+  FiMenu,
+  FiX,
+  FiLock,
+  FiInstagram,
+  FiUser,
+  FiChevronDown,
+} from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { STORE_INFO, CATEGORIES } from '../../data/seedProducts'
+import { STORE_INFO } from '../../data/seedProducts'
+import { getStoredCategories } from '../../data/categories'
 import { getWhatsAppChannelUrl } from '../../utils/whatsapp'
 import './Navbar.css'
 
@@ -47,6 +57,30 @@ const Navbar = () => {
   const channelUrl = getWhatsAppChannelUrl()
   const currentCategory = new URLSearchParams(location.search).get('category')
   const isCatalog = location.pathname === '/catalogo'
+
+  const [categories, setCategories] = useState(getStoredCategories)
+  const [categoriesDropdownOpen, setCategoriesDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleCats = () => setCategories(getStoredCategories())
+    window.addEventListener('azkaban_categories_updated', handleCats)
+    return () => window.removeEventListener('azkaban_categories_updated', handleCats)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setCategoriesDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    setCategoriesDropdownOpen(false)
+  }, [location])
 
   return (
     <header className={`navbar ${isScrolled ? 'navbar--scrolled' : ''}`}>
@@ -149,42 +183,81 @@ const Navbar = () => {
             >
               Inicio
             </Link>
+
             <Link
               to="/catalogo"
               className={`navbar__nav-item ${isCatalog && !currentCategory ? 'active' : ''}`}
             >
               Catálogo Completo
             </Link>
+
+            {/* Categorías Dropdown Menu (No satura la barra) */}
+            <div
+              className="navbar__categories-menu"
+              ref={dropdownRef}
+              onMouseEnter={() => setCategoriesDropdownOpen(true)}
+              onMouseLeave={() => setCategoriesDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                className={`navbar__nav-item navbar__categories-btn ${
+                  isCatalog && currentCategory ? 'active' : ''
+                }`}
+                onClick={() => setCategoriesDropdownOpen(!categoriesDropdownOpen)}
+                aria-expanded={categoriesDropdownOpen}
+              >
+                <span>Categorías</span>
+                <FiChevronDown
+                  className={`chevron-icon ${categoriesDropdownOpen ? 'open' : ''}`}
+                  size={14}
+                />
+              </button>
+
+              {categoriesDropdownOpen && (
+                <div className="navbar__categories-dropdown">
+                  <div className="dropdown-grid">
+                    {categories
+                      .filter((c) => c.id !== 'todos' && c.active !== false)
+                      .map((cat) => (
+                        <Link
+                          key={cat.id}
+                          to={`/catalogo?category=${cat.id}`}
+                          className={`dropdown-cat-item ${currentCategory === cat.id ? 'active' : ''}`}
+                          onClick={() => setCategoriesDropdownOpen(false)}
+                        >
+                          <span className="cat-emoji">{cat.emoji || '👕'}</span>
+                          <span className="cat-name">{cat.name}</span>
+                        </Link>
+                      ))}
+                  </div>
+                  <div className="dropdown-footer">
+                    <Link
+                      to="/catalogo"
+                      className="dropdown-all-link"
+                      onClick={() => setCategoriesDropdownOpen(false)}
+                    >
+                      Explorar todo el catálogo →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Acceso rápido a Buzos (prenda estrella) */}
             <Link
               to="/catalogo?category=buzos"
               className={`navbar__nav-item ${isCatalog && currentCategory === 'buzos' ? 'active' : ''}`}
             >
               Buzos
             </Link>
-            <Link
-              to="/catalogo?category=bermudas"
-              className={`navbar__nav-item ${isCatalog && currentCategory === 'bermudas' ? 'active' : ''}`}
-            >
-              Bermudas
-            </Link>
-            <Link
-              to="/catalogo?category=remeras"
-              className={`navbar__nav-item ${isCatalog && currentCategory === 'remeras' ? 'active' : ''}`}
-            >
-              Remeras
-            </Link>
-            <Link
-              to="/catalogo?category=camisetas-futbol"
-              className={`navbar__nav-item ${isCatalog && currentCategory === 'camisetas-futbol' ? 'active' : ''}`}
-            >
-              Camisetas
-            </Link>
+
             <Link
               to="/nosotros"
               className={`navbar__nav-item ${location.pathname === '/nosotros' ? 'active' : ''}`}
             >
               Punto de Retiro & Envíos
             </Link>
+
             <a
               href={channelUrl}
               target="_blank"
@@ -240,13 +313,14 @@ const Navbar = () => {
               <Link to="/cambios-y-devoluciones" className={`drawer-link ${location.pathname === '/cambios-y-devoluciones' ? 'active' : ''}`}>Cambios & Devoluciones</Link>
 
               <span className="drawer-section-heading">CATEGORÍAS</span>
-              {CATEGORIES.filter(c => c.id !== 'todos').map((c) => (
+              {categories.filter(c => c.id !== 'todos' && c.active !== false).map((c) => (
                 <Link
                   key={c.id}
                   to={`/catalogo?category=${c.id}`}
                   className={`drawer-sublink ${isCatalog && currentCategory === c.id ? 'active' : ''}`}
                 >
-                  {c.name}
+                  <span style={{ marginRight: '6px' }}>{c.emoji || '👕'}</span>
+                  <span>{c.name}</span>
                 </Link>
               ))}
 

@@ -314,6 +314,112 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* Shipping Calculator Box */
+.modal-shipping-calc {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.modal-shipping-calc__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.modal-shipping-calc__toggle:hover {
+  background: #f8fafc;
+}
+
+.modal-shipping-calc__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.modal-shipping-calc__body {
+  padding: 12px 14px;
+  border-top: 1px solid var(--color-border);
+  background: #fcfcfd;
+}
+
+.modal-shipping-calc__form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.modal-shipping-calc__form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.modal-shipping-calc__form input:focus {
+  border-color: var(--color-primary);
+}
+
+.btn-calc-cp {
+  background: #111116;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-calc-cp:hover {
+  opacity: 0.9;
+}
+
+.modal-shipping-zone-badge {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  background: rgba(255, 85, 0, 0.08);
+  border: 1px solid rgba(255, 85, 0, 0.2);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.modal-shipping-quotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-shipping-quote-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.modal-shipping-quote-row strong {
+  font-size: 0.85rem;
+}
+
 .assurance-card {
   display: flex;
   flex-direction: column;
