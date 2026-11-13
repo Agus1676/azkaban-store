@@ -46,38 +46,71 @@
   background: var(--color-bg-input);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-full);
-  padding: 0 12px 0 34px;
+  padding: 0 12px 0 36px;
   height: 38px;
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
   transition: all var(--transition-fast);
+  overflow: hidden;
 }
 
 .navbar__search-form:focus-within {
   background: #ffffff;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.12);
 }
 
 .navbar__search-icon {
   position: absolute;
   left: 12px;
   color: var(--color-text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.navbar__search-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.85rem;
-  color: var(--color-text-primary);
+.navbar__search-form input[type="text"],
+.navbar__search-form input.navbar__search-input,
+input[type="text"].navbar__search-input {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.85rem !important;
+  color: var(--color-text-primary) !important;
+  line-height: normal !important;
+}
+
+.navbar__search-form input[type="text"]:focus,
+.navbar__search-form input.navbar__search-input:focus,
+input[type="text"].navbar__search-input:focus {
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .navbar__search-clear {
   color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.navbar__search-clear:hover {
+  color: var(--color-text-primary);
 }
 
 /* Center Brand */
@@ -390,14 +423,24 @@
   align-items: center;
 }
 
+.mobile-search-wrap input[type="text"],
 .mobile-search-wrap input {
-  width: 100%;
-  background: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 9px 38px;
-  font-size: 0.88rem;
-  outline: none;
+  width: 100% !important;
+  background: var(--color-bg-input) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-full) !important;
+  padding: 9px 38px !important;
+  font-size: 0.88rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--color-text-primary) !important;
+}
+
+.mobile-search-wrap input[type="text"]:focus,
+.mobile-search-wrap input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.12) !important;
+  background: #ffffff !important;
 }
 
 .mobile-search-icon {
