@@ -620,30 +620,219 @@
   gap: 18px;
 }
 
-.dashboard-card-box {
+.dashboard-panel {
   background: #161722;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
-.dashboard-card-title {
+.dashboard-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+
+.dashboard-panel__header h4 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.dashboard-panel__header p {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.dashboard-panel__link-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dashboard-panel__link-btn:hover {
+  background: rgba(255, 85, 0, 0.12);
+}
+
+.dashboard-empty-box {
+  padding: 32px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.dashboard-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-order-row {
+  background: #12131b;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.dashboard-order-row:hover {
+  border-color: rgba(255, 85, 0, 0.25);
+}
+
+.order-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.order-customer-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.order-customer-info strong {
+  font-size: 0.88rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-row-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-row-status-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.order-row-price {
   font-family: var(--font-heading);
   font-size: 0.95rem;
   font-weight: 800;
   color: #ffffff;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
-.dashboard-card-title .see-all-link {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  cursor: pointer;
-  text-decoration: none;
+.status-pill {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-pill--pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-pill--completed {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-pill--shipping {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.status-pill--active {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.status-pill--cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dashboard-stock-alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard-stock-item {
+  background: #12131b;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.dashboard-stock-item:hover {
+  border-color: rgba(255, 85, 0, 0.25);
+}
+
+.stock-item-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #090a0f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.stock-item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.stock-item-info strong {
+  font-size: 0.84rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stock-item-badge {
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -2053,10 +2242,17 @@
 }
 
 /* ==========================================================================
-   RESPONSIVE OVERRIDES
+   RESPONSIVE OVERRIDES - COMPLETE MOBILE & TABLET PERFECTION
    ========================================================================== */
 
-@media (max-width: 992px) {
+.admin-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+}
+
+@media (max-width: 1024px) {
   .dashboard-kpis {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2069,22 +2265,192 @@
   .product-form-layout {
     grid-template-columns: 1fr;
   }
+  .order-card-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 16px 0 60px;
+  }
+
+  .admin-content-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .admin-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .admin-topbar__title {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-topbar__actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .admin-topbar__actions .btn-sm {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+
+  .admin-tabs {
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .admin-tab-btn {
+    padding: 8px 12px;
+    font-size: 0.76rem;
+  }
+
   .dashboard-kpis {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
+
+  .stock-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .admin-content-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-content-card__header .header-buttons {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .admin-content-card__header .header-buttons button {
+    flex: 1;
+    min-width: 130px;
+    justify-content: center;
+  }
+
+  .admin-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-search-wrap {
+    width: 100%;
+  }
+
+  .filter-select-wrap {
+    width: 100%;
+  }
+
+  .filter-select-wrap select {
+    width: 100%;
+  }
+
+  .quick-actions-btns {
+    flex-direction: column;
+  }
+
+  .quick-actions-btns button,
+  .quick-actions-btns a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .order-card-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .order-card-status-select-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .order-status-dropdown {
+    width: auto;
+    flex: 1;
+  }
+
+  .order-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .order-footer-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .order-footer-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+
   .form-grid-2,
   .form-grid-3 {
     grid-template-columns: 1fr;
   }
-  .admin-topbar {
+
+  .invoice-parties-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .admin-product-modal,
+  .invoice-modal-content {
+    max-width: 100% !important;
+    padding: 16px;
+    border-radius: 12px;
+    max-height: 94vh;
+  }
+
+  .invoice-sheet {
+    padding: 20px 16px;
+  }
+
+  .invoice-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  .admin-topbar__actions {
-    width: 100%;
-    justify-content: space-between;
+
+  .invoice-order-badge {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .stock-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-card {
+    padding: 14px;
+  }
+
+  .kpi-value {
+    font-size: 1.35rem;
   }
 }
