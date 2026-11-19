@@ -2,18 +2,9 @@ import { useState, useEffect } from 'react'
 import { FiMapPin, FiClock, FiPhone, FiMail, FiInstagram, FiTruck, FiArrowRight } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { STORE_INFO } from '../data/seedProducts'
+import { getStoredConfig } from '../services/storeDb'
 import { getWhatsAppChannelUrl, generateGeneralInquiryLink } from '../utils/whatsapp'
 import './AboutPage.css'
-
-const getStoredConfig = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_store_config')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return STORE_INFO
-}
 
 const AboutPage = () => {
   const [config, setConfig] = useState(getStoredConfig)

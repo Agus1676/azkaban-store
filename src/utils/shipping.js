@@ -31,8 +31,16 @@ export const getShippingConfig = () => {
     const saved = localStorage.getItem('azkaban_store_config')
     if (saved) {
       const parsed = JSON.parse(saved)
-      if (parsed.shippingConfig) {
-        return { ...DEFAULT_SHIPPING_CONFIG, ...parsed.shippingConfig }
+      return {
+        ...DEFAULT_SHIPPING_CONFIG,
+        ...(parsed.shippingConfig || {}),
+        ambaHomePrice: parsed.andreaniAmbaHome ?? parsed.shippingConfig?.ambaHomePrice ?? DEFAULT_SHIPPING_CONFIG.ambaHomePrice,
+        ambaBranchPrice: parsed.andreaniAmbaBranch ?? parsed.shippingConfig?.ambaBranchPrice ?? DEFAULT_SHIPPING_CONFIG.ambaBranchPrice,
+        interiorHomePrice: parsed.andreaniInteriorHome ?? parsed.shippingConfig?.interiorHomePrice ?? DEFAULT_SHIPPING_CONFIG.interiorHomePrice,
+        interiorBranchPrice: parsed.andreaniInteriorBranch ?? parsed.shippingConfig?.interiorBranchPrice ?? DEFAULT_SHIPPING_CONFIG.interiorBranchPrice,
+        viaCargoPrice: parsed.viaCargoAgency ?? parsed.shippingConfig?.viaCargoPrice ?? DEFAULT_SHIPPING_CONFIG.viaCargoPrice,
+        freeShippingMinTotal: parsed.freeShippingThreshold ?? parsed.shippingConfig?.freeShippingMinTotal ?? DEFAULT_SHIPPING_CONFIG.freeShippingMinTotal,
+        freeShippingEnabled: parsed.freeShippingEnabled ?? parsed.shippingConfig?.freeShippingEnabled ?? DEFAULT_SHIPPING_CONFIG.freeShippingEnabled,
       }
     }
   } catch (e) {

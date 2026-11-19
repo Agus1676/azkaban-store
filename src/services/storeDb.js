@@ -19,8 +19,45 @@ const KEYS = {
  */
 
 // ==========================================================================
-// 1. PRODUCTOS
+// 1. PRODUCTOS & NORMALIZADOR DEFENSIVO
 // ==========================================================================
+
+export const normalizeProduct = (p) => {
+  if (!p || typeof p !== 'object' || !p.id) return null
+  const stockNum = typeof p.stock === 'number' ? p.stock : (parseInt(p.stock, 10) || 0)
+  const priceNum = typeof p.price === 'number' ? p.price : (parseFloat(p.price) || 0)
+  const offerRaw = p.offerPrice ?? p.priceOffer
+  const offerNum = offerRaw && !isNaN(Number(offerRaw)) && Number(offerRaw) > 0 ? Number(offerRaw) : null
+
+  let images = []
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    images = p.images.filter((img) => typeof img === 'string' && img.trim() !== '')
+  } else if (p.imageUrl && typeof p.imageUrl === 'string') {
+    images = [p.imageUrl]
+  }
+  if (images.length === 0) {
+    images = ['/logo.png']
+  }
+
+  return {
+    ...p,
+    id: String(p.id),
+    name: (p.name || 'Prenda').trim(),
+    brand: (p.brand || 'Azkaban Indumentaria').trim(),
+    category: p.category || 'buzos',
+    price: Math.max(0, priceNum),
+    priceOffer: offerNum,
+    offerPrice: offerNum,
+    stock: Math.max(0, stockNum),
+    active: p.active !== false,
+    featured: Boolean(p.featured),
+    badge: p.badge || '',
+    description: p.description || '',
+    sizes: Array.isArray(p.sizes) && p.sizes.length > 0 ? p.sizes : ['ÚNICO'],
+    images: images,
+    imageUrl: images[0] || '/logo.png',
+  }
+}
 
 export const getStoredProducts = () => {
   try {
@@ -30,27 +67,28 @@ export const getStoredProducts = () => {
     if (raw !== null) {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed)) {
-        return parsed
+        return parsed.map(normalizeProduct).filter(Boolean)
       }
     }
 
     // Si nunca se inicializó, cargar semillas
     if (!isInit) {
+      const initial = SEED_PRODUCTS.map(normalizeProduct).filter(Boolean)
       localStorage.setItem(KEYS.INITIALIZED, 'true')
-      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(SEED_PRODUCTS))
-      return SEED_PRODUCTS
+      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(initial))
+      return initial
     }
 
     return []
   } catch (err) {
     console.error('Error leyendo productos desde localStorage:', err)
-    return SEED_PRODUCTS
+    return []
   }
 }
 
 export const saveStoredProducts = (products) => {
   try {
-    const safeArray = Array.isArray(products) ? products : []
+    const safeArray = (Array.isArray(products) ? products : []).map(normalizeProduct).filter(Boolean)
     localStorage.setItem(KEYS.INITIALIZED, 'true')
     localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(safeArray))
     window.dispatchEvent(new Event('azkaban_products_updated'))
@@ -63,13 +101,14 @@ export const saveStoredProducts = (products) => {
 
 export const restoreFactoryProducts = () => {
   try {
+    const factory = SEED_PRODUCTS.map(normalizeProduct).filter(Boolean)
     localStorage.setItem(KEYS.INITIALIZED, 'true')
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(SEED_PRODUCTS))
+    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(factory))
     window.dispatchEvent(new Event('azkaban_products_updated'))
-    return SEED_PRODUCTS
+    return factory
   } catch (err) {
     console.error('Error restaurando productos de fábrica:', err)
-    return SEED_PRODUCTS
+    return []
   }
 }
 

@@ -1,18 +1,9 @@
 import { useState, useEffect } from 'react'
 import { FaTruck, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa'
 import { getWhatsAppChannelUrl } from '../../utils/whatsapp'
+import { getStoredConfig } from '../../services/storeDb'
 import { STORE_INFO } from '../../data/seedProducts'
 import './AnnouncementBar.css'
-
-const getStoredConfig = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_store_config')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return STORE_INFO
-}
 
 const AnnouncementBar = () => {
   const [config, setConfig] = useState(getStoredConfig)

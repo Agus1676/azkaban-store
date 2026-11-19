@@ -12,18 +12,9 @@ import {
 import { FaWhatsapp } from 'react-icons/fa'
 import { getReturnPolicy } from '../data/policies'
 import { STORE_INFO } from '../data/seedProducts'
+import { getStoredConfig } from '../services/storeDb'
 import { generateGeneralInquiryLink } from '../utils/whatsapp'
 import './ReturnPolicyPage.css'
-
-const getStoredConfig = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_store_config')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return STORE_INFO
-}
 
 const ReturnPolicyPage = () => {
   const [policies, setPolicies] = useState(getReturnPolicy)

@@ -1,6 +1,5 @@
-// Gestor de Categorías de AzkabanStore
-// Permite que la dueña cree, edite, renombre, ordene y elimine categorías
-// desde el Panel de Administración de forma 100% dinámica.
+// Single source of truth: re-export from storeDb
+import { getStoredCategories as getFromDb, saveStoredCategories as saveToDb } from '../services/storeDb'
 
 export const DEFAULT_CATEGORIES = [
   { id: 'todos', name: 'Todos los Productos', slug: 'todos', active: true },
@@ -17,36 +16,5 @@ export const DEFAULT_CATEGORIES = [
 ]
 
 export const CATEGORIES_STORAGE_KEY = 'azkaban_categories'
-
-export const getStoredCategories = () => {
-  try {
-    const saved = localStorage.getItem(CATEGORIES_STORAGE_KEY)
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((c) => {
-          const { emoji, ...rest } = c
-          return rest
-        })
-      }
-    }
-  } catch (e) {
-    console.warn('Error leyendo categorías de localStorage:', e)
-  }
-  return DEFAULT_CATEGORIES
-}
-
-export const saveStoredCategories = (categories) => {
-  try {
-    const cleanCats = Array.isArray(categories)
-      ? categories.map((c) => {
-          const { emoji, ...rest } = c
-          return rest
-        })
-      : DEFAULT_CATEGORIES
-    localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(cleanCats))
-    window.dispatchEvent(new Event('azkaban_categories_updated'))
-  } catch (e) {
-    console.warn('Error guardando categorías:', e)
-  }
-}
+export const getStoredCategories = getFromDb
+export const saveStoredCategories = saveToDb

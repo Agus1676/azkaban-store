@@ -6,22 +6,11 @@ import FeaturedGrid from '../components/home/FeaturedGrid'
 import TrustFeatures from '../components/home/TrustFeatures'
 import CustomerReviewsSection from '../components/home/CustomerReviewsSection'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
-import { SEED_PRODUCTS } from '../data/seedProducts'
+import { getStoredProducts } from '../services/storeDb'
 import './HomePage.css'
 
 const loadProducts = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_products')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.filter((p) => p && p.active !== false)
-      }
-    }
-  } catch (e) {
-    console.warn('Error reading products:', e)
-  }
-  return SEED_PRODUCTS.filter((p) => p.active !== false)
+  return getStoredProducts().filter((p) => p && p.active !== false)
 }
 
 const HomePage = () => {

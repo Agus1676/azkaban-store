@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
+import { getStoredConfig } from '../../services/storeDb'
 import './HeroSlider.css'
 
 export const DEFAULT_SLIDES = [
@@ -33,66 +34,110 @@ export const DEFAULT_SLIDES = [
   },
 ]
 
+const loadSlides = () => {
+  try {
+    const config = getStoredConfig()
+    if (Array.isArray(config.banners) && config.banners.length > 0) {
+      return config.banners.map((b, i) => ({
+        id: b.id || i + 1,
+        category: b.tag || 'TEMPORADA 2026',
+        title: b.title || 'Nueva Colección',
+        subtitle: b.subtitle || 'Indumentaria Deportiva y Urbana',
+        ctaText: b.buttonText || 'Ver Catálogo',
+        ctaLink: b.buttonLink || '/catalogo',
+        bg: b.imageUrl || 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80',
+      }))
+    }
+  } catch (e) {
+    console.warn('Error reading hero slides:', e)
+  }
+  return DEFAULT_SLIDES
+}
+
 const HeroSlider = () => {
+  const [slides, setSlides] = useState(loadSlides)
   const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % DEFAULT_SLIDES.length)
-    }, 6000)
-    return () => clearInterval(timer)
+    const handleUpdate = () => {
+      const updated = loadSlides()
+      setSlides(updated)
+      setCurrentSlide(0)
+    }
+    window.addEventListener('azkaban_config_updated', handleUpdate)
+    return () => window.removeEventListener('azkaban_config_updated', handleUpdate)
   }, [])
 
+  useEffect(() => {
+    if (slides.length <= 1) return
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [slides.length])
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % DEFAULT_SLIDES.length)
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + DEFAULT_SLIDES.length) % DEFAULT_SLIDES.length)
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
   }
 
   return (
     <div className="hero-slider">
-      {DEFAULT_SLIDES.map((slide, idx) => (
+      {slides.map((slide, idx) => (
         <div
           key={slide.id}
           className={`hero-slide ${idx === currentSlide ? 'hero-slide--active' : ''}`}
           style={{ backgroundImage: `url(${slide.bg})` }}
         >
-          <div className="hero-slide__overlay"></div>
+          <div className="hero-slide__overlay" />
           <div className="container hero-slide__container">
             <div className="hero-slide__content">
-              <span className="hero-slide__category">{slide.category}</span>
-              <h1 className="hero-slide__title">{slide.title}</h1>
+              <span className="hero-slide__badge">{slide.category}</span>
+              <h2 className="hero-slide__title">{slide.title}</h2>
               <p className="hero-slide__subtitle">{slide.subtitle}</p>
-              <Link to={slide.ctaLink} className="btn-primary hero-slide__btn">
-                <span>{slide.ctaText}</span>
-                <FiArrowRight size={16} />
-              </Link>
+              <div className="hero-slide__actions">
+                <Link to={slide.ctaLink} className="hero-slide__btn">
+                  <span>{slide.ctaText}</span>
+                  <FiArrowRight />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       ))}
 
-      {/* Nav Controls */}
-      <button className="hero-slider__arrow hero-slider__arrow--left" onClick={prevSlide} aria-label="Anterior">
-        <FiChevronLeft size={24} />
-      </button>
-      <button className="hero-slider__arrow hero-slider__arrow--right" onClick={nextSlide} aria-label="Siguiente">
-        <FiChevronRight size={24} />
-      </button>
-
-      {/* Dots */}
-      <div className="hero-slider__dots">
-        {DEFAULT_SLIDES.map((_, idx) => (
+      {slides.length > 1 && (
+        <>
           <button
-            key={idx}
-            className={`hero-slider__dot ${idx === currentSlide ? 'active' : ''}`}
-            onClick={() => setCurrentSlide(idx)}
-            aria-label={`Ir a diapositiva ${idx + 1}`}
-          />
-        ))}
-      </div>
+            className="hero-slider__arrow hero-slider__arrow--prev"
+            onClick={prevSlide}
+            aria-label="Slide anterior"
+          >
+            <FiChevronLeft size={24} />
+          </button>
+          <button
+            className="hero-slider__arrow hero-slider__arrow--next"
+            onClick={nextSlide}
+            aria-label="Slide siguiente"
+          >
+            <FiChevronRight size={24} />
+          </button>
+
+          <div className="hero-slider__dots">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                className={`hero-slider__dot ${idx === currentSlide ? 'hero-slider__dot--active' : ''}`}
+                onClick={() => setCurrentSlide(idx)}
+                aria-label={`Ir al slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
