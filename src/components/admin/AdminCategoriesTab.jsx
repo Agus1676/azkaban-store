@@ -14,15 +14,12 @@ import {
 import toast from 'react-hot-toast'
 import { DEFAULT_CATEGORIES } from '../../data/categories'
 
-const EMOJI_OPTIONS = ['🧥', '🩳', '👕', '⚽', '🏃', '👖', '🔥', '🧢', '👟', '🎒', '⚡', '⭐']
-
 const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editingCat, setEditingCat] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    emoji: '👕',
     active: true,
   })
 
@@ -47,7 +44,6 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
     setFormData({
       name: '',
       slug: '',
-      emoji: '👕',
       active: true,
     })
     setIsEditing(true)
@@ -58,7 +54,6 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
     setFormData({
       name: cat.name,
       slug: cat.slug || cat.id,
-      emoji: cat.emoji || '👕',
       active: cat.active !== false,
     })
     setIsEditing(true)
@@ -84,7 +79,6 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
               ...c,
               name: trimmedName,
               slug: generatedSlug,
-              emoji: formData.emoji,
               active: formData.active,
             }
           : c
@@ -97,7 +91,6 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
         id: generatedSlug,
         slug: generatedSlug,
         name: trimmedName,
-        emoji: formData.emoji,
         active: formData.active,
       }
       onSaveCategories([...categories, newCat])
@@ -153,7 +146,7 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
         <div>
           <h3>Gestión de Categorías ({categories.length})</h3>
           <p>
-            Creá, renombrá y organizá las categorías de indumentaria. Se reflejan al instante en el menú desplegable y en el catálogo.
+            Creá, renombrá y organizá las colecciones de indumentaria. Se sincronizan en vivo en el catálogo y menú.
           </p>
         </div>
         <div className="header-buttons">
@@ -173,16 +166,16 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
         <table className="admin-table">
           <thead>
             <tr>
-              <th style={{ width: '60px' }}>Icono</th>
-              <th>Nombre de la Categoría</th>
-              <th>Identificador (Slug)</th>
-              <th style={{ width: '120px', textAlign: 'center' }}>Prendas</th>
-              <th style={{ width: '100px', textAlign: 'center' }}>Visible</th>
-              <th style={{ width: '140px', textAlign: 'right' }}>Acciones</th>
+              <th style={{ width: '50px', textAlign: 'center' }}>#</th>
+              <th>Colección / Categoría</th>
+              <th>Identificador (Slug URL)</th>
+              <th style={{ width: '130px', textAlign: 'center' }}>Prendas en Stock</th>
+              <th style={{ width: '100px', textAlign: 'center' }}>Estado</th>
+              <th style={{ width: '110px', textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {categories.map((cat) => {
+            {categories.map((cat, idx) => {
               const count = getProductCount(cat.slug || cat.id)
               const isTodos = cat.id === 'todos'
 
@@ -191,21 +184,24 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
                   key={cat.id}
                   className={`table-row ${cat.active === false ? 'row-inactive' : ''}`}
                 >
-                  <td style={{ fontSize: '1.4rem', textAlign: 'center' }}>
-                    {cat.emoji || '👕'}
+                  <td style={{ textAlign: 'center', color: '#94a3b8', fontWeight: '700', fontSize: '0.8rem' }}>
+                    {String(idx + 1).padStart(2, '0')}
                   </td>
                   <td>
-                    <strong style={{ fontSize: '0.95rem', color: 'var(--color-text-primary)' }}>
-                      {cat.name}
-                    </strong>
-                    {isTodos && (
-                      <span className="table-badge" style={{ marginLeft: '8px' }}>
-                        PRINCIPAL
-                      </span>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FiFolder style={{ color: '#ff5500', flexShrink: 0 }} size={16} />
+                      <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>
+                        {cat.name}
+                      </strong>
+                      {isTodos && (
+                        <span className="table-badge" style={{ marginLeft: '6px' }}>
+                          TODOS
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td>
-                    <code style={{ fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.08)', color: '#cbd5e1', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                    <code style={{ fontSize: '0.8rem', background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', fontFamily: 'monospace' }}>
                       {cat.slug || cat.id}
                     </code>
                   </td>
@@ -222,21 +218,21 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
                         onClick={() => handleToggleActive(cat.id)}
                         title={cat.active !== false ? 'Ocultar categoría' : 'Mostrar categoría'}
                       >
-                        {cat.active !== false ? <FiEye size={16} /> : <FiEyeOff size={16} />}
+                        {cat.active !== false ? <FiEye size={15} /> : <FiEyeOff size={15} />}
                       </button>
                     ) : (
-                      <span className="text-xs text-muted">Fija</span>
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600' }}>Fija</span>
                     )}
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div className="table-actions-row" style={{ justifyContent: 'flex-end' }}>
+                    <div className="table-actions-row" style={{ justifyContent: 'flex-end', gap: '6px' }}>
                       <button
                         type="button"
                         className="btn-table-icon"
                         onClick={() => handleOpenEdit(cat)}
                         title="Editar categoría"
                       >
-                        <FiEdit size={16} />
+                        <FiEdit size={15} />
                       </button>
                       {!isTodos && (
                         <button
@@ -245,7 +241,7 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
                           onClick={() => handleDelete(cat.id)}
                           title="Eliminar categoría"
                         >
-                          <FiTrash2 size={16} />
+                          <FiTrash2 size={15} />
                         </button>
                       )}
                     </div>
@@ -260,7 +256,7 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
       {/* Modal Nueva / Editar Categoría */}
       {isEditing && (
         <div className="modal-overlay" onClick={() => setIsEditing(false)}>
-          <div className="admin-product-modal" style={{ maxWidth: '480px' }} onClick={(e) => e.stopPropagation()}>
+          <div className="admin-product-modal" style={{ maxWidth: '460px' }} onClick={(e) => e.stopPropagation()}>
             <div className="admin-modal-header">
               <div className="admin-modal-header__title">
                 <FiTag className="text-orange" size={20} />
@@ -271,59 +267,35 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="admin-product-form" style={{ padding: '20px' }}>
+            <form onSubmit={handleFormSubmit} className="admin-product-form" style={{ padding: '24px' }}>
               <div className="form-group">
                 <label>Nombre de la Categoría *</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej: Buzos & Hoodies, Camperas Puffer, Gorras..."
+                  placeholder="Ej: Buzos & Hoodies, Camperas, Bermudas..."
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
               <div className="form-group">
-                <label>Emoji / Icono representativo</label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                  {EMOJI_OPTIONS.map((em) => (
-                    <button
-                      key={em}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, emoji: em })}
-                      style={{
-                        fontSize: '1.2rem',
-                        padding: '6px 10px',
-                        border: formData.emoji === em ? '1.5px solid #ff5500' : '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '6px',
-                        background: formData.emoji === em ? 'rgba(255, 85, 0, 0.2)' : '#181924',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {em}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Identificador de URL (Slug opcional)</label>
+                <label>Identificador URL (Slug opcional)</label>
                 <input
                   type="text"
-                  placeholder="ej: camperas-puffer"
+                  placeholder="ej: buzos-hoodies"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                 />
-                <span className="text-xs text-muted" style={{ marginTop: '4px', display: 'block' }}>
-                  Aparece en la dirección web: /catalogo?category={formData.slug || 'nombre'}
+                <span className="field-hint">
+                  Dirección web: /catalogo?category={formData.slug || 'nombre'}
                 </span>
               </div>
 
-              <label className="switch-row" style={{ marginTop: '12px' }}>
+              <label className="switch-row" style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong>Categoría Activa</strong>
-                  <span className="text-xs text-muted">Visible en el menú desplegable y filtros</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#0f172a', display: 'block' }}>Categoría Activa</strong>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Visible en el menú desplegable y filtros</span>
                 </div>
                 <input
                   type="checkbox"
@@ -333,7 +305,7 @@ const AdminCategoriesTab = ({ categories, onSaveCategories, products }) => {
                 />
               </label>
 
-              <div className="admin-modal-actions" style={{ marginTop: '20px' }}>
+              <div className="admin-modal-actions" style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                 <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)}>
                   Cancelar
                 </button>

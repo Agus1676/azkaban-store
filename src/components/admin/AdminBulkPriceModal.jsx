@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   FiTrendingUp,
+  FiTrendingDown,
   FiX,
   FiCheck,
   FiInfo,
@@ -137,14 +138,16 @@ const AdminBulkPriceModal = ({ isOpen, onClose, products, onApplyBulkUpdate, cat
                 className={`segmented-btn ${direction === 'increase' ? 'active' : ''}`}
                 onClick={() => setDirection('increase')}
               >
-                📈 Aumentar Precios (+)
+                <FiTrendingUp size={15} />
+                <span>Aumentar Precios (+)</span>
               </button>
               <button
                 type="button"
                 className={`segmented-btn ${direction === 'decrease' ? 'active' : ''}`}
                 onClick={() => setDirection('decrease')}
               >
-                📉 Descontar Precios (-)
+                <FiTrendingDown size={15} />
+                <span>Descontar Precios (-)</span>
               </button>
             </div>
           </div>

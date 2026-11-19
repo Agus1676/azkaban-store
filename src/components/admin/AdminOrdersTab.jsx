@@ -10,6 +10,8 @@ import {
   FiClock,
   FiDollarSign,
   FiExternalLink,
+  FiMapPin,
+  FiMessageSquare,
 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { formatPrice } from '../../utils/formatPrice'
@@ -251,7 +253,10 @@ const AdminOrdersTab = ({
 
                     {ord.customer?.city && (
                       <div className="customer-location-item">
-                        <span>📍 {ord.customer.city}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <FiMapPin size={13} style={{ color: '#ff5500' }} />
+                          {ord.customer.city}
+                        </span>
                         {ord.customer.address && (
                           <span className="text-muted text-xs">
                             ({ord.customer.address})
@@ -339,8 +344,9 @@ const AdminOrdersTab = ({
                 <div className="order-card-footer">
                   <div className="order-footer-left">
                     {ord.customer?.notes && (
-                      <span className="order-customer-notes">
-                        💬 <strong>Aclaraciones:</strong> {ord.customer.notes}
+                      <span className="order-customer-notes" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <FiMessageSquare size={13} style={{ color: '#ff5500', flexShrink: 0 }} />
+                        <strong>Aclaraciones:</strong> {ord.customer.notes}
                       </span>
                     )}
                   </div>

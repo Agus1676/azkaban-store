@@ -409,9 +409,12 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                 <div style={{ background: '#181924', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '14px', marginTop: '6px' }}>
                   {simulationResult.zoneInfo ? (
                     <>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>📍 {simulationResult.zoneInfo.location}</span>
-                        <span style={{ color: '#ff5500' }}>{simulationResult.zoneInfo.zone}</span>
+                      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0f172a', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                          <FiMapPin size={14} style={{ color: '#ff5500' }} />
+                          {simulationResult.zoneInfo.location}
+                        </span>
+                        <span style={{ color: '#ff5500', fontWeight: '800' }}>{simulationResult.zoneInfo.zone}</span>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {simulationResult.quotes.map((q) => (
@@ -420,24 +423,24 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                             style={{
                               display: 'flex',
                               justifyContent: 'space-between',
-                              fontSize: '0.8rem',
-                              padding: '8px 10px',
-                              background: '#12131b',
-                              border: '1px solid rgba(255, 255, 255, 0.06)',
-                              borderRadius: '6px',
-                              color: '#cbd5e1',
+                              fontSize: '0.82rem',
+                              padding: '10px 12px',
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '8px',
+                              color: '#1e293b',
                             }}
                           >
-                            <span>{q.icon} {q.name}</span>
-                            <strong style={{ color: q.price === 0 ? '#4ade80' : '#ffffff' }}>
+                            <span>{q.name}</span>
+                            <strong style={{ color: q.price === 0 ? '#15803d' : '#0f172a' }}>
                               {q.price === 0 ? '¡GRATIS!' : formatPrice(q.price)}
                             </strong>
                           </div>
                         ))}
                       </div>
                       {simulationResult.isFreeEligible && (
-                        <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#4ade80', fontWeight: 700, textAlign: 'center', background: 'rgba(74, 222, 128, 0.1)', padding: '6px', borderRadius: '6px' }}>
-                          🎉 ¡Aplica Envío Andreani Gratis!
+                        <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#15803d', fontWeight: 700, textAlign: 'center', background: '#dcfce7', border: '1px solid #bbf7d0', padding: '7px', borderRadius: '6px' }}>
+                          ¡Aplica Envío Andreani Gratis!
                         </div>
                       )}
                     </>
