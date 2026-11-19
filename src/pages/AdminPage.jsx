@@ -12,12 +12,23 @@ import {
   FiLayers,
   FiTruck,
   FiTag,
+  FiMenu,
+  FiX,
+  FiPackage,
 } from 'react-icons/fi'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useAuth } from '../contexts/AuthContext'
-import { SEED_PRODUCTS, STORE_INFO } from '../data/seedProducts'
-import { DEFAULT_RETURN_POLICY_TEXT } from '../data/policies'
-import { getStoredCategories, saveStoredCategories } from '../data/categories'
-import { DEFAULT_SHIPPING_CONFIG } from '../utils/shipping'
+import {
+  getStoredProducts,
+  saveStoredProducts,
+  restoreFactoryProducts,
+  getStoredCategories,
+  saveStoredCategories,
+  getStoredOrders,
+  saveStoredOrders,
+  getStoredConfig,
+  saveStoredConfig,
+} from '../services/storeDb'
 import toast from 'react-hot-toast'
 
 // Modular Admin Components
@@ -34,56 +45,23 @@ import AdminOrderInvoiceModal from '../components/admin/AdminOrderInvoiceModal'
 
 import './AdminPage.css'
 
-const getStoredProducts = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_products')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return SEED_PRODUCTS
-}
-
-const getStoredOrders = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_orders')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return []
-}
-
-const getStoredConfig = () => {
-  try {
-    const saved = localStorage.getItem('azkaban_store_config')
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.warn(e)
-  }
-  return {
-    ...STORE_INFO,
-    phoneRaw: STORE_INFO.phoneRaw || '5491137934198',
-    phoneDisplay: STORE_INFO.phoneDisplay || '+54 9 11 3793-4198',
-    hours: STORE_INFO.hours || 'Lunes a Viernes de 10:00 a 20:00 hs',
-    address: STORE_INFO.address || 'Dr. marcos zimmermann 3339, San Martín, Prov. Buenos Aires',
-    shippingCarriersText: 'Andreani / Vía Cargo',
-    announcementText: 'Envíos a todo el país por Andreani y Vía Cargo • Retiro en San Martín',
-    bankHolder: 'Azkaban Store Oficial',
-    bankName: 'Mercado Pago / Banco',
-    bankAlias: 'AZKABAN.STORE',
-    bankCbu: '0000003100012345678901',
-    returnPolicy: DEFAULT_RETURN_POLICY_TEXT,
-    shippingConfig: DEFAULT_SHIPPING_CONFIG,
-  }
+const TAB_INFO = {
+  dashboard: { title: 'Dashboard General', sub: 'Métricas de ventas, pedidos y control de stock' },
+  products: { title: 'Catálogo de Prendas', sub: 'Administración de productos, fotos, precios y talles' },
+  stock: { title: 'Control Rápido de Stock', sub: 'Ajuste de existencias físicas e inventario en tiempo real' },
+  categories: { title: 'Gestión de Categorías', sub: 'Organización de colecciones para el menú y catálogo' },
+  shipping: { title: 'Logística & Cotizador Andreani', sub: 'Tarifas zonales, sucursales y envíos a todo el país' },
+  orders: { title: 'Gestión de Pedidos & Ventas', sub: 'Seguimiento de compras, códigos de guía y remitos' },
+  settings: { title: 'Configuración de la Tienda', sub: 'Canales de contacto, punto de retiro y copias de seguridad' },
 }
 
 const AdminPage = () => {
   const { isAdmin, login, logout, changePassword } = useAuth()
   const [passwordInput, setPasswordInput] = useState('')
   const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard' | 'products' | 'categories' | 'shipping' | 'stock' | 'orders' | 'settings'
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Global store states
+  // Global store states (100% Blindados con storeDb)
   const [products, setProducts] = useState(getStoredProducts)
   const [categories, setCategories] = useState(getStoredCategories)
   const [orders, setOrders] = useState(getStoredOrders)
@@ -100,21 +78,21 @@ const AdminPage = () => {
   const [isBulkPriceModalOpen, setIsBulkPriceModalOpen] = useState(false)
   const [invoiceOrder, setInvoiceOrder] = useState(null)
 
-  // Sync to localStorage
+  // Sync to storeDb & localStorage
   useEffect(() => {
-    localStorage.setItem('azkaban_products', JSON.stringify(products))
-    window.dispatchEvent(new Event('azkaban_products_updated'))
+    saveStoredProducts(products)
   }, [products])
 
   useEffect(() => {
-    localStorage.setItem('azkaban_orders', JSON.stringify(orders))
-    window.dispatchEvent(new Event('azkaban_orders_updated'))
+    saveStoredOrders(orders)
   }, [orders])
 
   useEffect(() => {
-    localStorage.setItem('azkaban_store_config', JSON.stringify(storeConfig))
-    window.dispatchEvent(new Event('azkaban_config_updated'))
+    saveStoredConfig(storeConfig)
   }, [storeConfig])
+
+  // Badge counts
+  const lowStockCount = products.filter((p) => (Number(p.stock) || 0) <= 2 && p.active !== false).length
 
   // Login Handler
   const handleLogin = (e) => {
@@ -336,7 +314,8 @@ const AdminPage = () => {
         '¿Deseás restaurar las 12 prendas iniciales de Treinta? Se sobreescribirán los cambios de productos.'
       )
     ) {
-      setProducts(SEED_PRODUCTS)
+      const restored = restoreFactoryProducts()
+      setProducts(restored)
       toast.success('Catálogo de Treinta restaurado exitosamente')
     }
   }
@@ -378,171 +357,331 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="admin-dashboard">
-      <div className="container">
-        {/* Top Navbar */}
-        <div className="admin-topbar">
-          <div className="admin-topbar__title">
-            <div className="admin-logo-circle">
-              <img src="/logo.png" alt="AzkabanStore" />
-            </div>
-            <div>
-              <h2>Panel de Administración</h2>
-              <span className="admin-badge-sub">AzkabanStore • San Martín</span>
+    <div className="admin-app-layout">
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="admin-backdrop-overlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Dedicated Left Sidebar (Jokers Style) */}
+      <aside className={`admin-app-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="admin-sidebar-brand">
+          <div className="admin-brand-logo-wrap">
+            <img src="/logo.png" alt="Azkaban" className="admin-sidebar-logo" />
+          </div>
+          <div className="admin-brand-texts">
+            <h3>AZKABAN</h3>
+            <span>ADMIN STUDIO</span>
+          </div>
+          <button
+            className="admin-sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Cerrar navegación"
+          >
+            <FiX size={18} />
+          </button>
+        </div>
+
+        <nav className="admin-sidebar-nav">
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('dashboard')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiLayers size={18} />
+            <span>Dashboard</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('products')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiBox size={18} />
+            <span>Prendas &amp; Catálogo</span>
+            <span className="nav-item-badge">{products.length}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'stock' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('stock')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiPackage size={18} />
+            <span>Control de Stock</span>
+            {lowStockCount > 0 && (
+              <span className="nav-item-badge badge-warning">{lowStockCount}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'categories' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('categories')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiTag size={18} />
+            <span>Categorías</span>
+            <span className="nav-item-badge">{categories.length}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'shipping' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('shipping')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiTruck size={18} />
+            <span>Envíos &amp; Andreani</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('orders')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiShoppingBag size={18} />
+            <span>Pedidos &amp; CRM</span>
+            {orders.length > 0 && (
+              <span className="nav-item-badge">{orders.length}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('settings')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiSettings size={18} />
+            <span>Configuración</span>
+          </button>
+        </nav>
+
+        <div className="admin-sidebar-footer">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sidebar-footer-link"
+            title="Abrir tienda en nueva pestaña"
+          >
+            <FiExternalLink size={15} />
+            <span>Ver Tienda Online</span>
+          </a>
+          <button
+            type="button"
+            onClick={handleExportBackup}
+            className="sidebar-footer-link"
+            title="Descargar copia de seguridad JSON"
+          >
+            <FiDownload size={15} />
+            <span>Descargar Backup JSON</span>
+          </button>
+          <label className="sidebar-footer-link" style={{ cursor: 'pointer' }}>
+            <FiUpload size={15} />
+            <span>Restaurar Copia JSON</span>
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImportBackup}
+              style={{ display: 'none' }}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={logout}
+            className="sidebar-footer-link btn-sidebar-logout"
+            title="Cerrar sesión"
+          >
+            <FiLogOut size={15} />
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Admin Area */}
+      <div className="admin-app-main">
+        {/* Top Header */}
+        <header className="admin-app-header">
+          <div className="header-left">
+            <button
+              type="button"
+              className="admin-hamburger-btn"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Abrir navegación"
+            >
+              {sidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+            </button>
+            <div className="header-title-box">
+              <h2>{TAB_INFO[activeTab]?.title || 'Panel de Administración'}</h2>
+              <span className="header-sub">
+                {TAB_INFO[activeTab]?.sub || 'AzkabanStore • San Martín, Prov. Buenos Aires'}
+              </span>
             </div>
           </div>
 
-          <div className="admin-topbar__actions">
+          <div className="header-right">
+            <span className="status-indicator-pill">
+              <span className="pulse-dot" /> Online
+            </span>
             <a
-              href="/"
+              href={`https://wa.me/${storeConfig?.phoneRaw || '5491137934198'}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary btn-sm"
-              title="Abrir tienda online"
+              className="btn-header-wa"
+              title="Abrir chat de WhatsApp"
             >
-              <FiExternalLink size={14} /> Tienda
+              <FaWhatsapp size={15} />
+              <span className="hide-on-mobile">WhatsApp Tienda</span>
             </a>
-            <button
-              className="btn-secondary btn-sm"
-              onClick={handleExportBackup}
-              title="Descargar copia de seguridad"
-            >
-              <FiDownload size={14} /> Backup
-            </button>
-            <label className="btn-secondary btn-sm" style={{ cursor: 'pointer' }} title="Importar copia JSON">
-              <FiUpload size={14} /> Restaurar
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImportBackup}
-                style={{ display: 'none' }}
-              />
-            </label>
-            <button className="btn-secondary btn-sm btn-logout" onClick={logout} title="Cerrar sesión">
-              <FiLogOut size={14} /> Salir
-            </button>
           </div>
+        </header>
+
+        {/* Tab Body */}
+        <div className="admin-app-body">
+          {activeTab === 'dashboard' && (
+            <AdminDashboardTab
+              products={products}
+              orders={orders}
+              onNavigateTab={setActiveTab}
+              onOpenNewProduct={handleOpenNewProduct}
+              onOpenBulkPrice={() => setIsBulkPriceModalOpen(true)}
+              onExportBackup={handleExportBackup}
+            />
+          )}
+
+          {activeTab === 'products' && (
+            <AdminProductsTab
+              products={products}
+              categories={categories}
+              onOpenNewProduct={handleOpenNewProduct}
+              onOpenEditProduct={handleOpenEditProduct}
+              onDuplicateProduct={handleDuplicateProduct}
+              onDeleteProduct={handleDeleteProduct}
+              onToggleActive={handleToggleActive}
+              onToggleFeatured={handleToggleFeatured}
+              onAdjustStock={handleAdjustStock}
+              onOpenBulkPrice={() => setIsBulkPriceModalOpen(true)}
+              onRestoreTreinta={handleRestoreTreinta}
+            />
+          )}
+
+          {activeTab === 'categories' && (
+            <AdminCategoriesTab
+              categories={categories}
+              onSaveCategories={handleSaveCategories}
+              products={products}
+            />
+          )}
+
+          {activeTab === 'shipping' && (
+            <AdminShippingTab
+              storeConfig={storeConfig}
+              onSaveConfig={setStoreConfig}
+            />
+          )}
+
+          {activeTab === 'stock' && (
+            <AdminStockTab
+              products={products}
+              onSetStock={handleSetStock}
+              onAdjustStock={handleAdjustStock}
+            />
+          )}
+
+          {activeTab === 'orders' && (
+            <AdminOrdersTab
+              orders={orders}
+              storeConfig={storeConfig}
+              onUpdateStatus={handleUpdateOrderStatus}
+              onUpdateTracking={handleUpdateOrderTracking}
+              onDeleteOrder={handleDeleteOrder}
+              onOpenInvoice={setInvoiceOrder}
+            />
+          )}
+
+          {activeTab === 'settings' && (
+            <AdminSettingsTab
+              storeConfig={storeConfig}
+              onSaveConfig={setStoreConfig}
+              onChangePassword={changePassword}
+              onExportBackup={handleExportBackup}
+              onImportBackup={handleImportBackup}
+              onRestoreTreinta={handleRestoreTreinta}
+            />
+          )}
         </div>
-
-        {/* Navigation Tabs */}
-        <div className="admin-tabs">
-          <button
-            className={`admin-tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <FiLayers size={16} /> Resumen General
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'products' ? 'active' : ''}`}
-            onClick={() => setActiveTab('products')}
-          >
-            <FiBox size={16} /> Prendas ({products.length})
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'categories' ? 'active' : ''}`}
-            onClick={() => setActiveTab('categories')}
-          >
-            <FiTag size={16} /> Categorías ({categories.length})
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'shipping' ? 'active' : ''}`}
-            onClick={() => setActiveTab('shipping')}
-          >
-            <FiTruck size={16} /> Envíos & Andreani
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'stock' ? 'active' : ''}`}
-            onClick={() => setActiveTab('stock')}
-          >
-            <FiBox size={16} /> Control de Stock
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-            onClick={() => setActiveTab('orders')}
-          >
-            <FiShoppingBag size={16} /> Pedidos ({orders.length})
-          </button>
-          <button
-            className={`admin-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            <FiSettings size={16} /> Configuración
-          </button>
-        </div>
-
-        {/* TAB VIEWS */}
-        {activeTab === 'dashboard' && (
-          <AdminDashboardTab
-            products={products}
-            orders={orders}
-            onNavigateTab={setActiveTab}
-            onOpenNewProduct={handleOpenNewProduct}
-            onOpenBulkPrice={() => setIsBulkPriceModalOpen(true)}
-            onExportBackup={handleExportBackup}
-          />
-        )}
-
-        {activeTab === 'products' && (
-          <AdminProductsTab
-            products={products}
-            categories={categories}
-            onOpenNewProduct={handleOpenNewProduct}
-            onOpenEditProduct={handleOpenEditProduct}
-            onDuplicateProduct={handleDuplicateProduct}
-            onDeleteProduct={handleDeleteProduct}
-            onToggleActive={handleToggleActive}
-            onToggleFeatured={handleToggleFeatured}
-            onAdjustStock={handleAdjustStock}
-            onOpenBulkPrice={() => setIsBulkPriceModalOpen(true)}
-            onRestoreTreinta={handleRestoreTreinta}
-          />
-        )}
-
-        {activeTab === 'categories' && (
-          <AdminCategoriesTab
-            categories={categories}
-            onSaveCategories={handleSaveCategories}
-            products={products}
-          />
-        )}
-
-        {activeTab === 'shipping' && (
-          <AdminShippingTab
-            storeConfig={storeConfig}
-            onSaveConfig={setStoreConfig}
-          />
-        )}
-
-        {activeTab === 'stock' && (
-          <AdminStockTab
-            products={products}
-            onSetStock={handleSetStock}
-            onAdjustStock={handleAdjustStock}
-          />
-        )}
-
-        {activeTab === 'orders' && (
-          <AdminOrdersTab
-            orders={orders}
-            storeConfig={storeConfig}
-            onUpdateStatus={handleUpdateOrderStatus}
-            onUpdateTracking={handleUpdateOrderTracking}
-            onDeleteOrder={handleDeleteOrder}
-            onOpenInvoice={setInvoiceOrder}
-          />
-        )}
-
-        {activeTab === 'settings' && (
-          <AdminSettingsTab
-            storeConfig={storeConfig}
-            onSaveConfig={setStoreConfig}
-            onChangePassword={changePassword}
-            onExportBackup={handleExportBackup}
-            onImportBackup={handleImportBackup}
-            onRestoreTreinta={handleRestoreTreinta}
-          />
-        )}
       </div>
+
+      {/* Mobile Sticky Bottom Nav Bar (< 900px) */}
+      <nav className="admin-mobile-bottom-nav">
+        <button
+          type="button"
+          className={`bottom-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
+        >
+          <FiLayers size={18} />
+          <span>Dashboard</span>
+        </button>
+        <button
+          type="button"
+          className={`bottom-nav-btn ${activeTab === 'products' ? 'active' : ''}`}
+          onClick={() => setActiveTab('products')}
+        >
+          <FiBox size={18} />
+          <span>Prendas</span>
+        </button>
+        <button
+          type="button"
+          className={`bottom-nav-btn ${activeTab === 'stock' ? 'active' : ''}`}
+          onClick={() => setActiveTab('stock')}
+        >
+          <FiPackage size={18} />
+          <span>Stock</span>
+        </button>
+        <button
+          type="button"
+          className={`bottom-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}
+          onClick={() => setActiveTab('orders')}
+        >
+          <div className="bottom-btn-badge-wrap">
+            <FiShoppingBag size={18} />
+            {orders.length > 0 && <span className="bottom-badge-dot" />}
+          </div>
+          <span>Pedidos</span>
+        </button>
+        <button
+          type="button"
+          className={`bottom-nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          <FiSettings size={18} />
+          <span>Ajustes</span>
+        </button>
+      </nav>
 
       {/* MODALS */}
       <AdminProductModal

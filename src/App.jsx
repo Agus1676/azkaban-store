@@ -31,8 +31,11 @@ const PageLoader = () => (
 )
 
 function App() {
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith('/admin')
+
   return (
-    <div className="app">
+    <div className={`app ${isAdmin ? 'app--admin' : ''}`}>
       <ScrollToTop />
       <Toaster
         position="top-right"
@@ -46,10 +49,10 @@ function App() {
           },
         }}
       />
-      <AnnouncementBar />
-      <Navbar />
+      {!isAdmin && <AnnouncementBar />}
+      {!isAdmin && <Navbar />}
 
-      <main className="main-content">
+      <main className={isAdmin ? 'admin-main-wrapper' : 'main-content'}>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -62,9 +65,9 @@ function App() {
         </Suspense>
       </main>
 
-      <Footer />
-      <WhatsAppFloat />
-      <CartDrawer />
+      {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppFloat />}
+      {!isAdmin && <CartDrawer />}
     </div>
   )
 }
