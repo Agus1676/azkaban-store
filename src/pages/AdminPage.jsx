@@ -519,6 +519,19 @@ const AdminPage = () => {
             <FiLogOut size={15} />
             <span>Cerrar Sesión</span>
           </button>
+
+          <div className="admin-sidebar-author">
+            <span className="admin-sidebar-author-label">Desarrollado por</span>
+            <a
+              href="https://agustinpollan.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-sidebar-author-link"
+              title="Ver Portafolio de Agustín Pollán"
+            >
+              Agustín Pollán ↗
+            </a>
+          </div>
         </div>
       </aside>
 
