@@ -4,7 +4,7 @@ import { FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import { getStoredConfig } from '../../services/storeDb'
 import './HeroSlider.css'
 
-export const DEFAULT_SLIDES = [
+const DEFAULT_SLIDES = [
   {
     id: 1,
     category: 'TEMPORADA 2026 • INDUMENTARIA DEPORTIVA & URBANA',

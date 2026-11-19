@@ -1,6 +1,3 @@
-// Single source of truth: re-export from storeDb
-import { getStoredCategories as getFromDb, saveStoredCategories as saveToDb } from '../services/storeDb'
-
 export const DEFAULT_CATEGORIES = [
   { id: 'todos', name: 'Todos los Productos', slug: 'todos', active: true },
   { id: 'buzos', name: 'Buzos & Hoodies', slug: 'buzos', active: true },
@@ -16,5 +13,32 @@ export const DEFAULT_CATEGORIES = [
 ]
 
 export const CATEGORIES_STORAGE_KEY = 'azkaban_categories'
-export const getStoredCategories = getFromDb
-export const saveStoredCategories = saveToDb
+
+export const getStoredCategories = () => {
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(CATEGORIES_STORAGE_KEY) : null
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed
+      }
+    }
+  } catch (err) {
+    console.warn('Error leyendo categorías:', err)
+  }
+  return DEFAULT_CATEGORIES
+}
+
+export const saveStoredCategories = (categories) => {
+  try {
+    const safeArray = Array.isArray(categories) ? categories : DEFAULT_CATEGORIES
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(safeArray))
+      window.dispatchEvent(new Event('azkaban_categories_updated'))
+    }
+    return true
+  } catch (err) {
+    console.error('Error guardando categorías:', err)
+    return false
+  }
+}
