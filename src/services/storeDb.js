@@ -8,6 +8,7 @@ const KEYS = {
   CATEGORIES: 'azkaban_categories',
   ORDERS: 'azkaban_orders',
   CONFIG: 'azkaban_store_config',
+  STOCK_LOGS: 'azkaban_stock_logs',
 }
 
 /**
@@ -176,5 +177,46 @@ export const saveStoredConfig = (config) => {
   } catch (err) {
     console.error('Error guardando configuración:', err)
     return false
+  }
+}
+
+// ==========================================================================
+// 5. REGISTRO DE MOVIMIENTOS & VENTAS (STOCK LOGS)
+// ==========================================================================
+
+export const getStoredStockLogs = () => {
+  try {
+    const raw = localStorage.getItem(KEYS.STOCK_LOGS)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) return parsed
+    }
+  } catch (err) {
+    console.warn('Error leyendo registros de stock/ventas:', err)
+  }
+  return []
+}
+
+export const saveStoredStockLogs = (logs) => {
+  try {
+    const safeArray = Array.isArray(logs) ? logs : []
+    localStorage.setItem(KEYS.STOCK_LOGS, JSON.stringify(safeArray))
+    window.dispatchEvent(new Event('azkaban_stock_updated'))
+    return true
+  } catch (err) {
+    console.error('Error guardando logs de stock:', err)
+    return false
+  }
+}
+
+export const addStoredStockLog = (entry) => {
+  try {
+    const current = getStoredStockLogs()
+    const updated = [entry, ...current]
+    saveStoredStockLogs(updated)
+    return updated
+  } catch (err) {
+    console.error('Error agregando log de stock:', err)
+    return []
   }
 }
