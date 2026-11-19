@@ -1,23 +1,16 @@
 import { useState } from 'react'
 import {
-  FiSettings,
+  FiSave,
   FiLock,
   FiDownload,
   FiUpload,
   FiRefreshCw,
-  FiCheck,
   FiShield,
   FiDollarSign,
-  FiTruck,
   FiMapPin,
-  FiClock,
-  FiPhone,
-  FiMail,
-  FiInstagram,
-  FiRadio,
-  FiCreditCard,
+  FiFileText,
+  FiMessageSquare,
 } from 'react-icons/fi'
-import { FaWhatsapp } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import { DEFAULT_RETURN_POLICY_TEXT } from '../../data/policies'
 
@@ -37,7 +30,7 @@ const AdminSettingsTab = ({
   const handleConfigSubmit = (e) => {
     e.preventDefault()
     onSaveConfig(formData)
-    toast.success('¡Configuración de la tienda guardada exitosamente!')
+    toast.success('¡Configuración guardada exitosamente!')
   }
 
   const handlePasswordSubmit = (e) => {
@@ -47,7 +40,7 @@ const AdminSettingsTab = ({
       return
     }
     if (newPass !== confirmPass) {
-      toast.error('Las nuevas contraseñas no coinciden')
+      toast.error('Las contraseñas no coinciden')
       return
     }
 
@@ -63,36 +56,44 @@ const AdminSettingsTab = ({
   }
 
   return (
-    <div className="admin-content-card">
-      {/* Header */}
-      <div className="admin-content-card__header">
+    <div className="admin-page-container">
+      {/* Top Banner Header */}
+      <div className="admin-section-header">
         <div>
-          <h3>Configuración General de AzkabanStore</h3>
+          <h2>Configuración de la Tienda</h2>
           <p>
-            Gestioná los canales de contacto, WhatsApp de pedidos, punto de retiro físico en San Martín y copias de seguridad.
+            Gestioná los datos comerciales, canales de WhatsApp, punto de retiro, seguridad y copias de seguridad.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleConfigSubmit}
+          className="btn-admin-primary"
+        >
+          <FiSave size={16} />
+          <span>Guardar Cambios</span>
+        </button>
       </div>
 
-      <div className="settings-columns-layout">
-        {/* Left Column: Main Form */}
-        <div className="settings-main-form-box">
+      <div className="settings-grid-layout">
+        {/* Main Column */}
+        <div className="settings-main-column">
           <form onSubmit={handleConfigSubmit}>
-            {/* Card 1: Identidad & Contacto */}
-            <div className="settings-card-section">
-              <div className="settings-card-section__header">
-                <div className="settings-icon-pill">
-                  <FiSettings size={18} />
-                </div>
-                <div>
-                  <h4>1. Identidad de Marca & Contacto</h4>
-                  <span>Datos comerciales y canales oficiales de atención al cliente</span>
+            {/* Card 1: Identidad & Canales */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="card-title-group">
+                  <FiMessageSquare className="card-header-icon" />
+                  <div>
+                    <h3>Identidad de Marca & Canales de Contacto</h3>
+                    <p>Datos visibles para los clientes y líneas directas de atención</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="form-grid-2">
-                <div className="form-group">
-                  <label htmlFor="cfg-name">Nombre de la Tienda *</label>
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-name">Nombre de la Tienda</label>
                   <input
                     id="cfg-name"
                     type="text"
@@ -103,8 +104,8 @@ const AdminSettingsTab = ({
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="cfg-slogan">Eslogan / Subtítulo</label>
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-slogan">Eslogan o Subtítulo</label>
                   <input
                     id="cfg-slogan"
                     type="text"
@@ -115,177 +116,146 @@ const AdminSettingsTab = ({
                 </div>
               </div>
 
-              <div className="form-grid-2">
-                <div className="form-group">
-                  <label htmlFor="cfg-phone-raw">
-                    WhatsApp para Pedidos (Sin signos ni espacios) *
-                  </label>
-                  <div className="input-with-icon">
-                    <FaWhatsapp className="field-icon-wa" />
-                    <input
-                      id="cfg-phone-raw"
-                      type="text"
-                      required
-                      placeholder="5491137934198"
-                      value={formData.phoneRaw || ''}
-                      onChange={(e) => setFormData({ ...formData, phoneRaw: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="cfg-phone-disp">
-                    WhatsApp Visible al Cliente *
-                  </label>
-                  <div className="input-with-icon">
-                    <FiPhone className="field-icon" />
-                    <input
-                      id="cfg-phone-disp"
-                      type="text"
-                      required
-                      placeholder="+54 9 11 3793-4198"
-                      value={formData.phoneDisplay || ''}
-                      onChange={(e) => setFormData({ ...formData, phoneDisplay: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-grid-2">
-                <div className="form-group">
-                  <label htmlFor="cfg-email">Email Oficial de la Tienda</label>
-                  <div className="input-with-icon">
-                    <FiMail className="field-icon" />
-                    <input
-                      id="cfg-email"
-                      type="email"
-                      placeholder="azkabanstoreonline@gmail.com"
-                      value={formData.email || ''}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="cfg-channel">Link Canal de WhatsApp</label>
-                  <div className="input-with-icon">
-                    <FaWhatsapp className="field-icon-wa" />
-                    <input
-                      id="cfg-channel"
-                      type="url"
-                      placeholder="https://whatsapp.com/channel/..."
-                      value={formData.whatsappChannelUrl || ''}
-                      onChange={(e) => setFormData({ ...formData, whatsappChannelUrl: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="cfg-insta">Instagram Oficial (Enlace o usuario)</label>
-                <div className="input-with-icon">
-                  <FiInstagram className="field-icon" />
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-phone-raw">WhatsApp para Pedidos (Código país + número)</label>
                   <input
-                    id="cfg-insta"
+                    id="cfg-phone-raw"
                     type="text"
-                    placeholder="https://instagram.com/azkabanstore.indumentaria"
-                    value={formData.instagramUrl || ''}
-                    onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
+                    required
+                    placeholder="5491137934198"
+                    value={formData.phoneRaw || ''}
+                    onChange={(e) => setFormData({ ...formData, phoneRaw: e.target.value })}
+                  />
+                  <span className="field-hint">Sin espacios ni símbolos (+). Ej: 5491137934198</span>
+                </div>
+
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-phone-disp">WhatsApp Visible al Cliente</label>
+                  <input
+                    id="cfg-phone-disp"
+                    type="text"
+                    required
+                    placeholder="+54 9 11 3793-4198"
+                    value={formData.phoneDisplay || ''}
+                    onChange={(e) => setFormData({ ...formData, phoneDisplay: e.target.value })}
+                  />
+                  <span className="field-hint">Formato para el header y footer</span>
+                </div>
+              </div>
+
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-email">Email Oficial de la Tienda</label>
+                  <input
+                    id="cfg-email"
+                    type="email"
+                    placeholder="azkabanstoreonline@gmail.com"
+                    value={formData.email || ''}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
+
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-channel">Enlace del Canal Oficial de WhatsApp</label>
+                  <input
+                    id="cfg-channel"
+                    type="url"
+                    placeholder="https://whatsapp.com/channel/..."
+                    value={formData.channelUrl || ''}
+                    onChange={(e) => setFormData({ ...formData, channelUrl: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="cfg-insta">Instagram Oficial (Enlace o @usuario)</label>
+                <input
+                  id="cfg-insta"
+                  type="text"
+                  placeholder="https://instagram.com/azkabanstore.indumentaria"
+                  value={formData.instagramUrl || ''}
+                  onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
+                />
               </div>
             </div>
 
-            {/* Card 2: Punto de Retiro & Logística */}
-            <div className="settings-card-section">
-              <div className="settings-card-section__header">
-                <div className="settings-icon-pill settings-icon-pill--location">
-                  <FiMapPin size={18} />
-                </div>
-                <div>
-                  <h4>2. Punto de Retiro & Logística</h4>
-                  <span>Ubicación física en San Martín, horarios y empresas de envío</span>
+            {/* Card 2: Punto de Retiro & Anuncio */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="card-title-group">
+                  <FiMapPin className="card-header-icon" />
+                  <div>
+                    <h3>Punto de Retiro & Logística</h3>
+                    <p>Ubicación física para retiro en el local y avisos en el sitio</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="cfg-address">Dirección Física del Punto de Retiro *</label>
-                <div className="input-with-icon">
-                  <FiMapPin className="field-icon" />
+              <div className="admin-form-group">
+                <label htmlFor="cfg-address">Dirección Física del Punto de Retiro</label>
+                <input
+                  id="cfg-address"
+                  type="text"
+                  required
+                  placeholder="Dr. marcos zimmermann 3339 (Entre av JM campos y pasaje 86)"
+                  value={formData.address || ''}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                />
+                <span className="field-hint">Visible en la página /nosotros y al seleccionar retiro en local</span>
+              </div>
+
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-hours">Horarios de Atención y Despacho</label>
                   <input
-                    id="cfg-address"
+                    id="cfg-hours"
                     type="text"
                     required
-                    placeholder="Dr. marcos zimmermann 3339 (Entre av JM campos y pasaje 86). San Martín"
-                    value={formData.address || ''}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Lunes a Viernes de 10:00 a 20:00 hs"
+                    value={formData.hours || ''}
+                    onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                   />
                 </div>
-              </div>
 
-              <div className="form-grid-2">
-                <div className="form-group">
-                  <label htmlFor="cfg-hours">Horarios de Atención *</label>
-                  <div className="input-with-icon">
-                    <FiClock className="field-icon" />
-                    <input
-                      id="cfg-hours"
-                      type="text"
-                      required
-                      placeholder="Lunes a Viernes de 10:00 a 20:00 hs"
-                      value={formData.hours || ''}
-                      onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="cfg-carriers">Empresas de Logística / Despacho</label>
-                  <div className="input-with-icon">
-                    <FiTruck className="field-icon" />
-                    <input
-                      id="cfg-carriers"
-                      type="text"
-                      placeholder="Andreani / Vía Cargo"
-                      value={formData.shippingCarriersText || 'Andreani / Vía Cargo'}
-                      onChange={(e) => setFormData({ ...formData, shippingCarriersText: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Announcement Bar */}
-              <div className="form-group">
-                <label htmlFor="cfg-announcement">
-                  Texto de la Barra Superior de Anuncios (En vivo en toda la web)
-                </label>
-                <div className="input-with-icon">
-                  <FiRadio className="field-icon" />
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-carriers">Empresas de Logística Asociadas</label>
                   <input
-                    id="cfg-announcement"
+                    id="cfg-carriers"
                     type="text"
-                    placeholder="Envíos a todo el país por Andreani y Vía Cargo • Retiro en San Martín"
-                    value={formData.announcementText || ''}
-                    onChange={(e) => setFormData({ ...formData, announcementText: e.target.value })}
+                    placeholder="Andreani / Vía Cargo"
+                    value={formData.shippingCarriersText || 'Andreani / Vía Cargo'}
+                    onChange={(e) => setFormData({ ...formData, shippingCarriersText: e.target.value })}
                   />
                 </div>
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="cfg-announcement">Barra Superior de Anuncios (En vivo en toda la web)</label>
+                <input
+                  id="cfg-announcement"
+                  type="text"
+                  placeholder="Envíos a todo el país por Andreani y Vía Cargo • Retiro en San Martín"
+                  value={formData.announcementText || ''}
+                  onChange={(e) => setFormData({ ...formData, announcementText: e.target.value })}
+                />
               </div>
             </div>
 
             {/* Card 3: Datos Bancarios */}
-            <div className="settings-card-section">
-              <div className="settings-card-section__header">
-                <div className="settings-icon-pill settings-icon-pill--bank">
-                  <FiDollarSign size={18} />
-                </div>
-                <div>
-                  <h4>3. Datos Bancarios para Transferencias</h4>
-                  <span>Información que ve el cliente en el checkout para abonar por banco</span>
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="card-title-group">
+                  <FiDollarSign className="card-header-icon" />
+                  <div>
+                    <h3>Datos Bancarios para Transferencias</h3>
+                    <p>Información que se muestra a los compradores para pagar por banco</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="form-grid-2">
-                <div className="form-group">
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
                   <label htmlFor="cfg-bank-holder">Titular de la Cuenta</label>
                   <input
                     id="cfg-bank-holder"
@@ -296,35 +266,32 @@ const AdminSettingsTab = ({
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="cfg-bank-name">Banco / Billetera Virtual</label>
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-bank-name">Entidad / Billetera Virtual</label>
                   <input
                     id="cfg-bank-name"
                     type="text"
-                    placeholder="Mercado Pago / Banco Santander..."
+                    placeholder="Mercado Pago / Banco Santander"
                     value={formData.bankName || ''}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="form-grid-2">
-                <div className="form-group">
+              <div className="admin-form-grid-2">
+                <div className="admin-form-group">
                   <label htmlFor="cfg-bank-alias">Alias de Transferencia</label>
-                  <div className="input-with-icon">
-                    <FiCreditCard className="field-icon" />
-                    <input
-                      id="cfg-bank-alias"
-                      type="text"
-                      placeholder="AZKABAN.STORE"
-                      value={formData.bankAlias || ''}
-                      onChange={(e) => setFormData({ ...formData, bankAlias: e.target.value })}
-                    />
-                  </div>
+                  <input
+                    id="cfg-bank-alias"
+                    type="text"
+                    placeholder="AZKABAN.STORE"
+                    value={formData.bankAlias || ''}
+                    onChange={(e) => setFormData({ ...formData, bankAlias: e.target.value })}
+                  />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="cfg-bank-cbu">CBU / CVU</label>
+                <div className="admin-form-group">
+                  <label htmlFor="cfg-bank-cbu">CBU o CVU (22 dígitos)</label>
                   <input
                     id="cfg-bank-cbu"
                     type="text"
@@ -336,125 +303,99 @@ const AdminSettingsTab = ({
               </div>
             </div>
 
-            {/* Card 4: Política de Cambios y Devoluciones */}
-            <div className="settings-card-section">
-              <div className="settings-card-section__header">
-                <div className="settings-icon-pill" style={{ background: 'rgba(255, 85, 0, 0.12)', color: '#ff5500' }}>
-                  <FiShield size={18} />
+            {/* Card 4: Política de Cambios */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="card-title-group">
+                  <FiFileText className="card-header-icon" />
+                  <div>
+                    <h3>Política de Cambios y Devoluciones</h3>
+                    <p>Texto oficial visible en la sección /cambios-y-devoluciones</p>
+                  </div>
                 </div>
-                <div>
-                  <h4>4. Condiciones de Cambios y Devoluciones</h4>
-                  <span>Políticas visibles en el detalle de cada prenda, página de políticas y pie de página</span>
-                </div>
+                <button
+                  type="button"
+                  className="btn-admin-secondary btn-sm"
+                  onClick={() => {
+                    setFormData({ ...formData, returnPolicy: DEFAULT_RETURN_POLICY_TEXT })
+                    toast.success('Texto por defecto restaurado')
+                  }}
+                >
+                  Restaurar por defecto
+                </button>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="cfg-return-policy">
-                  Cláusulas y Condiciones (Escribí una condición por cada línea)
-                </label>
+              <div className="admin-form-group">
                 <textarea
-                  id="cfg-return-policy"
-                  rows="5"
-                  placeholder="Una regla por renglón..."
-                  value={formData.returnPolicy !== undefined ? formData.returnPolicy : DEFAULT_RETURN_POLICY_TEXT}
+                  rows={5}
+                  value={formData.returnPolicy || DEFAULT_RETURN_POLICY_TEXT}
                   onChange={(e) => setFormData({ ...formData, returnPolicy: e.target.value })}
-                  style={{
-                    lineHeight: '1.6',
-                    fontFamily: 'inherit',
-                    fontSize: '0.9rem',
-                    padding: '12px',
-                  }}
+                  className="admin-textarea"
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                  <span className="text-xs text-muted">
-                    Cada renglón se muestra como un punto en las fichas de producto y en /cambios-y-devoluciones.
-                  </span>
-                  <button
-                    type="button"
-                    className="btn-secondary btn-sm"
-                    style={{ fontSize: '0.75rem', padding: '4px 8px' }}
-                    onClick={() => {
-                      setFormData({ ...formData, returnPolicy: DEFAULT_RETURN_POLICY_TEXT })
-                      toast.success('Condiciones originales restauradas')
-                    }}
-                  >
-                    Restaurar texto por defecto
-                  </button>
-                </div>
               </div>
             </div>
 
-            {/* Save Button */}
-            <div className="settings-submit-row">
-              <button type="submit" className="btn-primary btn-save-config">
-                <FiCheck size={18} />
-                <span>Guardar Cambios de Configuración</span>
+            <div className="settings-bottom-actions">
+              <button type="submit" className="btn-admin-primary btn-lg">
+                <FiSave size={18} />
+                <span>Guardar Todos los Cambios</span>
               </button>
             </div>
           </form>
         </div>
 
-        {/* Right Column: Security & Backups */}
-        <div className="settings-side-box">
+        {/* Side Column: Security & Backups */}
+        <div className="settings-side-column">
           {/* Security Card */}
-          <div className="settings-side-card">
-            <div className="settings-card-section__header">
-              <div className="settings-icon-pill settings-icon-pill--security">
-                <FiShield size={18} />
-              </div>
-              <div>
-                <h4>Seguridad del Panel</h4>
-                <span>Contraseña de acceso de administrador</span>
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <div className="card-title-group">
+                <FiShield className="card-header-icon" />
+                <div>
+                  <h3>Seguridad del Panel</h3>
+                  <p>Contraseña de acceso para administración</p>
+                </div>
               </div>
             </div>
 
-            <form onSubmit={handlePasswordSubmit} className="password-form-side">
-              <div className="form-group">
-                <label htmlFor="pass-current">Contraseña Actual *</label>
-                <div className="input-with-icon">
-                  <FiLock className="field-icon" />
-                  <input
-                    id="pass-current"
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={currentPass}
-                    onChange={(e) => setCurrentPass(e.target.value)}
-                  />
-                </div>
+            <form onSubmit={handlePasswordSubmit} className="admin-side-form">
+              <div className="admin-form-group">
+                <label htmlFor="pass-current">Contraseña Actual</label>
+                <input
+                  id="pass-current"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={currentPass}
+                  onChange={(e) => setCurrentPass(e.target.value)}
+                />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="pass-new">Nueva Contraseña *</label>
-                <div className="input-with-icon">
-                  <FiLock className="field-icon" />
-                  <input
-                    id="pass-new"
-                    type="password"
-                    required
-                    placeholder="Mínimo 4 caracteres"
-                    value={newPass}
-                    onChange={(e) => setNewPass(e.target.value)}
-                  />
-                </div>
+              <div className="admin-form-group">
+                <label htmlFor="pass-new">Nueva Contraseña</label>
+                <input
+                  id="pass-new"
+                  type="password"
+                  required
+                  placeholder="Mínimo 4 caracteres"
+                  value={newPass}
+                  onChange={(e) => setNewPass(e.target.value)}
+                />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="pass-confirm">Confirmar Nueva Contraseña *</label>
-                <div className="input-with-icon">
-                  <FiLock className="field-icon" />
-                  <input
-                    id="pass-confirm"
-                    type="password"
-                    required
-                    placeholder="Repetir nueva contraseña"
-                    value={confirmPass}
-                    onChange={(e) => setConfirmPass(e.target.value)}
-                  />
-                </div>
+              <div className="admin-form-group">
+                <label htmlFor="pass-confirm">Confirmar Contraseña</label>
+                <input
+                  id="pass-confirm"
+                  type="password"
+                  required
+                  placeholder="Repetir nueva contraseña"
+                  value={confirmPass}
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                />
               </div>
 
-              <button type="submit" className="btn-secondary btn-block">
+              <button type="submit" className="btn-admin-secondary btn-block">
                 <FiLock size={15} />
                 <span>Actualizar Contraseña</span>
               </button>
@@ -462,33 +403,33 @@ const AdminSettingsTab = ({
           </div>
 
           {/* Backup Management Card */}
-          <div className="settings-side-card">
-            <div className="settings-card-section__header">
-              <div className="settings-icon-pill settings-icon-pill--backup">
-                <FiDownload size={18} />
-              </div>
-              <div>
-                <h4>Copias de Seguridad</h4>
-                <span>Descarga y restauración en formato JSON</span>
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <div className="card-title-group">
+                <FiDownload className="card-header-icon" />
+                <div>
+                  <h3>Copias de Seguridad</h3>
+                  <p>Resguardo e importación de productos, pedidos y ajustes</p>
+                </div>
               </div>
             </div>
 
-            <p className="settings-side-desc">
-              Hacé una copia de seguridad periódica para resguardar tus prendas, órdenes y configuraciones en tu computadora.
+            <p className="admin-card-intro">
+              Descargá una copia de seguridad en formato JSON para guardar todo tu inventario en tu computadora o migrar datos de forma segura.
             </p>
 
-            <div className="backup-actions-stack">
+            <div className="backup-buttons-stack">
               <button
                 type="button"
-                className="btn-secondary btn-block"
+                className="btn-admin-secondary btn-block"
                 onClick={onExportBackup}
               >
-                <FiDownload size={15} />
+                <FiDownload size={16} />
                 <span>Descargar Copia JSON</span>
               </button>
 
-              <label className="btn-secondary btn-block btn-upload-label">
-                <FiUpload size={15} />
+              <label className="btn-admin-secondary btn-block btn-upload-label">
+                <FiUpload size={16} />
                 <span>Restaurar Copia JSON</span>
                 <input
                   type="file"
@@ -498,9 +439,11 @@ const AdminSettingsTab = ({
                 />
               </label>
 
+              <div className="backup-divider" />
+
               <button
                 type="button"
-                className="btn-danger-outline btn-block"
+                className="btn-admin-danger btn-block"
                 onClick={onRestoreTreinta}
               >
                 <FiRefreshCw size={15} />
