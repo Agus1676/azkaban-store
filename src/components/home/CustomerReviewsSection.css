@@ -163,3 +163,29 @@
     gap: 16px;
   }
 }
+
+@media (max-width: 580px) {
+  .customer-reviews {
+    padding: 36px 0 45px;
+  }
+  .customer-reviews__score-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 16px 14px;
+    margin-bottom: 24px;
+  }
+  .customer-reviews__score-left {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .customer-reviews__stars-row {
+    justify-content: center;
+  }
+  .customer-reviews__card {
+    padding: 16px;
+  }
+  .customer-reviews__card-header {
+    gap: 10px;
+  }
+}

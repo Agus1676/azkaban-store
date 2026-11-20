@@ -74,9 +74,10 @@
 /* Scroll Container */
 .carousel-scroll-container {
   overflow-x: auto;
-  padding: 6px 0 16px;
+  padding: 6px 4px 16px 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
 .carousel-scroll-container::-webkit-scrollbar {
@@ -86,16 +87,37 @@
 .carousel-items-track {
   display: flex;
   gap: 16px;
+  padding: 0 2px;
 }
 
 .carousel-product-wrap {
   width: 270px;
   flex-shrink: 0;
+  scroll-snap-align: start;
 }
 
 @media (max-width: 640px) {
+  .product-carousel-section {
+    padding: 24px 0;
+  }
+  .carousel-nav-arrows {
+    display: none;
+  }
   .carousel-product-wrap {
-    width: 210px;
+    width: 200px;
+  }
+  .carousel-items-track {
+    gap: 12px;
+  }
+  .carousel-tab-btn {
+    padding: 5px 11px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .carousel-product-wrap {
+    width: 175px;
   }
 }
 

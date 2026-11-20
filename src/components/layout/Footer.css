@@ -234,5 +234,9 @@
   .footer__bottom {
     flex-direction: column;
     text-align: center;
+    gap: 12px;
+  }
+  .footer__badges {
+    justify-content: center;
   }
 }

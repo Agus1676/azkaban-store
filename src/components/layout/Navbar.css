@@ -213,16 +213,18 @@ input[type="text"].navbar__search-input:focus {
 
 .navbar__cart-badge {
   background: #ffffff;
-  color: var(--color-primary);
-  font-size: 0.72rem;
-  font-weight: 800;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
+  color: #ff5500;
+  font-size: 0.74rem;
+  font-weight: 900;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  line-height: 1;
 }
 
 /* Bottom Row Navigation */
@@ -549,7 +551,24 @@ input[type="text"].navbar__search-input:focus {
 
 @media (max-width: 900px) {
   .navbar__top-row {
-    height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 58px;
+    width: 100%;
+  }
+  .navbar__top-left {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+  .navbar__brand {
+    flex: 0 1 auto;
+    justify-content: center;
+    gap: 8px;
+  }
+  .navbar__top-right {
+    flex: 0 0 auto;
+    gap: 8px;
   }
   .navbar__search-form,
   .navbar__bottom-row {
@@ -567,5 +586,48 @@ input[type="text"].navbar__search-input:focus {
   }
   .navbar__brand-main-text {
     font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar__top-row {
+    height: 54px;
+  }
+  /* Ocultar iconos secundarios de la barra superior compacta (ya están en el menú drawer) */
+  .navbar__top-right a.navbar__icon-btn[title="Instagram"],
+  .navbar__top-right a.navbar__icon-btn[title="Panel de Administración"] {
+    display: none;
+  }
+  .navbar__brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+  .navbar__brand-main-text {
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+  .navbar__brand-sub {
+    display: none;
+  }
+  .navbar__cart-btn {
+    padding: 7px 11px;
+    font-size: 0.8rem;
+    gap: 6px;
+  }
+  .navbar__mobile-search-overlay {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .navbar__brand-main-text {
+    font-size: 0.95rem;
+  }
+  .navbar__cart-btn {
+    padding: 6px 9px;
+  }
+  .navbar__icon-btn {
+    width: 32px;
+    height: 32px;
   }
 }
