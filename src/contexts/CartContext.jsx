@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { getWhatsAppNumber } from '../utils/whatsapp'
+import { safeSetItem, sanitizeText, stripPrototypePollution, getStoredOrders, saveStoredOrders } from '../services/storeDb'
 import toast from 'react-hot-toast'
 
 const CartContext = createContext()
@@ -13,13 +14,20 @@ export const useCart = () => {
 }
 
 const CART_STORAGE_KEY = 'azkaban_cart'
-const ORDERS_STORAGE_KEY = 'azkaban_orders'
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem(CART_STORAGE_KEY)
-      return saved ? JSON.parse(saved) : []
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map((item) => stripPrototypePollution(item))
+            .filter((item) => item && item.product && typeof item.product === 'object' && item.quantity > 0)
+        }
+      }
+      return []
     } catch (e) {
       console.warn('Error reading cart:', e)
       return []
@@ -30,7 +38,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
+      safeSetItem(CART_STORAGE_KEY, cart)
     } catch (e) {
       console.warn('Error saving cart:', e)
     }
@@ -181,32 +189,35 @@ export const CartProvider = ({ children }) => {
 
     message += `\n¿Me confirman disponibilidad y los datos para realizar el pago? ¡Muchas gracias!`
 
-    // Log the order in Admin
+    // Log the order in Admin (Sanitized & Safe)
     try {
       const orderEntry = {
         id: `AZK-${Date.now().toString().slice(-6)}`,
         date: new Date().toISOString(),
-        customer: { name, phone, city, address },
-        shippingMethod: shippingDetails?.name || shippingMethod,
-        shippingCost: shippingPrice,
-        shippingCarrier: shippingDetails?.carrier || 'Andreani',
-        postalCode: shippingDetails?.postalCode || '',
-        paymentMethod,
+        customer: {
+          name: sanitizeText(name, 80),
+          phone: sanitizeText(phone, 30),
+          city: sanitizeText(city, 80),
+          address: sanitizeText(address, 150),
+        },
+        shippingMethod: sanitizeText(shippingDetails?.name || shippingMethod, 60),
+        shippingCost: Math.max(0, Number(shippingPrice) || 0),
+        shippingCarrier: sanitizeText(shippingDetails?.carrier || 'Andreani', 40),
+        postalCode: sanitizeText(shippingDetails?.postalCode || '', 10),
+        paymentMethod: sanitizeText(paymentMethod, 50),
         items: cart.map((i) => ({
-          id: i.product.id,
-          name: i.product.name,
-          size: i.selectedSize,
-          qty: i.quantity,
-          price: i.product.priceOffer || i.product.price,
+          id: String(i.product.id),
+          name: sanitizeText(i.product.name, 100),
+          size: sanitizeText(i.selectedSize, 20),
+          qty: Math.max(1, Number(i.quantity) || 1),
+          price: Math.max(0, Number(i.product.priceOffer || i.product.price) || 0),
         })),
-        subtotal: totalPrice,
-        total: finalOrderTotal,
+        subtotal: Math.max(0, Number(totalPrice) || 0),
+        total: Math.max(0, Number(finalOrderTotal) || 0),
         status: 'Pendiente',
       }
-      const existingOrders = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]')
-      existingOrders.unshift(orderEntry)
-      localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(existingOrders))
-      window.dispatchEvent(new Event('azkaban_orders_updated'))
+      const existingOrders = getStoredOrders()
+      saveStoredOrders([orderEntry, ...existingOrders])
     } catch (e) {
       console.warn('Error saving order log:', e)
     }

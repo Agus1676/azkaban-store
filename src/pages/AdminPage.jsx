@@ -204,14 +204,40 @@ const AdminPage = () => {
     const reader = new FileReader()
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target.result)
-        if (data.products && Array.isArray(data.products)) setProducts(data.products)
-        if (data.categories && Array.isArray(data.categories)) setCategories(data.categories)
-        if (data.orders && Array.isArray(data.orders)) setOrders(data.orders)
-        if (data.storeConfig) setStoreConfig(data.storeConfig)
-        toast.success('¡Copia de seguridad restaurada correctamente!')
+        const raw = event.target.result
+        if (typeof raw !== 'string' || raw.length > 10 * 1024 * 1024) {
+          toast.error('El archivo excede el tamaño máximo permitido (10MB)')
+          return
+        }
+        const data = JSON.parse(raw)
+        // Prototype pollution check
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          throw new Error('Estructura inválida')
+        }
+        delete data.__proto__
+        delete data.constructor
+        delete data.prototype
+
+        // Defensive normalization & sanitization
+        if (data.products && Array.isArray(data.products)) {
+          const cleanProds = data.products.map(normalizeProduct).filter(Boolean)
+          if (cleanProds.length > 0) setProducts(cleanProds)
+        }
+        if (data.categories && Array.isArray(data.categories)) {
+          const cleanCats = data.categories.filter((c) => c && typeof c === 'object' && c.id && c.name)
+          if (cleanCats.length > 0) setCategories(cleanCats)
+        }
+        if (data.orders && Array.isArray(data.orders)) {
+          const cleanOrders = data.orders.filter((o) => o && typeof o === 'object' && o.id)
+          setOrders(cleanOrders)
+        }
+        if (data.storeConfig && typeof data.storeConfig === 'object') {
+          setStoreConfig((prev) => ({ ...prev, ...data.storeConfig }))
+        }
+        toast.success('¡Copia de seguridad validada y restaurada!')
       } catch (err) {
-        toast.error('Archivo de respaldo inválido o dañado')
+        console.error('Security/Validation error on backup import:', err)
+        toast.error('Archivo de respaldo no seguro o con formato incorrecto')
       }
     }
     reader.readAsText(file)
@@ -267,9 +293,10 @@ const AdminPage = () => {
               {lockoutRemaining > 0 ? `Bloqueado (${lockoutRemaining}s)` : 'Ingresar al Panel'}
             </button>
           </form>
-          <span style={{ display: 'block', marginTop: '16px', fontSize: '0.78rem', color: '#94a3b8' }}>
-            Contraseña por defecto: <code>admin</code> o <code>azkaban2026</code>
-          </span>
+          <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.78rem', color: '#64748b' }}>
+            <FiShield size={14} style={{ color: '#ff5500' }} />
+            <span>Acceso administrativo protegido • Cifrado SHA-256</span>
+          </div>
         </div>
       </div>
     )

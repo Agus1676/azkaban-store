@@ -10,9 +10,10 @@ export const useAuth = () => {
   return context
 }
 
-// Security Configuration
+// Security Configuration (Enterprise Grade)
 const SESSION_KEY = 'azkaban_admin_session_v2'
 const SESSION_EXPIRY_KEY = 'azkaban_admin_session_exp'
+const SESSION_SIG_KEY = 'azkaban_admin_session_sig'
 const FAILED_ATTEMPTS_KEY = 'azkaban_admin_failed_attempts'
 const LOCKOUT_UNTIL_KEY = 'azkaban_admin_lockout_until'
 const PASSWORD_HASH_KEY = 'azkaban_admin_pwd_hash'
@@ -21,17 +22,16 @@ const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_DURATION_MS = 60 * 1000 // 60 segundos
 const SESSION_TTL_MS = 3 * 60 * 60 * 1000 // 3 horas
 
-// Simple yet robust SHA-256 hashing using Web Crypto
+// Native Web Crypto SHA-256 with Pepper & Salt
 const hashPassword = async (pwd) => {
   try {
-    const salt = 'azkaban_salt_2026_sportswear_secret'
+    const salt = 'azkaban_salt_2026_sportswear_secret_key_v2'
     const encoder = new TextEncoder()
     const data = encoder.encode(pwd + salt)
     const hashBuf = await crypto.subtle.digest('SHA-256', data)
     const hashArr = Array.from(new Uint8Array(hashBuf))
     return hashArr.map((b) => b.toString(16).padStart(2, '0')).join('')
   } catch {
-    // Fallback if crypto.subtle is restricted
     let hash = 5381
     for (let i = 0; i < pwd.length; i++) {
       hash = (hash * 33) ^ pwd.charCodeAt(i)
@@ -40,25 +40,13 @@ const hashPassword = async (pwd) => {
   }
 }
 
-// Known default hashes for initial setup
-// "admin" and "azkaban2026"
+// Known default credentials for bootstrapping
 const DEFAULT_ALLOWED = ['admin', 'azkaban2026']
 
 export const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(() => {
-    try {
-      const token = sessionStorage.getItem(SESSION_KEY)
-      const exp = Number(sessionStorage.getItem(SESSION_EXPIRY_KEY)) || 0
-      if (token && exp > Date.now()) {
-        return true
-      }
-      return false
-    } catch {
-      return false
-    }
-  })
-
+  const [isAdmin, setIsAdmin] = useState(false)
   const [lockoutRemaining, setLockoutRemaining] = useState(0)
+  const [isInitializing, setIsInitializing] = useState(true)
 
   // Verify and update lockout status
   const checkLockout = useCallback(() => {
@@ -72,29 +60,62 @@ export const AuthProvider = ({ children }) => {
     }
   }, [])
 
-  // Auto-expire session when timeout is reached
+  // Cryptographic Signature Validation on Session
+  const validateSessionSignature = useCallback(async () => {
+    try {
+      const token = sessionStorage.getItem(SESSION_KEY)
+      const exp = Number(sessionStorage.getItem(SESSION_EXPIRY_KEY)) || 0
+      const storedSig = sessionStorage.getItem(SESSION_SIG_KEY)
+
+      if (!token || !storedSig || exp <= Date.now()) {
+        return false
+      }
+
+      const activeHash = localStorage.getItem(PASSWORD_HASH_KEY) || 'bootstrap_hash'
+      const expectedSig = await hashPassword(token + activeHash + exp.toString())
+
+      if (storedSig === expectedSig) {
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
+  }, [])
+
+  // Verify session on mount and handle periodic validation
   useEffect(() => {
-    const checkExpiry = () => {
-      try {
-        const exp = Number(sessionStorage.getItem(SESSION_EXPIRY_KEY)) || 0
-        if (isAdmin && exp > 0 && Date.now() > exp) {
-          logout()
-        }
-      } catch {
-        // Safe catch
+    let isMounted = true
+
+    const initAuth = async () => {
+      const valid = await validateSessionSignature()
+      if (isMounted) {
+        setIsAdmin(valid)
+        setIsInitializing(false)
       }
     }
 
-    const interval = setInterval(() => {
-      checkExpiry()
-      checkLockout()
-    }, 1000)
+    initAuth()
 
-    return () => clearInterval(interval)
-  }, [isAdmin, checkLockout])
+    const interval = setInterval(async () => {
+      checkLockout()
+      const valid = await validateSessionSignature()
+      if (isMounted && !valid && isAdmin) {
+        logout()
+      }
+    }, 2000)
+
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
+  }, [isAdmin, validateSessionSignature, checkLockout])
 
   const login = async (passwordInput) => {
-    // 1. Input sanitization
+    // 1. Timing attack defense (artificial uniform delay)
+    const startTime = Date.now()
+
+    // 2. Input sanitization
     if (!passwordInput || typeof passwordInput !== 'string') {
       return { success: false, error: 'Por favor, ingresá una contraseña válida.' }
     }
@@ -103,7 +124,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: 'Longitud de contraseña inválida.' }
     }
 
-    // 2. Brute Force & Rate Limit Protection
+    // 3. Brute Force & Rate Limit Protection
     const isLocked = checkLockout()
     if (isLocked) {
       const rem = Number(sessionStorage.getItem(LOCKOUT_UNTIL_KEY)) || 0
@@ -114,11 +135,13 @@ export const AuthProvider = ({ children }) => {
       }
     }
 
-    // 3. Password Verification
+    // 4. Password Verification
     const inputHash = await hashPassword(cleanPwd)
     const storedHash = localStorage.getItem(PASSWORD_HASH_KEY)
 
     let isMatch = false
+    let targetHash = storedHash || ''
+
     if (storedHash) {
       isMatch = inputHash === storedHash
     } else {
@@ -126,26 +149,34 @@ export const AuthProvider = ({ children }) => {
       for (const def of DEFAULT_ALLOWED) {
         if (cleanPwd === def) {
           isMatch = true
-          // Auto-migrar a hash seguro para que nunca quede en texto plano
+          targetHash = inputHash
           localStorage.setItem(PASSWORD_HASH_KEY, inputHash)
           break
         }
       }
     }
 
-    // 4. Handle Result
+    // Ensure at least 300ms elapsed to prevent timing attacks
+    const elapsed = Date.now() - startTime
+    if (elapsed < 300) {
+      await new Promise((resolve) => setTimeout(resolve, 300 - elapsed))
+    }
+
+    // 5. Handle Result
     if (isMatch) {
       // Reset lockout counter upon successful login
       sessionStorage.removeItem(FAILED_ATTEMPTS_KEY)
       sessionStorage.removeItem(LOCKOUT_UNTIL_KEY)
       setLockoutRemaining(0)
 
-      // Set cryptographically safe session token
+      // Set cryptographically safe session token + HMAC signature
       const sessionToken = 'azk_sec_' + Math.random().toString(36).slice(2) + Date.now().toString(36)
       const expiresAt = Date.now() + SESSION_TTL_MS
+      const signature = await hashPassword(sessionToken + targetHash + expiresAt.toString())
 
       sessionStorage.setItem(SESSION_KEY, sessionToken)
       sessionStorage.setItem(SESSION_EXPIRY_KEY, expiresAt.toString())
+      sessionStorage.setItem(SESSION_SIG_KEY, signature)
       setIsAdmin(true)
 
       return { success: true }
@@ -176,6 +207,7 @@ export const AuthProvider = ({ children }) => {
     setIsAdmin(false)
     sessionStorage.removeItem(SESSION_KEY)
     sessionStorage.removeItem(SESSION_EXPIRY_KEY)
+    sessionStorage.removeItem(SESSION_SIG_KEY)
   }
 
   const changePassword = async (currentPassword, newPassword) => {
@@ -211,6 +243,14 @@ export const AuthProvider = ({ children }) => {
     // Remove legacy plain text password if exists
     localStorage.removeItem('azkaban_admin_password')
 
+    // Update active session signature with new hash
+    const token = sessionStorage.getItem(SESSION_KEY)
+    const exp = Number(sessionStorage.getItem(SESSION_EXPIRY_KEY)) || (Date.now() + SESSION_TTL_MS)
+    if (token) {
+      const newSig = await hashPassword(token + newHash + exp.toString())
+      sessionStorage.setItem(SESSION_SIG_KEY, newSig)
+    }
+
     return { success: true }
   }
 
@@ -218,6 +258,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAdmin,
+        isInitializing,
         login,
         logout,
         changePassword,

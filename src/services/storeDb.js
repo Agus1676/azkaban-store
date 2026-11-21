@@ -22,6 +22,36 @@ const KEYS = {
 // 1. SANITIZADOR DEFENSIVO XSS & SEGURIDAD DE ENTRADAS
 // ==========================================================================
 
+export const stripPrototypePollution = (val) => {
+  if (!val || typeof val !== 'object') return val
+  delete val.__proto__
+  delete val.constructor
+  delete val.prototype
+  return val
+}
+
+export const safeSetItem = (key, value) => {
+  try {
+    const serialized = typeof value === 'string' ? value : JSON.stringify(value)
+    localStorage.setItem(key, serialized)
+    return true
+  } catch (err) {
+    console.error('LocalStorage write error:', err)
+    // Quota management: purge non-critical cache if full
+    if (err && (err.name === 'QuotaExceededError' || err.code === 22)) {
+      try {
+        localStorage.removeItem(KEYS.STOCK_LOGS)
+        const serialized = typeof value === 'string' ? value : JSON.stringify(value)
+        localStorage.setItem(key, serialized)
+        return true
+      } catch {
+        return false
+      }
+    }
+    return false
+  }
+}
+
 export const sanitizeText = (val, maxLen = 2000) => {
   if (typeof val !== 'string') return ''
   return val
@@ -105,8 +135,8 @@ export const getStoredProducts = () => {
 export const saveStoredProducts = (products) => {
   try {
     const safeArray = (Array.isArray(products) ? products : []).map(normalizeProduct).filter(Boolean)
-    localStorage.setItem(KEYS.INITIALIZED, 'true')
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(safeArray))
+    safeSetItem(KEYS.INITIALIZED, 'true')
+    safeSetItem(KEYS.PRODUCTS, safeArray)
     window.dispatchEvent(new Event('azkaban_products_updated'))
     return true
   } catch (err) {
@@ -118,8 +148,8 @@ export const saveStoredProducts = (products) => {
 export const restoreFactoryProducts = () => {
   try {
     const factory = SEED_PRODUCTS.map(normalizeProduct).filter(Boolean)
-    localStorage.setItem(KEYS.INITIALIZED, 'true')
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(factory))
+    safeSetItem(KEYS.INITIALIZED, 'true')
+    safeSetItem(KEYS.PRODUCTS, factory)
     window.dispatchEvent(new Event('azkaban_products_updated'))
     return factory
   } catch (err) {
@@ -149,8 +179,17 @@ export const getStoredCategories = () => {
 
 export const saveStoredCategories = (categories) => {
   try {
-    const safeArray = Array.isArray(categories) ? categories : DEFAULT_CATEGORIES
-    localStorage.setItem(KEYS.CATEGORIES, JSON.stringify(safeArray))
+    const rawArray = Array.isArray(categories) ? categories : DEFAULT_CATEGORIES
+    const safeArray = rawArray.map((c) => {
+      const clean = stripPrototypePollution(c)
+      return {
+        ...clean,
+        id: sanitizeText(String(clean.id || ''), 50),
+        name: sanitizeText(String(clean.name || ''), 80),
+        slug: sanitizeText(String(clean.slug || ''), 60),
+      }
+    })
+    safeSetItem(KEYS.CATEGORIES, safeArray)
     window.dispatchEvent(new Event('azkaban_categories_updated'))
     return true
   } catch (err) {
@@ -178,8 +217,9 @@ export const getStoredOrders = () => {
 
 export const saveStoredOrders = (orders) => {
   try {
-    const safeArray = Array.isArray(orders) ? orders : []
-    localStorage.setItem(KEYS.ORDERS, JSON.stringify(safeArray))
+    const rawArray = Array.isArray(orders) ? orders : []
+    const safeArray = rawArray.map((o) => stripPrototypePollution(o))
+    safeSetItem(KEYS.ORDERS, safeArray)
     window.dispatchEvent(new Event('azkaban_orders_updated'))
     return true
   } catch (err) {
@@ -226,7 +266,8 @@ export const getStoredConfig = () => {
 
 export const saveStoredConfig = (config) => {
   try {
-    localStorage.setItem(KEYS.CONFIG, JSON.stringify(config))
+    const cleanConfig = stripPrototypePollution(config)
+    safeSetItem(KEYS.CONFIG, cleanConfig)
     window.dispatchEvent(new Event('azkaban_config_updated'))
     return true
   } catch (err) {
@@ -254,8 +295,9 @@ export const getStoredStockLogs = () => {
 
 export const saveStoredStockLogs = (logs) => {
   try {
-    const safeArray = Array.isArray(logs) ? logs : []
-    localStorage.setItem(KEYS.STOCK_LOGS, JSON.stringify(safeArray))
+    const rawArray = Array.isArray(logs) ? logs : []
+    const safeArray = rawArray.map((l) => stripPrototypePollution(l))
+    safeSetItem(KEYS.STOCK_LOGS, safeArray)
     window.dispatchEvent(new Event('azkaban_stock_updated'))
     return true
   } catch (err) {
