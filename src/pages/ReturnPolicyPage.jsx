@@ -129,7 +129,7 @@ const ReturnPolicyPage = () => {
             <div className="policy-step">
               <div className="policy-step__num">3</div>
               <h4>Coordinación rápida</h4>
-              <p>Coordinamos el cambio en nuestro punto de retiro en San Martín o mediante despacho de logística (Andreani / Vía Cargo).</p>
+              <p>Coordinamos el cambio en nuestro punto de retiro en San Martín o mediante despacho oficial de Andreani.</p>
             </div>
           </div>
         </div>

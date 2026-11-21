@@ -22,7 +22,6 @@ const ORDER_STATUSES = [
   'Pago Confirmado',
   'En preparación',
   'Despachado por Andreani',
-  'Despachado por Vía Cargo',
   'Listo para retirar en San Martín',
   'Entregado',
   'Cancelado',
@@ -281,7 +280,7 @@ const AdminOrdersTab = ({
                     {/* Tracking Code Input */}
                     <div className="tracking-code-block">
                       <label className="text-xs">
-                        Código de Seguimiento (Andreani / Vía Cargo):
+                        Código de Seguimiento (Andreani Express):
                       </label>
                       <div className="tracking-input-row">
                         <input

@@ -128,7 +128,7 @@ const Footer = () => {
               </span>
               <span className="footer__contact-item">
                 <FiTruck className="text-orange" />
-                <span>Despachos a todo el país por <strong>Andreani</strong> y <strong>Vía Cargo</strong> con código de seguimiento.</span>
+                <span>Despachos a todo el país exclusivamente por <strong>Andreani Express</strong> con código de seguimiento.</span>
               </span>
               <span className="footer__contact-item">
                 <FiClock className="text-orange" />
@@ -161,7 +161,7 @@ const Footer = () => {
               © {new Date().getFullYear()} AzkabanStore. Indumentaria Deportiva y Urbana. Todos los derechos reservados.
             </p>
             <div className="footer__badges">
-              <span className="footer__badge-pill">Envíos Andreani & Vía Cargo</span>
+              <span className="footer__badge-pill">Envíos Oficiales Andreani</span>
               <span className="footer__badge-pill">Retiro en San Martín</span>
               <span className="footer__badge-pill">Compras 100% Seguras</span>
             </div>

@@ -40,23 +40,9 @@
   flex-direction: column;
 }
 
-.about-card-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
 .about-ico {
   font-size: 1.4rem;
   color: var(--color-primary);
-}
-
-.about-card-top h3 {
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--color-text-primary);
 }
 
 .about-address-text {
@@ -98,60 +84,214 @@
   justify-content: space-between;
 }
 
-.hours-row strong {
-  color: #16a34a;
+.about-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.about-card-top__icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 85, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ff5500;
+}
+
+.about-card-top__icon-badge--orange {
+  background: rgba(255, 85, 0, 0.12);
+}
+
+.about-card-top h3 {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.about-card-top__tag {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ff5500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
 .about-shipping-p {
   font-size: 0.88rem;
   color: var(--color-text-secondary);
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  line-height: 1.5;
 }
 
-.about-shipping-bullets {
-  list-style: none;
+.about-shipping-options {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 16px;
-  font-size: 0.85rem;
-  color: var(--color-text-primary);
 }
 
-.about-shipping-bullets strong {
-  color: var(--color-primary);
+.about-shipping-pill {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: all 0.2s ease;
+}
+
+.about-shipping-pill:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.about-shipping-pill__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.about-shipping-pill__header strong {
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.pill-badge-green {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.pill-badge-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.about-shipping-pill p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.4;
 }
 
 .about-pill-status {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #16a34a;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
-  padding: 8px 12px;
-  border-radius: var(--radius-xs);
+  padding: 10px 14px;
+  border-radius: 8px;
   margin-top: auto;
-}
-
-.about-channel-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.about-channel-list li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.88rem;
 }
 
-.channel-lbl {
-  display: block;
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
+/* Redes & Contacto Directo */
+.about-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.about-contact-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.about-contact-tile:hover {
+  background: #ffffff;
+  border-color: #ff5500;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 85, 0, 0.12);
+}
+
+.about-contact-tile__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-contact-tile__icon--whatsapp {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.about-contact-tile__icon--instagram {
+  background: #fdf2f8;
+  color: #db2777;
+}
+
+.about-contact-tile__icon--channel {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.about-contact-tile__icon--email {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.about-contact-tile__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tile-category {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.tile-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-action {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ff5500;
+  white-space: nowrap;
+  padding: 4px 8px;
+  background: rgba(255, 85, 0, 0.08);
+  border-radius: 6px;
 }
 
 .about-action-btn {

@@ -13,7 +13,7 @@ export const STORE_INFO = {
   address: 'Dr. marcos zimmermann 3339 (Entre av JM campos y pasaje 86)',
   city: 'San Martín, Prov. Buenos Aires',
   hours: 'Lunes a Viernes de 10:00 a 20:00 hs',
-  shippingCarriers: ['Andreani', 'Vía Cargo'],
+  shippingCarriers: ['Andreani'],
   pickupAvailable: true,
   primaryColor: '#ff5500',
 }

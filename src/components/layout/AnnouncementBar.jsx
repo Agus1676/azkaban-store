@@ -25,7 +25,7 @@ const AnnouncementBar = () => {
             <span><FaTruck className="ann-icon" /> {customText}</span>
           ) : (
             <>
-              <span><FaTruck className="ann-icon" /> Envíos <strong>Andreani</strong> &amp; <strong>Vía Cargo</strong></span>
+              <span><FaTruck className="ann-icon" /> Envíos a todo el país por <strong>Andreani</strong></span>
               <span className="ann-dot">•</span>
               <span><FaMapMarkerAlt className="ann-icon" /> Retiro en <strong>San Martín</strong></span>
               <span className="ann-dot ann-desktop-only">•</span>

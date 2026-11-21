@@ -15,8 +15,7 @@ Sitio web y catálogo online oficial de **AzkabanStore** desarrollado con React 
   - Carrito deslizable con persistencia local.
   - Selección de método de entrega:
     - Retiro sin cargo en San Martín (`Dr. marcos zimmermann 3339`).
-    - Envío por **Andreani** a domicilio o sucursal.
-    - Envío por **Vía Cargo** a terminal.
+    - Envío por **Andreani Express** a domicilio o sucursal con seguimiento online.
   - Formulario de cliente y generación automática del mensaje formateado para enviar el pedido directo a WhatsApp.
 - **Panel de Administración (`/admin`):**
   - Acceso seguro con contraseña (por defecto: `admin` o `azkaban2026`).

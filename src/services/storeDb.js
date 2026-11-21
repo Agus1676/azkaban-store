@@ -266,12 +266,11 @@ export const getStoredConfig = () => {
     phoneDisplay: STORE_INFO.phoneDisplay || '+54 9 11 3793-4198',
     hours: STORE_INFO.hours || 'Lunes a Viernes de 10:00 a 20:00 hs',
     address: STORE_INFO.address || 'Dr. marcos zimmermann 3339, San Martín, Prov. Buenos Aires',
-    shippingCarriersText: 'Andreani / Vía Cargo',
+    shippingCarriersText: 'Andreani Express',
     andreaniAmbaHome: 7500,
     andreaniAmbaBranch: 5200,
     andreaniInteriorHome: 11800,
     andreaniInteriorBranch: 8900,
-    viaCargoAgency: 9500,
     freeShippingThreshold: 120000,
     freeShippingEnabled: true,
   }

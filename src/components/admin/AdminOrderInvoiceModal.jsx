@@ -134,7 +134,7 @@ const AdminOrderInvoiceModal = ({ isOpen, onClose, order, storeConfig }) => {
             </div>
           </div>
 
-          {/* Footer note for Andreani / Via Cargo */}
+          {/* Footer note for Andreani */}
           <div className="invoice-footer-note">
             <p>
               Comprobante oficial de despacho y empaque • AzkabanStore San Martín.<br />

@@ -12,8 +12,8 @@ const AboutPage = () => {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Punto de Retiro & Envíos Andreani / Vía Cargo | AzkabanStore San Martín',
-      description: 'Retirá tu compra gratis en nuestro punto de San Martín o recibila en tu domicilio en cualquier punto de Argentina por Andreani o Vía Cargo.',
+      title: 'Punto de Retiro & Envíos Andreani Express | AzkabanStore San Martín',
+      description: 'Retirá tu compra gratis en nuestro punto de San Martín o recibila en tu domicilio en cualquier punto de Argentina exclusivamente por Andreani con tracking oficial.',
       canonical: 'https://www.azkabanstore.com.ar/nosotros',
     })
   }, [])
@@ -98,83 +98,122 @@ const AboutPage = () => {
             </a>
           </div>
 
-          {/* Card 3: Envíos */}
-          <div className="about-info-card">
+          {/* Card 3: Envíos Exclusivos por Andreani */}
+          <div className="about-info-card about-info-card--shipping">
             <div className="about-card-top">
-              <FiTruck className="about-ico" />
-              <h3>Logística Nacional</h3>
+              <div className="about-card-top__icon-badge">
+                <FiTruck className="about-ico" />
+              </div>
+              <div>
+                <h3>Envíos por Andreani Express</h3>
+                <span className="about-card-top__tag">Cobertura Nacional 100%</span>
+              </div>
             </div>
+
             <p className="about-shipping-p">
-              Despachamos pedidos a cualquier punto del país dentro de las 24 a 48 hs hábiles:
+              Despachamos todas las compras a cualquier punto del país dentro de las 24 a 48 hs hábiles:
             </p>
-            <ul className="about-shipping-bullets">
-              <li>
-                <strong>Andreani:</strong> Envíos a domicilio o retiro en sucursal con número de seguimiento.
-              </li>
-              <li>
-                <strong>Vía Cargo:</strong> Despachos a terminales y agencias oficiales de todo el país.
-              </li>
-            </ul>
+
+            <div className="about-shipping-options">
+              <div className="about-shipping-pill">
+                <div className="about-shipping-pill__header">
+                  <strong>🏠 Entrega a Domicilio</strong>
+                  <span className="pill-badge-green">24 a 72 hs</span>
+                </div>
+                <p>El cartero de Andreani entrega el paquete en mano en tu domicilio o lugar de trabajo.</p>
+              </div>
+
+              <div className="about-shipping-pill">
+                <div className="about-shipping-pill__header">
+                  <strong>🏢 Retiro en Sucursal Andreani</strong>
+                  <span className="pill-badge-blue">Económico</span>
+                </div>
+                <p>Retirá cuando quieras en la sucursal Andreani o punto pick-up más cercano a tu ciudad.</p>
+              </div>
+            </div>
+
             <div className="about-pill-status">
-              <span>🚚 Despachos diarios con código de tracking</span>
+              <span>🚚 Despachos de lunes a viernes • Código de seguimiento online</span>
             </div>
           </div>
 
           {/* Card 4: Redes & Contacto Directo */}
-          <div className="about-info-card">
+          <div className="about-info-card about-info-card--contact">
             <div className="about-card-top">
-              <FiPhone className="about-ico" />
-              <h3>Canales Oficiales</h3>
+              <div className="about-card-top__icon-badge about-card-top__icon-badge--orange">
+                <FiPhone className="about-ico" />
+              </div>
+              <div>
+                <h3>Canales Oficiales</h3>
+                <span className="about-card-top__tag">Atención Personalizada</span>
+              </div>
             </div>
+
             <div className="about-contact-list">
+              {/* WhatsApp Ventas */}
               <a
                 href={chatUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="about-contact-row"
+                className="about-contact-tile"
               >
-                <FaWhatsapp className="text-green" />
-                <div>
-                  <strong>WhatsApp de Ventas</strong>
-                  <span>{config?.phoneDisplay || STORE_INFO.phoneDisplay}</span>
+                <div className="about-contact-tile__icon about-contact-tile__icon--whatsapp">
+                  <FaWhatsapp size={20} />
                 </div>
+                <div className="about-contact-tile__body">
+                  <span className="tile-category">VENTAS & ASESORAMIENTO</span>
+                  <strong className="tile-value">{config?.phoneDisplay || STORE_INFO.phoneDisplay}</strong>
+                </div>
+                <span className="tile-action">Chatear ↗</span>
               </a>
 
+              {/* Instagram */}
               <a
                 href={config?.instagramUrl || STORE_INFO.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="about-contact-row"
+                className="about-contact-tile"
               >
-                <FiInstagram className="text-orange" />
-                <div>
-                  <strong>Instagram</strong>
-                  <span>{config?.instagram || STORE_INFO.instagram}</span>
+                <div className="about-contact-tile__icon about-contact-tile__icon--instagram">
+                  <FiInstagram size={18} />
                 </div>
+                <div className="about-contact-tile__body">
+                  <span className="tile-category">INSTAGRAM OFICIAL</span>
+                  <strong className="tile-value">{config?.instagram || STORE_INFO.instagram}</strong>
+                </div>
+                <span className="tile-action">Seguir ↗</span>
               </a>
 
+              {/* Canal de WhatsApp */}
               <a
                 href={channelUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="about-contact-row"
+                className="about-contact-tile"
               >
-                <FaWhatsapp className="text-green" />
-                <div>
-                  <strong>Canal de Novedades</strong>
-                  <span>Drops, ingresos y promociones exclusivas</span>
+                <div className="about-contact-tile__icon about-contact-tile__icon--channel">
+                  <FaWhatsapp size={20} />
                 </div>
+                <div className="about-contact-tile__body">
+                  <span className="tile-category">CANAL VIP DE WHATSAPP</span>
+                  <strong className="tile-value">Drops & Descuentos Exclusivos</strong>
+                </div>
+                <span className="tile-action">Unirme ↗</span>
               </a>
 
+              {/* Correo Electrónico */}
               <a
                 href={`mailto:${config?.email || STORE_INFO.email}`}
-                className="about-contact-row"
+                className="about-contact-tile"
               >
-                <FiMail />
-                <div>
-                  <strong>Correo Electrónico</strong>
-                  <span>{config?.email || STORE_INFO.email}</span>
+                <div className="about-contact-tile__icon about-contact-tile__icon--email">
+                  <FiMail size={18} />
                 </div>
+                <div className="about-contact-tile__body">
+                  <span className="tile-category">CORREO ELECTRÓNICO</span>
+                  <strong className="tile-value">{config?.email || STORE_INFO.email}</strong>
+                </div>
+                <span className="tile-action">Escribir ↗</span>
               </a>
             </div>
           </div>

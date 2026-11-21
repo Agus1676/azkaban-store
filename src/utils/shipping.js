@@ -1,4 +1,4 @@
-// Motor de cálculo y cotización de envíos Andreani y Vía Cargo para AzkabanStore
+// Motor de cálculo y cotización de envíos Andreani Express para AzkabanStore
 // Permite cotizar automáticamente según el Código Postal (CP) de Argentina
 // y se configura de forma 100% personalizada desde el Panel Admin > Envíos / Configuración.
 
@@ -10,9 +10,6 @@ export const DEFAULT_SHIPPING_CONFIG = {
   // Tarifas Andreani Interior de Buenos Aires y Provincias
   andreaniInteriorHome: 8900,
   andreaniInteriorBranch: 6900,
-
-  // Vía Cargo Encomienda a Terminal
-  viaCargoTerminal: 7500,
 
   // Monto para Envío Gratis (si el total del carrito lo supera, Andreani queda en $0)
   freeShippingEnabled: true,
@@ -38,7 +35,6 @@ export const getShippingConfig = () => {
         ambaBranchPrice: parsed.andreaniAmbaBranch ?? parsed.shippingConfig?.ambaBranchPrice ?? DEFAULT_SHIPPING_CONFIG.ambaBranchPrice,
         interiorHomePrice: parsed.andreaniInteriorHome ?? parsed.shippingConfig?.interiorHomePrice ?? DEFAULT_SHIPPING_CONFIG.interiorHomePrice,
         interiorBranchPrice: parsed.andreaniInteriorBranch ?? parsed.shippingConfig?.interiorBranchPrice ?? DEFAULT_SHIPPING_CONFIG.interiorBranchPrice,
-        viaCargoPrice: parsed.viaCargoAgency ?? parsed.shippingConfig?.viaCargoPrice ?? DEFAULT_SHIPPING_CONFIG.viaCargoPrice,
         freeShippingMinTotal: parsed.freeShippingThreshold ?? parsed.shippingConfig?.freeShippingMinTotal ?? DEFAULT_SHIPPING_CONFIG.freeShippingMinTotal,
         freeShippingEnabled: parsed.freeShippingEnabled ?? parsed.shippingConfig?.freeShippingEnabled ?? DEFAULT_SHIPPING_CONFIG.freeShippingEnabled,
       }
@@ -207,7 +203,6 @@ export const calculateShippingQuotes = (postalCode, cartTotal = 0, customConfig 
 
   let homePrice = zoneInfo.isAmba ? cfg.andreaniAmbaHome : cfg.andreaniInteriorHome
   let branchPrice = zoneInfo.isAmba ? cfg.andreaniAmbaBranch : cfg.andreaniInteriorBranch
-  let viaCargoPrice = cfg.viaCargoTerminal
 
   if (isFreeEligible) {
     homePrice = 0
@@ -238,18 +233,6 @@ export const calculateShippingQuotes = (postalCode, cartTotal = 0, customConfig 
       estimatedDays: zoneInfo.estimatedDays,
       icon: '🏢',
       description: 'Retirá en la sucursal Andreani más cercana con tu DNI.',
-    },
-    {
-      id: 'via_cargo',
-      carrier: 'Vía Cargo',
-      type: 'Terminal',
-      name: 'Vía Cargo a Terminal / Agencia',
-      price: viaCargoPrice,
-      originalPrice: viaCargoPrice,
-      isFree: false,
-      estimatedDays: '3 a 5 días hábiles',
-      icon: '🚚',
-      description: 'Retiro en agencia o terminal de micros oficial Vía Cargo.',
     },
     {
       id: 'pickup',

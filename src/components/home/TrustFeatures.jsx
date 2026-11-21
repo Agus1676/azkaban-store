@@ -6,7 +6,7 @@ const TrustFeatures = () => {
     {
       icon: <FiTruck />,
       title: 'Envíos Nacionales',
-      text: 'Despachos por Andreani y Vía Cargo con código de seguimiento en tiempo real.',
+      text: 'Despachos oficiales por Andreani a domicilio o sucursal con tracking en tiempo real.',
     },
     {
       icon: <FiMapPin />,

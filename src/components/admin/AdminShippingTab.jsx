@@ -64,7 +64,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
       {/* Header */}
       <div className="admin-content-card__header">
         <div>
-          <h3>Logística y Calculador Automático de Envíos (Andreani & Vía Cargo)</h3>
+          <h3>Logística y Calculador Automático de Envíos (Andreani Express)</h3>
           <p>
             Automatizá el cálculo de envíos en base al Código Postal del cliente para AMBA e Interior del país.
           </p>
@@ -184,23 +184,6 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                   />
                   <span className="text-xs text-muted">Retiro en sucursales del interior del país</span>
                 </div>
-              </div>
-
-              <div className="form-group" style={{ marginTop: '14px' }}>
-                <label>Tarifa Vía Cargo a Terminal / Agencia ($ ARS)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="100"
-                  value={shippingConfig.viaCargoTerminal}
-                  onChange={(e) =>
-                    setShippingConfig({
-                      ...shippingConfig,
-                      viaCargoTerminal: Number(e.target.value) || 0,
-                    })
-                  }
-                />
-                <span className="text-xs text-muted">Despachos por encomienda de micro a terminales</span>
               </div>
             </div>
 

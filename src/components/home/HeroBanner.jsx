@@ -18,7 +18,7 @@ const HeroBanner = () => {
             Indumentaria deportiva y urbana con la <span className="text-orange">mejor calidad</span>.
           </h1>
           <p className="hero-description">
-            Buzos frizados, bermudas, remeras y conjuntos seleccionados. Retirá en nuestro local en <strong>San Martín</strong> o recibí tu paquete en cualquier punto del país por <strong>Andreani</strong> y <strong>Vía Cargo</strong>.
+            Buzos frizados, bermudas, remeras y conjuntos seleccionados. Retirá en nuestro local en <strong>San Martín</strong> o recibí tu paquete en cualquier punto del país por <strong>Andreani</strong> con seguimiento online.
           </p>
 
           <div className="hero-cta-group">
@@ -40,7 +40,7 @@ const HeroBanner = () => {
           <div className="hero-highlights">
             <div className="highlight-item">
               <FiTruck className="highlight-icon" />
-              <span>Envíos Andreani & Vía Cargo</span>
+              <span>Envíos Andreani a Todo el País</span>
             </div>
             <div className="highlight-item">
               <FiMapPin className="highlight-icon" />

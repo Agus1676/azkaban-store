@@ -21,7 +21,7 @@ const HomePage = () => {
   useEffect(() => {
     updatePageSEO({
       title: 'AzkabanStore | Indumentaria Deportiva y Urbana | Catálogo Online',
-      description: 'Catálogo oficial de AzkabanStore en Argentina. Buzos frizados, bermudas de algodón, remeras oversize y conjuntos urbanos. Envíos a todo el país por Andreani y Vía Cargo.',
+      description: 'Catálogo oficial de AzkabanStore en Argentina. Buzos frizados, bermudas de algodón, remeras oversize y conjuntos urbanos. Envíos a todo el país por Andreani Express.',
       canonical: 'https://www.azkabanstore.com.ar/',
     })
   }, [])

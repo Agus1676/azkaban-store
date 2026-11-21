@@ -9,7 +9,7 @@ const DEFAULT_SLIDES = [
     id: 1,
     category: 'TEMPORADA 2026 • INDUMENTARIA DEPORTIVA & URBANA',
     title: 'Nueva Colección Streetwear & Deportivo',
-    subtitle: 'Buzos frizados, bermudas y conjuntos de máxima calidad. Despachamos a todo el país por Andreani y Vía Cargo.',
+    subtitle: 'Buzos frizados, bermudas y conjuntos de máxima calidad. Despachamos a todo el país por Andreani Express con seguimiento.',
     ctaText: 'Ver Colección 2026',
     ctaLink: '/catalogo',
     bg: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1600&q=80',

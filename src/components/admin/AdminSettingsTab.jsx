@@ -41,14 +41,13 @@ const AdminSettingsTab = ({
     email: 'azkabanstoreonline@gmail.com',
     instagramUrl: 'https://instagram.com/azkabanstore.indumentaria',
     whatsappChannelUrl: 'https://whatsapp.com/channel/0029Vb6rLHIAzNc2gW3gXm3o',
-    announcementText: '🔥 Envíos a todo el país por Andreani y Vía Cargo • Punto de Retiro en San Martín',
+    announcementText: '🔥 Envíos a todo el país por Andreani Express • Punto de Retiro en San Martín',
 
     // Andreani & Shipping rates
     andreaniAmbaHome: 7500,
     andreaniAmbaBranch: 5200,
     andreaniInteriorHome: 11800,
     andreaniInteriorBranch: 8900,
-    viaCargoAgency: 9500,
     freeShippingThreshold: 120000,
     freeShippingEnabled: true,
 
@@ -458,7 +457,7 @@ const AdminSettingsTab = ({
       {/* TAB 3: ENVÍOS & ENTREGAS */}
       {activeSubTab === 'shipping' && (
         <div className="pf__card">
-          <h3>🚚 Tarifas de Envíos &amp; Logística Andreani / Vía Cargo</h3>
+          <h3>🚚 Tarifas de Envíos &amp; Logística Oficial Andreani</h3>
           <p>Configurá las tarifas zonales para el cotizador automático del carrito y envíos gratis.</p>
 
           <div className="pf__grid-2">
@@ -499,15 +498,6 @@ const AdminSettingsTab = ({
             </div>
 
             <div className="pf__form-group">
-              <label>Vía Cargo a Agencia ($)</label>
-              <input
-                type="number"
-                value={formData.viaCargoAgency}
-                onChange={(e) => handleFieldChange('viaCargoAgency', Number(e.target.value))}
-              />
-            </div>
-
-            <div className="pf__form-group">
               <label>Monto Mínimo para Envío Gratis ($)</label>
               <input
                 type="number"
@@ -531,7 +521,7 @@ const AdminSettingsTab = ({
               rows={3}
               value={formData.announcementText}
               onChange={(e) => handleFieldChange('announcementText', e.target.value)}
-              placeholder="Ej: 🔥 Envíos a todo el país por Andreani y Vía Cargo • Punto de Retiro en San Martín"
+              placeholder="Ej: 🔥 Envíos a todo el país por Andreani Express • Punto de Retiro en San Martín"
             />
           </div>
 

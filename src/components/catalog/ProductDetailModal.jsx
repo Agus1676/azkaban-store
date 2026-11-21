@@ -289,7 +289,7 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
             <div className="modal-assurances">
               <div className="assurance-card">
                 <FiTruck className="assurance-icon" />
-                <span>Envíos Andreani &amp; Vía Cargo</span>
+                <span>Envíos Andreani Express</span>
               </div>
               <div className="assurance-card">
                 <FiMapPin className="assurance-icon" />
