@@ -5,6 +5,7 @@ import {
   FiArchive,
   FiBarChart2,
   FiTag,
+  FiShoppingBag,
   FiSettings,
   FiMenu,
   FiX,
