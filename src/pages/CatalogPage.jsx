@@ -5,6 +5,7 @@ import ProductCard from '../components/catalog/ProductCard'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
 import { getStoredProducts } from '../services/storeDb'
 import { getStoredCategories } from '../data/categories'
+import { updatePageSEO } from '../utils/seo'
 import './CatalogPage.css'
 
 const loadCatalogProducts = () => {
@@ -42,6 +43,21 @@ const CatalogPage = () => {
       window.removeEventListener('azkaban_categories_updated', handleCats)
     }
   }, [])
+
+  useEffect(() => {
+    const catName = categories.find((c) => c.id === selectedCategory)?.name || 'Todos los Productos'
+    const titleText = selectedCategory !== 'todos'
+      ? `${catName} | Catálogo AzkabanStore Argentina`
+      : 'Catálogo de Indumentaria Deportiva y Urbana | AzkabanStore'
+
+    updatePageSEO({
+      title: titleText,
+      description: `Explorá ${catName} en AzkabanStore. Calidad premium en buzos frizados, bermudas de algodón y prendas urbanas. Despachos rápidos a toda la Argentina.`,
+      canonical: selectedCategory !== 'todos'
+        ? `https://www.azkabanstore.com.ar/catalogo?category=${selectedCategory}`
+        : 'https://www.azkabanstore.com.ar/catalogo',
+    })
+  }, [selectedCategory, categories])
 
   const handleCategoryChange = (catId) => {
     setSelectedCategory(catId)

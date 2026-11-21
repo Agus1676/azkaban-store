@@ -14,11 +14,20 @@ import { getReturnPolicy } from '../data/policies'
 import { STORE_INFO } from '../data/seedProducts'
 import { getStoredConfig } from '../services/storeDb'
 import { generateGeneralInquiryLink } from '../utils/whatsapp'
+import { updatePageSEO } from '../utils/seo'
 import './ReturnPolicyPage.css'
 
 const ReturnPolicyPage = () => {
   const [policies, setPolicies] = useState(getReturnPolicy)
   const [config, setConfig] = useState(getStoredConfig)
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Términos, Garantía y Política Oficial de Cambios | AzkabanStore',
+      description: 'Conocé las condiciones de garantía por falla de fábrica, requisitos para cambios de talle y plazos oficiales de AzkabanStore.',
+      canonical: 'https://www.azkabanstore.com.ar/politica-de-cambios',
+    })
+  }, [])
 
   useEffect(() => {
     const handleConfig = () => {

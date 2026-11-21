@@ -20,6 +20,7 @@ import { generateProductInquiryLink } from '../../utils/whatsapp'
 import { parseVideoUrl } from '../../utils/video'
 import { getReturnPolicy, RETURN_POLICY_PATH } from '../../data/policies'
 import { calculateShippingQuotes } from '../../utils/shipping'
+import { updatePageSEO, createProductSchema } from '../../utils/seo'
 import './ProductDetailModal.css'
 
 const ProductVideo = ({ video, title }) => {
@@ -64,6 +65,23 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
+
+  // SEO dinámico y Rich Snippet JSON-LD para Google Shopping
+  useEffect(() => {
+    if (product) {
+      updatePageSEO({
+        title: `${product.name} | AzkabanStore`,
+        description: product.description || `Comprá ${product.name} en AzkabanStore. Indumentaria deportiva y urbana con envíos a todo el país.`,
+        canonical: `https://www.azkabanstore.com.ar/catalogo?category=${product.category || 'todos'}`,
+        image: product.imageUrl,
+        schemaJson: createProductSchema(product),
+      })
+    }
+    return () => {
+      // Limpiar rich snippet al cerrar el modal
+      updatePageSEO({ schemaJson: null })
+    }
+  }, [product])
 
   const [shippingCp, setShippingCp] = useState('')
   const [shippingCalcResult, setShippingCalcResult] = useState(null)

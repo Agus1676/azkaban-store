@@ -4,10 +4,19 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { STORE_INFO } from '../data/seedProducts'
 import { getStoredConfig } from '../services/storeDb'
 import { getWhatsAppChannelUrl, generateGeneralInquiryLink } from '../utils/whatsapp'
+import { updatePageSEO } from '../utils/seo'
 import './AboutPage.css'
 
 const AboutPage = () => {
   const [config, setConfig] = useState(getStoredConfig)
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Punto de Retiro & Envíos Andreani / Vía Cargo | AzkabanStore San Martín',
+      description: 'Retirá tu compra gratis en nuestro punto de San Martín o recibila en tu domicilio en cualquier punto de Argentina por Andreani o Vía Cargo.',
+      canonical: 'https://www.azkabanstore.com.ar/nosotros',
+    })
+  }, [])
 
   useEffect(() => {
     const handleConfig = () => setConfig(getStoredConfig())

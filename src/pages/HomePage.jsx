@@ -7,6 +7,7 @@ import TrustFeatures from '../components/home/TrustFeatures'
 import CustomerReviewsSection from '../components/home/CustomerReviewsSection'
 import ProductDetailModal from '../components/catalog/ProductDetailModal'
 import { getStoredProducts } from '../services/storeDb'
+import { updatePageSEO } from '../utils/seo'
 import './HomePage.css'
 
 const loadProducts = () => {
@@ -16,6 +17,14 @@ const loadProducts = () => {
 const HomePage = () => {
   const [products, setProducts] = useState(loadProducts)
   const [selectedProduct, setSelectedProduct] = useState(null)
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'AzkabanStore | Indumentaria Deportiva y Urbana | Catálogo Online',
+      description: 'Catálogo oficial de AzkabanStore en Argentina. Buzos frizados, bermudas de algodón, remeras oversize y conjuntos urbanos. Envíos a todo el país por Andreani y Vía Cargo.',
+      canonical: 'https://www.azkabanstore.com.ar/',
+    })
+  }, [])
 
   useEffect(() => {
     const handleUpdate = () => setProducts(loadProducts())

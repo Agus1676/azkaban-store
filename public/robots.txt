@@ -1,0 +1,16 @@
+# Robots.txt para AzkabanStore
+# https://www.azkabanstore.com.ar
+
+User-agent: *
+Allow: /
+Allow: /catalogo
+Allow: /nosotros
+Allow: /politica-de-cambios
+Allow: /assets/
+
+# Proteger panel de administración
+Disallow: /admin
+Disallow: /admin/
+
+# Sitemap Oficial
+Sitemap: https://www.azkabanstore.com.ar/sitemap.xml
