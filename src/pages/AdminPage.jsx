@@ -304,19 +304,48 @@ const AdminPage = () => {
 
   return (
     <div className="admin">
-      {/* Mobile Toggle Button matching Jokers */}
-      <button
-        className="admin__toggle"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        aria-label="Abrir navegación admin"
-      >
-        {sidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-      </button>
+      {/* Mobile Top Header */}
+      <header className="admin__mobile-header">
+        <button
+          className="admin__mobile-menu-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Abrir menú de navegación"
+        >
+          <FiMenu size={22} />
+        </button>
+        <span className="admin__mobile-title">Azkaban´s Admin</span>
+        <button
+          className="admin__mobile-logout-btn"
+          onClick={logout}
+          title="Cerrar Sesión"
+          aria-label="Cerrar sesión"
+        >
+          <FiLogOut size={18} />
+        </button>
+      </header>
+
+      {/* Overlay Backdrop for Mobile */}
+      {sidebarOpen && (
+        <div
+          className="admin__overlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Sidebar matching Jokers Screenshot 1 & 2 */}
       <aside className={`admin__sidebar ${sidebarOpen ? 'admin__sidebar--open' : ''}`}>
         <div className="admin__sidebar-header">
-          <h3>Azkaban´s Admin</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Azkaban´s Admin</h3>
+            <button
+              className="admin__sidebar-close-btn"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Cerrar menú"
+            >
+              <FiX size={20} />
+            </button>
+          </div>
         </div>
 
         <nav className="admin__nav">

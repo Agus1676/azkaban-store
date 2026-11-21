@@ -49,8 +49,8 @@ function App() {
           },
         }}
       />
-      <AnnouncementBar />
-      <Navbar />
+      {!isAdmin && <AnnouncementBar />}
+      {!isAdmin && <Navbar />}
 
       <main className={isAdmin ? 'admin-main-wrapper' : 'main-content'}>
         <Suspense fallback={<PageLoader />}>
@@ -66,8 +66,8 @@ function App() {
       </main>
 
       {!isAdmin && <Footer />}
-      <WhatsAppFloat />
-      <CartDrawer />
+      {!isAdmin && <WhatsAppFloat />}
+      {!isAdmin && <CartDrawer />}
     </div>
   )
 }

@@ -58,9 +58,22 @@ export const sanitizeText = (val, maxLen = 2000) => {
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/on\w+\s*=/gi, '')
     .replace(/javascript:/gi, '')
-    .replace(/data:/gi, 'safe-data:')
     .trim()
     .slice(0, maxLen)
+}
+
+export const sanitizeImageUrl = (val) => {
+  if (typeof val !== 'string') return '/logo.png'
+  const trimmed = val.trim()
+  // Permitir Data URLs seguras de imágenes (WebP, JPEG, PNG, etc.)
+  if (/^data:image\/(webp|jpeg|jpg|png|gif|svg\+xml);base64,/i.test(trimmed)) {
+    return trimmed.slice(0, 500000)
+  }
+  // Permitir URLs web seguras o rutas relativas
+  if (/^(https?:\/\/|\/)/i.test(trimmed)) {
+    return trimmed.replace(/[<>"'`]/g, '').slice(0, 2000)
+  }
+  return '/logo.png'
 }
 
 export const normalizeProduct = (p) => {
@@ -74,9 +87,9 @@ export const normalizeProduct = (p) => {
   if (Array.isArray(p.images) && p.images.length > 0) {
     images = p.images
       .filter((img) => typeof img === 'string' && img.trim() !== '')
-      .map((img) => sanitizeText(img, 1000))
+      .map(sanitizeImageUrl)
   } else if (p.imageUrl && typeof p.imageUrl === 'string') {
-    images = [sanitizeText(p.imageUrl, 1000)]
+    images = [sanitizeImageUrl(p.imageUrl)]
   }
   if (images.length === 0) {
     images = ['/logo.png']

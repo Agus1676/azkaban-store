@@ -12,10 +12,13 @@ import {
   FiTrash2,
   FiDownload,
   FiUpload,
+  FiUploadCloud,
   FiRefreshCw,
   FiLock,
   FiCheck,
+  FiLoader,
 } from 'react-icons/fi'
+import { compressImageFile } from '../../utils/imageOptimizer'
 import toast from 'react-hot-toast'
 
 const AdminSettingsTab = ({
@@ -84,6 +87,25 @@ const AdminSettingsTab = ({
   const [currentPass, setCurrentPass] = useState('')
   const [newPass, setNewPass] = useState('')
   const [confirmPass, setConfirmPass] = useState('')
+  const [compressingBannerIndex, setCompressingBannerIndex] = useState(null)
+
+  const handleBannerFileUpload = async (index, file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Seleccioná un archivo de imagen válido (JPG, PNG, WebP)')
+      return
+    }
+    setCompressingBannerIndex(index)
+    const toastId = toast.loading('Optimizando y procesando imagen de banner...')
+    try {
+      const dataUrl = await compressImageFile(file, { maxWidth: 1600, maxHeight: 800, quality: 0.84 })
+      handleBannerChange(index, 'imageUrl', dataUrl)
+      toast.success('¡Banner cargado y optimizado con éxito!', { id: toastId })
+    } catch (err) {
+      toast.error(err.message || 'Error al procesar el banner', { id: toastId })
+    } finally {
+      setCompressingBannerIndex(null)
+    }
+  }
 
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({
@@ -265,12 +287,60 @@ const AdminSettingsTab = ({
 
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div className="pf__form-group">
-                    <label>URL de la Imagen (Enlace Directo)</label>
+                    <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Imagen del Banner</span>
+                      <span className="text-xs text-muted">Recomendado: 1600x800 px</span>
+                    </label>
+
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      <label
+                        className="btn-secondary"
+                        style={{
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '9px 16px',
+                          fontSize: '0.88rem',
+                          background: '#fff',
+                          border: '1.5px dashed #ff5500',
+                          color: '#0f172a',
+                          fontWeight: 600,
+                          borderRadius: '8px',
+                        }}
+                      >
+                        {compressingBannerIndex === idx ? (
+                          <>
+                            <FiLoader className="spin" size={16} />
+                            <span>Optimizando banner...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiUploadCloud size={18} className="text-orange" />
+                            <span>📁 Subir Foto desde PC / Celular</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          disabled={compressingBannerIndex === idx}
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              handleBannerFileUpload(idx, e.target.files[0])
+                              e.target.value = ''
+                            }
+                          }}
+                        />
+                      </label>
+                      <span className="text-xs text-muted">o pegar enlace web abajo</span>
+                    </div>
+
                     <input
                       type="text"
                       value={slide.imageUrl}
                       onChange={(e) => handleBannerChange(idx, 'imageUrl', e.target.value)}
-                      placeholder="https://..."
+                      placeholder="https://images.unsplash.com/... o data:image/..."
                     />
                   </div>
 

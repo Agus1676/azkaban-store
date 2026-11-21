@@ -1,8 +1,23 @@
-import { useState, useEffect } from 'react'
-import { FiX, FiCheck, FiImage, FiTag, FiEye, FiVideo, FiPlayCircle } from 'react-icons/fi'
+import { useState, useEffect, useRef } from 'react'
+import {
+  FiX,
+  FiCheck,
+  FiImage,
+  FiTag,
+  FiEye,
+  FiVideo,
+  FiPlayCircle,
+  FiUploadCloud,
+  FiTrash2,
+  FiStar,
+  FiPlus,
+  FiLoader,
+} from 'react-icons/fi'
 import { CATEGORIES } from '../../data/seedProducts'
 import { formatPrice } from '../../utils/formatPrice'
 import { parseVideoUrl } from '../../utils/video'
+import { compressImageFile } from '../../utils/imageOptimizer'
+import toast from 'react-hot-toast'
 
 const PRESET_SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ÚNICO']
 const PRESET_BADGES = [
@@ -40,15 +55,24 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
     badge: 'NUEVO',
     description: '',
     sizes: ['S', 'M', 'L', 'XL'],
+    images: [],
     imageUrl: '',
     videoUrl: '',
     brand: 'Azkaban',
   })
 
   const [customSizeInput, setCustomSizeInput] = useState('')
+  const [urlInput, setUrlInput] = useState('')
+  const [isCompressing, setIsCompressing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     if (product) {
+      const rawImages = Array.isArray(product.images) && product.images.length > 0
+        ? product.images
+        : (product.imageUrl ? [product.imageUrl] : [])
+
       setForm({
         name: product.name || '',
         category: product.category || 'buzos',
@@ -61,7 +85,8 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
         badge: product.badge || '',
         description: product.description || '',
         sizes: Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ['ÚNICO'],
-        imageUrl: product.imageUrl || '',
+        images: rawImages,
+        imageUrl: rawImages[0] || product.imageUrl || '',
         videoUrl: product.videoUrl || '',
         brand: product.brand || 'Azkaban',
       })
@@ -78,11 +103,13 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
         badge: 'NUEVO',
         description: '',
         sizes: ['S', 'M', 'L', 'XL'],
+        images: [],
         imageUrl: '',
         videoUrl: '',
         brand: 'Azkaban',
       })
     }
+    setUrlInput('')
   }, [product, isOpen])
 
   if (!isOpen) return null
@@ -117,11 +144,124 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
     }
   }
 
+  // Process files from PC / Mobile
+  const handleProcessFiles = async (files) => {
+    const fileArray = Array.from(files || []).filter((f) => f.type.startsWith('image/'))
+    if (fileArray.length === 0) {
+      toast.error('Por favor seleccioná archivos de imagen válidos (JPG, PNG, WEBP)')
+      return
+    }
+
+    setIsCompressing(true)
+    const toastId = toast.loading(`Procesando y optimizando ${fileArray.length} foto${fileArray.length > 1 ? 's' : ''}...`)
+
+    try {
+      const compressedList = []
+      for (const file of fileArray) {
+        const dataUrl = await compressImageFile(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 })
+        compressedList.push(dataUrl)
+      }
+
+      setForm((prev) => {
+        const nextImages = [...(prev.images || []), ...compressedList]
+        return {
+          ...prev,
+          images: nextImages,
+          imageUrl: nextImages[0] || prev.imageUrl,
+        }
+      })
+      toast.success(`¡${compressedList.length} imagen${compressedList.length > 1 ? 'es' : ''} cargada con éxito!`, { id: toastId })
+    } catch (err) {
+      toast.error(err.message || 'Error al procesar las imágenes', { id: toastId })
+    } finally {
+      setIsCompressing(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  // File Input Change
+  const handleFileInputChange = (e) => {
+    handleProcessFiles(e.target.files)
+  }
+
+  // Drag and Drop
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+    if (e.dataTransfer && e.dataTransfer.files) {
+      handleProcessFiles(e.dataTransfer.files)
+    }
+  }
+
+  // Add Image from URL
+  const handleAddUrlImage = () => {
+    const url = urlInput.trim()
+    if (!url) return
+    if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+      toast.error('Ingresá una URL válida que empiece con https://')
+      return
+    }
+
+    setForm((prev) => {
+      const nextImages = [...(prev.images || []), url]
+      return {
+        ...prev,
+        images: nextImages,
+        imageUrl: nextImages[0] || url,
+      }
+    })
+    setUrlInput('')
+    toast.success('Imagen agregada desde URL')
+  }
+
+  // Remove an Image
+  const handleRemoveImage = (indexToRemove) => {
+    setForm((prev) => {
+      const nextImages = (prev.images || []).filter((_, idx) => idx !== indexToRemove)
+      return {
+        ...prev,
+        images: nextImages,
+        imageUrl: nextImages[0] || '',
+      }
+    })
+  }
+
+  // Set an Image as Main / Cover
+  const handleSetMainImage = (indexToMain) => {
+    setForm((prev) => {
+      const current = [...(prev.images || [])]
+      const [selected] = current.splice(indexToMain, 1)
+      const nextImages = [selected, ...current]
+      return {
+        ...prev,
+        images: nextImages,
+        imageUrl: selected,
+      }
+    })
+    toast.success('Foto establecida como portada principal')
+  }
+
   // Submit
   const handleSubmit = (e) => {
     e.preventDefault()
+    const finalImages = form.images && form.images.length > 0
+      ? form.images
+      : (form.imageUrl ? [form.imageUrl] : ['/logo.png'])
+
     onSave({
       ...form,
+      images: finalImages,
+      imageUrl: finalImages[0] || '/logo.png',
       sizes: form.sizes.length > 0 ? form.sizes : ['ÚNICO'],
       price: Number(form.price) || 0,
       priceOffer: form.priceOffer ? Number(form.priceOffer) : null,
@@ -137,6 +277,9 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
       : null
 
   const parsedVideo = parseVideoUrl(form.videoUrl)
+  const currentImages = form.images && form.images.length > 0
+    ? form.images
+    : (form.imageUrl ? [form.imageUrl] : [])
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -308,31 +451,124 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
               </div>
             </div>
 
-            {/* Right Column: Image Preview & Visibility Switches */}
+            {/* Right Column: Image Uploader & Preview & Visibility Switches */}
             <div className="product-form-right">
-              {/* Image Preview Box */}
+              {/* Image Upload Zone */}
               <div className="form-group">
-                <label>Foto de la Prenda (URL)</label>
-                <div className="image-preview-card">
-                  <img
-                    src={form.imageUrl || '/logo.jpg'}
-                    alt="Vista previa"
-                    className="image-preview-img"
-                    onError={(e) => {
-                      e.target.src = '/logo.jpg'
-                    }}
+                <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📸 Fotos de la Prenda ({currentImages.length})</span>
+                  <span className="text-xs text-muted">Podés subir varias</span>
+                </label>
+
+                {/* File Upload Drop Area */}
+                <div
+                  className={`admin-upload-dropzone ${isDragging ? 'dragging' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileInputChange}
+                    accept="image/*"
+                    multiple
+                    style={{ display: 'none' }}
                   />
-                  {form.badge && (
-                    <span className="image-preview-badge">{form.badge}</span>
+                  {isCompressing ? (
+                    <div className="admin-upload-loading">
+                      <FiLoader className="spin" size={26} />
+                      <span>Optimizando y subiendo fotos...</span>
+                    </div>
+                  ) : (
+                    <div className="admin-upload-prompt">
+                      <FiUploadCloud size={30} className="text-orange" />
+                      <strong>Hacé clic acá para subir fotos desde tu PC o Celular</strong>
+                      <span className="text-xs text-muted">
+                        o arrastrá y soltá las imágenes acá (JPG, PNG, WebP)
+                      </span>
+                    </div>
                   )}
                 </div>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={form.imageUrl}
-                  onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  style={{ marginTop: '8px' }}
-                />
+
+                {/* Gallery of Uploaded Photos */}
+                {currentImages.length > 0 && (
+                  <div className="admin-photo-gallery">
+                    <span className="text-xs text-muted" style={{ fontWeight: 600 }}>
+                      Fotos cargadas (La primera es la portada de la tienda):
+                    </span>
+                    <div className="admin-photo-grid">
+                      {currentImages.map((img, idx) => (
+                        <div key={idx} className={`admin-photo-thumb ${idx === 0 ? 'is-main' : ''}`}>
+                          <img
+                            src={img}
+                            alt={`Foto ${idx + 1}`}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null
+                              e.currentTarget.src = '/logo.png'
+                            }}
+                          />
+                          {idx === 0 && <span className="admin-photo-main-badge">Portada</span>}
+                          <div className="admin-photo-actions">
+                            {idx !== 0 && (
+                              <button
+                                type="button"
+                                className="admin-photo-action-btn make-main"
+                                title="Hacer foto principal"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleSetMainImage(idx)
+                                }}
+                              >
+                                <FiStar size={12} />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className="admin-photo-action-btn delete"
+                              title="Eliminar foto"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleRemoveImage(idx)
+                              }}
+                            >
+                              <FiTrash2 size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Optional URL Adder */}
+                <div className="admin-url-add-box" style={{ marginTop: '12px' }}>
+                  <span className="text-xs text-muted">O agregá una foto mediante link URL:</span>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <input
+                      type="url"
+                      placeholder="https://images.unsplash.com/... o enlace de foto"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleAddUrlImage()
+                        }
+                      }}
+                      style={{ fontSize: '0.85rem' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn-secondary btn-sm"
+                      onClick={handleAddUrlImage}
+                      style={{ whiteSpace: 'nowrap', padding: '0 12px' }}
+                    >
+                      <FiPlus size={14} /> Agregar
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Preset helper buttons */}
@@ -344,9 +580,19 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
                       key={p.label}
                       type="button"
                       className="btn-preset-thumb"
-                      onClick={() => setForm({ ...form, imageUrl: p.url })}
+                      onClick={() => {
+                        setForm((prev) => {
+                          const nextImages = [...(prev.images || []), p.url]
+                          return {
+                            ...prev,
+                            images: nextImages,
+                            imageUrl: nextImages[0] || p.url,
+                          }
+                        })
+                        toast.success(`Foto ${p.label} agregada`)
+                      }}
                     >
-                      {p.label}
+                      + {p.label}
                     </button>
                   ))}
                 </div>
@@ -360,12 +606,12 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
                 </label>
                 <input
                   type="url"
-                  placeholder="https://youtube.com/shorts/... o Instagram Reel, TikTok, Drive, MP4"
+                  placeholder="https://youtube.com/shorts/... o Instagram Reel, TikTok, MP4"
                   value={form.videoUrl}
                   onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
                 />
                 <span className="text-xs text-muted" style={{ display: 'block', marginTop: '4px', lineHeight: 1.4 }}>
-                  Permite a tus clientes ver la prenda en movimiento y caída real. Soporta YouTube, YouTube Shorts, Reels de Instagram, TikTok, Google Drive o archivo .mp4.
+                  Permite a tus clientes ver la prenda en movimiento y caída real. Soporta YouTube, YouTube Shorts, Reels de Instagram, TikTok o .mp4.
                 </span>
                 {form.videoUrl && (
                   <div style={{ marginTop: '6px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -418,7 +664,7 @@ const AdminProductModal = ({ isOpen, onClose, product, onSave, categories = [] }
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancelar
             </button>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary" disabled={isCompressing}>
               <FiCheck size={16} />
               <span>{product ? 'Guardar Cambios' : 'Publicar Prenda'}</span>
             </button>

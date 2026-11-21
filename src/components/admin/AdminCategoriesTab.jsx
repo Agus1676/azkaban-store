@@ -205,10 +205,11 @@ const AdminCategoriesTab = ({ categories = [], onSaveCategories, products = [] }
                   <td style={{ textAlign: 'center' }}>
                     <span
                       style={{
-                        padding: '3px 8px',
+                        padding: '3px 10px',
                         borderRadius: '9999px',
-                        background: count > 0 ? '#f1f5f9' : '#fef2f2',
-                        color: count > 0 ? '#0f172a' : '#dc2626',
+                        background: count > 0 ? '#f1f5f9' : '#f8fafc',
+                        color: count > 0 ? '#0f172a' : '#64748b',
+                        border: count > 0 ? '1px solid #e2e8f0' : '1px dashed #cbd5e1',
                         fontSize: '0.78rem',
                         fontWeight: 700,
                       }}
