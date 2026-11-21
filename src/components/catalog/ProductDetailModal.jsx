@@ -58,6 +58,15 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   const [policyOpen, setPolicyOpen] = useState(false)
   const returnPolicy = getReturnPolicy()
 
+  const allImages = Array.isArray(product?.images) && product.images.length > 0
+    ? product.images
+    : (product?.imageUrl ? [product.imageUrl] : ['/logo.png'])
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+
+  useEffect(() => {
+    setActiveImageIndex(0)
+  }, [product])
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose()
@@ -123,7 +132,7 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
               ) : (
                 <>
                   <img
-                    src={product.imageUrl}
+                    src={allImages[activeImageIndex] || product.imageUrl || '/logo.png'}
                     alt={product.name}
                     className="modal-img"
                     onError={(e) => { e.target.src = '/logo.png' }}
@@ -132,6 +141,30 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 </>
               )}
             </div>
+
+            {/* Gallery Thumbnails */}
+            {allImages.length > 1 && (
+              <div className="modal-thumbs-row">
+                {allImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`modal-thumb-btn ${idx === activeImageIndex && view === 'photo' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveImageIndex(idx)
+                      setView('photo')
+                    }}
+                    aria-label={`Ver foto ${idx + 1}`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Miniatura ${idx + 1}`}
+                      onError={(e) => { e.target.src = '/logo.png' }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {video && (
               <div className="modal-media-tabs" role="tablist">

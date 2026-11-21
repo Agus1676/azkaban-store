@@ -36,7 +36,7 @@ const ProductCard = ({ product, onOpenDetail }) => {
       {/* Product Image */}
       <div className="product-card__media">
         <img
-          src={product.imageUrl}
+          src={product.imageUrl || product.images?.[0] || '/logo.png'}
           alt={`${product.name} - ${product.brand || 'AzkabanStore'} Indumentaria Deportiva`}
           title={`${product.name} | AzkabanStore`}
           className="product-card__img"

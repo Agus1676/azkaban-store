@@ -30,6 +30,8 @@ import toast from 'react-hot-toast'
 import AdminDashboardTab from '../components/admin/AdminDashboardTab'
 import AdminProductsTab from '../components/admin/AdminProductsTab'
 import AdminStockTab from '../components/admin/AdminStockTab'
+import AdminOrdersTab from '../components/admin/AdminOrdersTab'
+import AdminOrderInvoiceModal from '../components/admin/AdminOrderInvoiceModal'
 import AdminReportsTab from '../components/admin/AdminReportsTab'
 import AdminCategoriesTab from '../components/admin/AdminCategoriesTab'
 import AdminSettingsTab from '../components/admin/AdminSettingsTab'
@@ -62,6 +64,7 @@ const AdminPage = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
   const [isBulkPriceModalOpen, setIsBulkPriceModalOpen] = useState(false)
+  const [invoiceOrder, setInvoiceOrder] = useState(null)
 
   // Sync to database
   useEffect(() => {
@@ -76,11 +79,35 @@ const AdminPage = () => {
     saveStoredConfig(storeConfig)
   }, [storeConfig])
 
-  // Low stock badge
+  // Low stock & pending orders badge
   const lowStockCount = products.filter((p) => {
     const s = Number(p.stock) || 0
     return s > 0 && s <= 2 && p.active !== false
   }).length
+
+  const pendingOrdersCount = orders.filter((o) => o.status === 'Pendiente' || !o.status).length
+
+  // Order Handlers
+  const handleUpdateOrderStatus = (orderId, newStatus) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    )
+    toast.success(`Estado del pedido actualizado a: ${newStatus}`)
+  }
+
+  const handleUpdateOrderTracking = (orderId, trackingCode) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, trackingCode } : o))
+    )
+    toast.success('Código de seguimiento guardado')
+  }
+
+  const handleDeleteOrder = (orderId) => {
+    if (window.confirm('¿Seguro que deseás eliminar este pedido del historial?')) {
+      setOrders((prev) => prev.filter((o) => o.id !== orderId))
+      toast.success('Pedido eliminado')
+    }
+  }
 
   // Handlers
   const handleLogin = async (e) => {
@@ -413,6 +440,23 @@ const AdminPage = () => {
 
           <button
             type="button"
+            className={`admin__nav-item ${activeTab === 'orders' ? 'admin__nav-item--active' : ''}`}
+            onClick={() => {
+              setActiveTab('orders')
+              setSidebarOpen(false)
+            }}
+          >
+            <FiShoppingBag size={18} />
+            <span>Pedidos de Clientes</span>
+            {pendingOrdersCount > 0 ? (
+              <span className="admin__nav-badge admin__nav-badge--warning">{pendingOrdersCount}</span>
+            ) : (
+              <span className="admin__nav-badge">{orders.length}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
             className={`admin__nav-item ${activeTab === 'reports' ? 'admin__nav-item--active' : ''}`}
             onClick={() => {
               setActiveTab('reports')
@@ -499,6 +543,17 @@ const AdminPage = () => {
           />
         )}
 
+        {activeTab === 'orders' && (
+          <AdminOrdersTab
+            orders={orders}
+            storeConfig={storeConfig}
+            onUpdateStatus={handleUpdateOrderStatus}
+            onUpdateTracking={handleUpdateOrderTracking}
+            onDeleteOrder={handleDeleteOrder}
+            onOpenInvoice={(order) => setInvoiceOrder(order)}
+          />
+        )}
+
         {activeTab === 'reports' && (
           <AdminReportsTab orders={orders} />
         )}
@@ -555,6 +610,15 @@ const AdminPage = () => {
           categories={categories}
           onClose={() => setIsBulkPriceModalOpen(false)}
           onApplyBulkUpdate={handleApplyBulkPrice}
+        />
+      )}
+
+      {invoiceOrder && (
+        <AdminOrderInvoiceModal
+          isOpen={!!invoiceOrder}
+          order={invoiceOrder}
+          storeConfig={storeConfig}
+          onClose={() => setInvoiceOrder(null)}
         />
       )}
     </div>
