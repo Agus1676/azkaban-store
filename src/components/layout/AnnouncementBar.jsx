@@ -25,11 +25,11 @@ const AnnouncementBar = () => {
             <span><FaTruck className="ann-icon" /> {customText}</span>
           ) : (
             <>
-              <span><FaTruck className="ann-icon" /> Envíos por <strong>Andreani</strong> y <strong>Vía Cargo</strong></span>
+              <span><FaTruck className="ann-icon" /> Envíos <strong>Andreani</strong> &amp; <strong>Vía Cargo</strong></span>
               <span className="ann-dot">•</span>
-              <span><FaMapMarkerAlt className="ann-icon" /> Retiro gratis en <strong>San Martín</strong></span>
-              <span className="ann-dot">•</span>
-              <span>Horario: {config?.hours || 'Lun a Vie 10 a 20hs'}</span>
+              <span><FaMapMarkerAlt className="ann-icon" /> Retiro en <strong>San Martín</strong></span>
+              <span className="ann-dot ann-desktop-only">•</span>
+              <span className="ann-desktop-only">Horario: {config?.hours || 'Lun a Vie 10 a 20hs'}</span>
             </>
           )}
         </div>

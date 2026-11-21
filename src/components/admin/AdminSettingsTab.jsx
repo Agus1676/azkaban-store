@@ -128,10 +128,10 @@ const AdminSettingsTab = ({
     toast.success('¡Toda la configuración fue guardada y sincronizada!')
   }
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault()
-    if (!newPass.trim() || newPass.length < 4) {
-      toast.error('La contraseña debe tener al menos 4 caracteres')
+    if (!newPass.trim() || newPass.length < 5) {
+      toast.error('La contraseña debe tener al menos 5 caracteres')
       return
     }
     if (newPass !== confirmPass) {
@@ -139,7 +139,7 @@ const AdminSettingsTab = ({
       return
     }
 
-    const res = onChangePassword(currentPass, newPass)
+    const res = await onChangePassword(currentPass, newPass)
     if (res.success) {
       toast.success('¡Contraseña actualizada con éxito!')
       setCurrentPass('')

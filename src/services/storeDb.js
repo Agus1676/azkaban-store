@@ -19,8 +19,19 @@ const KEYS = {
  */
 
 // ==========================================================================
-// 1. PRODUCTOS & NORMALIZADOR DEFENSIVO
+// 1. SANITIZADOR DEFENSIVO XSS & SEGURIDAD DE ENTRADAS
 // ==========================================================================
+
+export const sanitizeText = (val, maxLen = 2000) => {
+  if (typeof val !== 'string') return ''
+  return val
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/data:/gi, 'safe-data:')
+    .trim()
+    .slice(0, maxLen)
+}
 
 export const normalizeProduct = (p) => {
   if (!p || typeof p !== 'object' || !p.id) return null
@@ -31,9 +42,11 @@ export const normalizeProduct = (p) => {
 
   let images = []
   if (Array.isArray(p.images) && p.images.length > 0) {
-    images = p.images.filter((img) => typeof img === 'string' && img.trim() !== '')
+    images = p.images
+      .filter((img) => typeof img === 'string' && img.trim() !== '')
+      .map((img) => sanitizeText(img, 1000))
   } else if (p.imageUrl && typeof p.imageUrl === 'string') {
-    images = [p.imageUrl]
+    images = [sanitizeText(p.imageUrl, 1000)]
   }
   if (images.length === 0) {
     images = ['/logo.png']
@@ -42,18 +55,21 @@ export const normalizeProduct = (p) => {
   return {
     ...p,
     id: String(p.id),
-    name: (p.name || 'Prenda').trim(),
-    brand: (p.brand || 'Azkaban Indumentaria').trim(),
-    category: p.category || 'buzos',
+    name: sanitizeText(p.name || 'Prenda', 120),
+    brand: sanitizeText(p.brand || 'Azkaban Indumentaria', 80),
+    category: sanitizeText(p.category || 'buzos', 50),
     price: Math.max(0, priceNum),
     priceOffer: offerNum,
     offerPrice: offerNum,
     stock: Math.max(0, stockNum),
     active: p.active !== false,
     featured: Boolean(p.featured),
-    badge: p.badge || '',
-    description: p.description || '',
-    sizes: Array.isArray(p.sizes) && p.sizes.length > 0 ? p.sizes : ['ÚNICO'],
+    badge: sanitizeText(p.badge || '', 40),
+    description: sanitizeText(p.description || '', 2000),
+    videoUrl: sanitizeText(p.videoUrl || '', 500),
+    sizes: Array.isArray(p.sizes) && p.sizes.length > 0
+      ? p.sizes.map((s) => sanitizeText(String(s), 20)).filter(Boolean)
+      : ['ÚNICO'],
     images: images,
     imageUrl: images[0] || '/logo.png',
   }

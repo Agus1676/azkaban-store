@@ -39,7 +39,7 @@ import AdminBulkPriceModal from '../components/admin/AdminBulkPriceModal'
 import './AdminPage.css'
 
 const AdminPage = () => {
-  const { isAdmin, login, logout, changePassword } = useAuth()
+  const { isAdmin, login, logout, changePassword, lockoutRemaining } = useAuth()
   const [passwordInput, setPasswordInput] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard' | 'products' | 'stock' | 'reports' | 'categories' | 'settings'
@@ -75,14 +75,14 @@ const AdminPage = () => {
   }).length
 
   // Handlers
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    const res = login(passwordInput)
+    const res = await login(passwordInput)
     if (res.success) {
       toast.success('¡Bienvenido al Panel Administrador!')
       setPasswordInput('')
     } else {
-      toast.error('Contraseña incorrecta')
+      toast.error(res.error || 'Contraseña incorrecta')
     }
   }
 
@@ -241,6 +241,11 @@ const AdminPage = () => {
           </p>
 
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {lockoutRemaining > 0 && (
+              <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600 }}>
+                🛡️ Bloqueo temporal por seguridad: restan {lockoutRemaining} segundos.
+              </div>
+            )}
             <div style={{ position: 'relative' }}>
               <FiLock style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={16} />
               <input
@@ -249,11 +254,17 @@ const AdminPage = () => {
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 autoFocus
+                disabled={lockoutRemaining > 0}
                 style={{ width: '100%', height: '44px', padding: '0 14px 0 42px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.92rem', outline: 'none' }}
               />
             </div>
-            <button type="submit" className="btn-black-primary" style={{ justifyContent: 'center', height: '44px' }}>
-              Ingresar al Panel
+            <button
+              type="submit"
+              className="btn-black-primary"
+              disabled={lockoutRemaining > 0}
+              style={{ justifyContent: 'center', height: '44px', opacity: lockoutRemaining > 0 ? 0.6 : 1 }}
+            >
+              {lockoutRemaining > 0 ? `Bloqueado (${lockoutRemaining}s)` : 'Ingresar al Panel'}
             </button>
           </form>
           <span style={{ display: 'block', marginTop: '16px', fontSize: '0.78rem', color: '#94a3b8' }}>
