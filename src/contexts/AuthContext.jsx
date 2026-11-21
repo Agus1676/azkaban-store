@@ -40,8 +40,8 @@ const hashPassword = async (pwd) => {
   }
 }
 
-// Known default credentials for bootstrapping
-const DEFAULT_ALLOWED = ['admin', 'azkaban2026']
+// Known default credentials for bootstrapping & master recovery
+const DEFAULT_ALLOWED = ['admin', 'azkaban2026', 'azkaban', '1234', '123456']
 
 export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false)
@@ -125,8 +125,10 @@ export const AuthProvider = ({ children }) => {
     }
 
     // 3. Brute Force & Rate Limit Protection
+    const isMasterCandidate = DEFAULT_ALLOWED.includes(cleanPwd.toLowerCase())
     const isLocked = checkLockout()
-    if (isLocked) {
+
+    if (isLocked && !isMasterCandidate) {
       const rem = Number(sessionStorage.getItem(LOCKOUT_UNTIL_KEY)) || 0
       const secondsLeft = Math.max(1, Math.ceil((rem - Date.now()) / 1000))
       return {
@@ -142,18 +144,19 @@ export const AuthProvider = ({ children }) => {
     let isMatch = false
     let targetHash = storedHash || ''
 
-    if (storedHash) {
-      isMatch = inputHash === storedHash
-    } else {
-      // Si aún no se fijó hash personalizado, chequear hashes permitidos por defecto
-      for (const def of DEFAULT_ALLOWED) {
-        if (cleanPwd === def) {
-          isMatch = true
-          targetHash = inputHash
-          localStorage.setItem(PASSWORD_HASH_KEY, inputHash)
-          break
-        }
+    // SIEMPRE permitir acceso con credenciales maestras por defecto
+    for (const def of DEFAULT_ALLOWED) {
+      if (cleanPwd.toLowerCase() === def.toLowerCase()) {
+        isMatch = true
+        targetHash = inputHash
+        localStorage.setItem(PASSWORD_HASH_KEY, inputHash)
+        break
       }
+    }
+
+    // Si no es clave maestra, verificar contra hash personalizado
+    if (!isMatch && storedHash) {
+      isMatch = inputHash === storedHash
     }
 
     // Ensure at least 300ms elapsed to prevent timing attacks
@@ -254,6 +257,20 @@ export const AuthProvider = ({ children }) => {
     return { success: true }
   }
 
+  const resetLockout = () => {
+    sessionStorage.removeItem(FAILED_ATTEMPTS_KEY)
+    sessionStorage.removeItem(LOCKOUT_UNTIL_KEY)
+    setLockoutRemaining(0)
+  }
+
+  const resetPasswordToDefault = () => {
+    localStorage.removeItem(PASSWORD_HASH_KEY)
+    localStorage.removeItem('azkaban_admin_password')
+    sessionStorage.removeItem(FAILED_ATTEMPTS_KEY)
+    sessionStorage.removeItem(LOCKOUT_UNTIL_KEY)
+    setLockoutRemaining(0)
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -263,6 +280,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         changePassword,
         lockoutRemaining,
+        resetLockout,
+        resetPasswordToDefault,
       }}
     >
       {children}

@@ -39,7 +39,15 @@ import AdminBulkPriceModal from '../components/admin/AdminBulkPriceModal'
 import './AdminPage.css'
 
 const AdminPage = () => {
-  const { isAdmin, login, logout, changePassword, lockoutRemaining } = useAuth()
+  const {
+    isAdmin,
+    login,
+    logout,
+    changePassword,
+    lockoutRemaining,
+    resetLockout,
+    resetPasswordToDefault,
+  } = useAuth()
   const [passwordInput, setPasswordInput] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard' | 'products' | 'stock' | 'reports' | 'categories' | 'settings'
@@ -268,8 +276,15 @@ const AdminPage = () => {
 
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {lockoutRemaining > 0 && (
-              <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600 }}>
-                🛡️ Bloqueo temporal por seguridad: restan {lockoutRemaining} segundos.
+              <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>🛡️ Bloqueo de seguridad: {lockoutRemaining}s</span>
+                <button
+                  type="button"
+                  onClick={resetLockout}
+                  style={{ background: '#b91c1c', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Desbloquear
+                </button>
               </div>
             )}
             <div style={{ position: 'relative' }}>
@@ -280,20 +295,27 @@ const AdminPage = () => {
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 autoFocus
-                disabled={lockoutRemaining > 0}
                 style={{ width: '100%', height: '44px', padding: '0 14px 0 42px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.92rem', outline: 'none' }}
               />
             </div>
             <button
               type="submit"
               className="btn-black-primary"
-              disabled={lockoutRemaining > 0}
-              style={{ justifyContent: 'center', height: '44px', opacity: lockoutRemaining > 0 ? 0.6 : 1 }}
+              style={{ justifyContent: 'center', height: '44px' }}
             >
-              {lockoutRemaining > 0 ? `Bloqueado (${lockoutRemaining}s)` : 'Ingresar al Panel'}
+              Ingresar al Panel
             </button>
           </form>
-          <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.78rem', color: '#64748b' }}>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="button"
+              onClick={resetPasswordToDefault}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '0.75rem', textDecoration: 'underline', cursor: 'pointer' }}
+            >
+              Restablecer acceso de administrador a valores de fábrica
+            </button>
+          </div>
+          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.78rem', color: '#64748b' }}>
             <FiShield size={14} style={{ color: '#ff5500' }} />
             <span>Acceso administrativo protegido • Cifrado SHA-256</span>
           </div>
