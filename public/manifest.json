@@ -1,0 +1,24 @@
+{
+  "name": "AzkabanStore | Indumentaria Deportiva y Urbana",
+  "short_name": "AzkabanStore",
+  "description": "Tienda oficial online de indumentaria deportiva y urbana en Argentina. Buzos frizados, bermudas, remeras y conjuntos con envíos por Andreani y Vía Cargo.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff5500",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

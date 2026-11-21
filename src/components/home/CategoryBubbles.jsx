@@ -73,9 +73,12 @@ const CategoryBubbles = () => {
                 <div className="category-bubble__img-wrap">
                   <img
                     src={cat.img}
-                    alt={cat.name}
+                    alt={`Colección de ${cat.name} AzkabanStore Indumentaria Argentina`}
+                    title={`Ver colección ${cat.name}`}
                     className="category-bubble__img"
-                    onError={(e) => { e.target.src = '/logo.jpg' }}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { e.target.src = '/logo.png' }}
                   />
                   <span className="category-bubble__tag">{cat.tag}</span>
                 </div>

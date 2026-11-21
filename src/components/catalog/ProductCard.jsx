@@ -37,11 +37,13 @@ const ProductCard = ({ product, onOpenDetail }) => {
       <div className="product-card__media">
         <img
           src={product.imageUrl}
-          alt={product.name}
+          alt={`${product.name} - ${product.brand || 'AzkabanStore'} Indumentaria Deportiva`}
+          title={`${product.name} | AzkabanStore`}
           className="product-card__img"
           loading="lazy"
+          decoding="async"
           onError={(e) => {
-            e.target.src = '/logo.jpg'
+            e.target.src = '/logo.png'
           }}
         />
 
