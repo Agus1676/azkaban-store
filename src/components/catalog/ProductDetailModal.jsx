@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FiX,
@@ -51,6 +51,7 @@ const ProductVideo = ({ video, title }) => {
 
 const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   const { addToCart, shippingPreference } = useCart()
+  const modalScrollRef = useRef(null)
 
   const [selectedSize, setSelectedSize] = useState(
     product?.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Único'
@@ -61,11 +62,17 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   const [policyOpen, setPolicyOpen] = useState(false)
   const returnPolicy = getReturnPolicy()
 
-  // Delivery & Shipping state
-  const [deliveryMethod, setDeliveryMethod] = useState('andreani') // 'andreani' | 'pickup'
+  // Delivery selection: 'home' | 'branch' | 'pickup'
+  const [shippingMode, setShippingMode] = useState(
+    shippingPreference?.quoteId === 'pickup'
+      ? 'pickup'
+      : shippingPreference?.quoteId === 'andreani_branch'
+      ? 'branch'
+      : 'home'
+  )
   const [selectedZoneKey, setSelectedZoneKey] = useState(shippingPreference?.zoneKey || 'amba')
   const [postalCode, setPostalCode] = useState(shippingPreference?.postalCode || '')
-  const [selectedQuoteId, setSelectedQuoteId] = useState(shippingPreference?.quoteId || 'andreani_home') // 'andreani_home' | 'andreani_branch'
+  const [showCpInput, setShowCpInput] = useState(false)
 
   const allImages = Array.isArray(product?.images) && product.images.length > 0
     ? product.images
@@ -74,6 +81,10 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
 
   useEffect(() => {
     setActiveImageIndex(0)
+    // Garantizar que el modal siempre abra desde arriba
+    if (modalScrollRef.current) {
+      modalScrollRef.current.scrollTop = 0
+    }
   }, [product])
 
   useEffect(() => {
@@ -104,46 +115,61 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
   const itemSubtotal = price * quantity
 
-  // Cálculo de envíos reactivo según el Código Postal o Zona y el subtotal
+  // Cotizaciones dinámicas según zona/CP y subtotal
   const shippingCalculation = useMemo(() => {
     const input = (postalCode && postalCode.trim().length >= 3) ? postalCode.trim() : selectedZoneKey
     return calculateShippingQuotes(input, itemSubtotal)
   }, [postalCode, selectedZoneKey, itemSubtotal])
 
-  // Si el usuario ingresa un CP que resuelve a una zona, sincronizamos el selector visual
+  // Sincronizar zona detectada por CP
   useEffect(() => {
     if (shippingCalculation?.zoneInfo?.zoneKey && shippingCalculation.zoneInfo.zoneKey !== selectedZoneKey) {
       setSelectedZoneKey(shippingCalculation.zoneInfo.zoneKey)
     }
   }, [shippingCalculation?.zoneInfo?.zoneKey])
 
-  // Determinar la cotización activa
-  const activeQuote = useMemo(() => {
-    if (deliveryMethod === 'pickup') {
-      return {
-        id: 'pickup',
-        carrier: 'AzkabanStore',
-        type: 'Punto de Retiro',
-        name: 'Retiro en San Martín',
-        zoneName: 'San Martín, Buenos Aires',
-        price: 0,
-        isFree: true,
-        estimatedDays: 'Inmediato (Coordinar por WhatsApp)',
-        icon: '🚶',
-        description: 'Dr. marcos zimmermann 3339, San Martín. Sin costo de flete.',
-      }
-    }
+  const homeQuote = shippingCalculation?.quotes?.find((q) => q.id === 'andreani_home')
+  const branchQuote = shippingCalculation?.quotes?.find((q) => q.id === 'andreani_branch')
+  const pickupQuote = shippingCalculation?.quotes?.find((q) => q.id === 'pickup')
 
-    const available = shippingCalculation?.quotes?.filter((q) => q.id !== 'pickup') || []
-    const match = available.find((q) => q.id === selectedQuoteId)
-    return match || available[0] || {
-      id: 'andreani_home',
-      name: 'Andreani a Domicilio',
-      price: 5900,
-      icon: '🏠',
-      estimatedDays: '24 a 48 hs',
+  // Determinar cotización activa
+  const activeQuote = useMemo(() => {
+    if (shippingMode === 'pickup') {
+      return (
+        pickupQuote || {
+          id: 'pickup',
+          carrier: 'AzkabanStore',
+          type: 'Punto de Retiro',
+          name: 'Retiro en San Martín',
+          zoneName: 'San Martín, Buenos Aires',
+          price: 0,
+          isFree: true,
+          estimatedDays: 'Inmediato',
+          icon: '🚶',
+        }
+      )
     }
-  }, [deliveryMethod, shippingCalculation, selectedQuoteId])
+    if (shippingMode === 'branch') {
+      return (
+        branchQuote || {
+          id: 'andreani_branch',
+          name: 'Andreani Retiro en Sucursal',
+          price: 4600,
+          icon: '🏢',
+          estimatedDays: '24 a 48 hs',
+        }
+      )
+    }
+    return (
+      homeQuote || {
+        id: 'andreani_home',
+        name: 'Andreani a Domicilio',
+        price: 5900,
+        icon: '🏠',
+        estimatedDays: '24 a 48 hs',
+      }
+    )
+  }, [shippingMode, homeQuote, branchQuote, pickupQuote])
 
   const shippingCost = Number(activeQuote?.price) || 0
   const grandTotal = itemSubtotal + shippingCost
@@ -170,12 +196,13 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+        {/* Botón Cerrar (X) con espacio protegido */}
         <button className="modal-close" onClick={onClose} aria-label="Cerrar ventana">
-          <FiX size={20} />
+          <FiX size={18} />
         </button>
 
-        <div className="modal-layout">
-          {/* Media: Foto / Video */}
+        <div className="modal-layout" ref={modalScrollRef}>
+          {/* Columna Izquierda: Foto / Video */}
           <div className="modal-media-col">
             <div className={`modal-media ${view === 'video' && video?.vertical ? 'modal-media--vertical' : ''}`}>
               {view === 'video' && video ? (
@@ -193,7 +220,7 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
               )}
             </div>
 
-            {/* Gallery Thumbnails */}
+            {/* Miniaturas de galería */}
             {allImages.length > 1 && (
               <div className="modal-thumbs-row">
                 {allImages.map((img, idx) => (
@@ -241,210 +268,182 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
             )}
           </div>
 
-          {/* Info & Checkout configuration */}
+          {/* Columna Derecha: Información & Compra Inmediata */}
           <div className="modal-content">
+            {/* Cabecera del Producto */}
             <div className="modal-heading">
-              {product.brand && <span className="modal-brand-label">{product.brand}</span>}
+              <div className="modal-heading-top">
+                {product.brand && <span className="modal-brand-label">{product.brand}</span>}
+                <span className="modal-cat-label">{product.categoryName || 'Indumentaria'}</span>
+              </div>
               <h2 className="modal-prod-title">{product.name}</h2>
-              <span className="modal-cat-label">{product.categoryName || 'Indumentaria'}</span>
-            </div>
-
-            <div className="modal-pricing-row">
-              <span className="modal-current-price">{formatPrice(price)}</span>
-              {product.priceOffer && (
-                <span className="modal-old-price">{formatPrice(product.price)}</span>
-              )}
-              <span className={`modal-stock-indicator ${isOutOfStock ? 'is-out' : ''}`}>
-                {isOutOfStock ? 'Agotado' : `Stock disponible: ${product.stock} un.`}
-              </span>
-            </div>
-
-            {/* Sizes */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="modal-sizes-container">
-                <h4>Seleccionar Talle:</h4>
-                <div className="modal-sizes-group">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`modal-size-chip ${selectedSize === s ? 'active' : ''}`}
-                      onClick={() => setSelectedSize(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Quantity */}
-            <div className="modal-qty-container">
-              <h4>Cantidad:</h4>
-              <div className="modal-qty-selector">
-                <button
-                  type="button"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                  aria-label="Restar"
-                >
-                  <FiMinus size={14} />
-                </button>
-                <span>{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
-                  disabled={quantity >= (product.stock || 99)}
-                  aria-label="Sumar"
-                >
-                  <FiPlus size={14} />
-                </button>
+              <div className="modal-pricing-row">
+                <span className="modal-current-price">{formatPrice(price)}</span>
+                {product.priceOffer && (
+                  <span className="modal-old-price">{formatPrice(product.price)}</span>
+                )}
+                <span className={`modal-stock-indicator ${isOutOfStock ? 'is-out' : ''}`}>
+                  {isOutOfStock ? 'Agotado' : `Stock: ${product.stock} un.`}
+                </span>
               </div>
             </div>
 
-            {/* CONFIGURACIÓN DE ENVÍO Y ZONA */}
-            <div className="modal-delivery-card">
-              <div className="modal-delivery-card__header">
-                <div className="delivery-card-title">
-                  <FiTruck size={17} className="text-orange" />
-                  <div>
-                    <h4>Método de Entrega &amp; Cotización</h4>
-                    <span>Elegí tu zona para sumar el costo exacto del flete</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Selector de Método: Andreani vs Retiro */}
-              <div className="modal-delivery-tabs">
-                <button
-                  type="button"
-                  className={`delivery-tab ${deliveryMethod === 'andreani' ? 'active' : ''}`}
-                  onClick={() => setDeliveryMethod('andreani')}
-                >
-                  <FiTruck size={15} />
-                  <span>Envío Andreani Express</span>
-                </button>
-                <button
-                  type="button"
-                  className={`delivery-tab ${deliveryMethod === 'pickup' ? 'active' : ''}`}
-                  onClick={() => setDeliveryMethod('pickup')}
-                >
-                  <FiMapPin size={15} />
-                  <span>Retiro en San Martín (Gratis)</span>
-                </button>
-              </div>
-
-              {deliveryMethod === 'andreani' ? (
-                <div className="modal-andreani-box">
-                  {/* Selector de Región / CP */}
-                  <div className="modal-zone-picker">
-                    <div className="zone-picker-field">
-                      <label>Provincia / Región de Entrega:</label>
-                      <select
-                        value={selectedZoneKey}
-                        onChange={(e) => {
-                          setSelectedZoneKey(e.target.value)
-                          setPostalCode('')
-                        }}
-                        className="modal-zone-select"
+            {/* Fila compacta: Talles y Cantidad */}
+            <div className="modal-selectors-bar">
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="modal-sizes-compact">
+                  <span className="modal-bar-label">Talle:</span>
+                  <div className="modal-sizes-group">
+                    {product.sizes.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`modal-size-chip ${selectedSize === s ? 'active' : ''}`}
+                        onClick={() => setSelectedSize(s)}
                       >
-                        {SHIPPING_ZONES.map((z) => (
-                          <option key={z.key} value={z.key}>
-                            {z.name} ({z.estimatedDays})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="zone-cp-field">
-                      <label>O tu Código Postal (CP):</label>
-                      <input
-                        type="text"
-                        maxLength="5"
-                        placeholder="Ej: 1650"
-                        value={postalCode}
-                        onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
-                        className="modal-cp-input"
-                      />
-                    </div>
+                        {s}
+                      </button>
+                    ))}
                   </div>
-
-                  {shippingCalculation?.zoneInfo && (
-                    <div className="modal-detected-zone">
-                      <span>📍 Destino: <strong>{shippingCalculation.zoneInfo.location}</strong></span>
-                      <span className="zone-tag-badge">{shippingCalculation.zoneInfo.zone}</span>
-                    </div>
-                  )}
-
-                  {/* Opciones de Andreani: Domicilio vs Sucursal */}
-                  <div className="modal-andreani-options">
-                    {shippingCalculation?.quotes
-                      ?.filter((q) => q.id !== 'pickup')
-                      ?.map((q) => {
-                        const isSelected = selectedQuoteId === q.id
-                        return (
-                          <div
-                            key={q.id}
-                            className={`modal-quote-pill ${isSelected ? 'selected' : ''}`}
-                            onClick={() => setSelectedQuoteId(q.id)}
-                          >
-                            <div className="modal-quote-pill__left">
-                              <input
-                                type="radio"
-                                name="modal_shipping_quote"
-                                checked={isSelected}
-                                onChange={() => setSelectedQuoteId(q.id)}
-                              />
-                              <div>
-                                <div className="quote-pill-name">
-                                  <span>{q.icon}</span>
-                                  <strong>{q.name}</strong>
-                                </div>
-                                <span className="quote-pill-eta">⏱️ {q.estimatedDays}</span>
-                              </div>
-                            </div>
-                            <div className="modal-quote-pill__price">
-                              {q.price === 0 ? (
-                                <span className="free-tag">¡GRATIS!</span>
-                              ) : (
-                                <strong>+{formatPrice(q.price)}</strong>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                  </div>
-                </div>
-              ) : (
-                <div className="modal-pickup-info">
-                  <div className="pickup-info-content">
-                    <span>📍 <strong>Dr. marcos zimmermann 3339</strong>, San Martín, Bs. As.</span>
-                    <span className="pickup-subtitle">Lunes a Viernes de 10:00 a 20:00 hs • Retiro sin costo de flete.</span>
-                  </div>
-                  <span className="free-badge">COSTO $0</span>
                 </div>
               )}
+
+              <div className="modal-qty-compact">
+                <span className="modal-bar-label">Cant:</span>
+                <div className="modal-qty-selector">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                    aria-label="Restar"
+                  >
+                    <FiMinus size={12} />
+                  </button>
+                  <span>{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
+                    disabled={quantity >= (product.stock || 99)}
+                    aria-label="Sumar"
+                  >
+                    <FiPlus size={12} />
+                  </button>
+                </div>
+              </div>
             </div>
 
-            {/* DESGLOSE EN VIVO CON ENVÍO SUMADO */}
-            <div className="modal-live-pricing-summary">
-              <div className="live-pricing-line">
-                <span>Prenda ({quantity} {quantity === 1 ? 'unidad' : 'unidades'}):</span>
-                <strong>{formatPrice(itemSubtotal)}</strong>
+            {/* SECCIÓN DE ENTREGA Y ENVÍO (COMPACTA, MODERNA Y ELEGANTE) */}
+            <div className="modal-shipping-block">
+              <div className="modal-shipping-block__header">
+                <div className="modal-shipping-title">
+                  <FiTruck size={15} className="text-orange" />
+                  <span>Entrega &amp; Envío</span>
+                </div>
+
+                {/* Selector de Zona / Región */}
+                <div className="modal-zone-inline">
+                  <FiMapPin size={13} className="text-orange" />
+                  <select
+                    value={selectedZoneKey}
+                    onChange={(e) => {
+                      setSelectedZoneKey(e.target.value)
+                      setPostalCode('')
+                    }}
+                    className="modal-zone-select-clean"
+                    title="Seleccioná tu zona"
+                  >
+                    {SHIPPING_ZONES.map((z) => (
+                      <option key={z.key} value={z.key}>
+                        {z.shortName}
+                      </option>
+                    ))}
+                  </select>
+
+                  {!showCpInput ? (
+                    <button
+                      type="button"
+                      className="btn-toggle-cp"
+                      onClick={() => setShowCpInput(true)}
+                    >
+                      O CP
+                    </button>
+                  ) : (
+                    <input
+                      type="text"
+                      maxLength="5"
+                      placeholder="CP (1650)"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
+                      className="modal-cp-input-inline"
+                    />
+                  )}
+                </div>
               </div>
-              <div className="live-pricing-line">
-                <span>Flete ({activeQuote.name}):</span>
-                <strong className={shippingCost === 0 ? 'text-green' : 'text-orange'}>
-                  {shippingCost === 0 ? '¡GRATIS!' : `+${formatPrice(shippingCost)}`}
-                </strong>
-              </div>
-              <div className="live-pricing-line live-pricing-total">
-                <span className="total-label">Total a Abonar:</span>
-                <span className="total-number">{formatPrice(grandTotal)}</span>
+
+              {/* 3 Opciones de entrega claras y táctiles */}
+              <div className="modal-shipping-options-grid">
+                {/* 1. Domicilio */}
+                <button
+                  type="button"
+                  className={`shipping-opt-card ${shippingMode === 'home' ? 'active' : ''}`}
+                  onClick={() => setShippingMode('home')}
+                >
+                  <div className="opt-card-top">
+                    <span className="opt-card-icon">🏠</span>
+                    <strong className="opt-card-name">A Domicilio</strong>
+                  </div>
+                  <span className="opt-card-eta">{homeQuote?.estimatedDays || '24 a 48 hs'}</span>
+                  <span className="opt-card-price">
+                    {homeQuote?.price === 0 ? '¡GRATIS!' : `+${formatPrice(homeQuote?.price || 5900)}`}
+                  </span>
+                </button>
+
+                {/* 2. Sucursal Andreani */}
+                <button
+                  type="button"
+                  className={`shipping-opt-card ${shippingMode === 'branch' ? 'active' : ''}`}
+                  onClick={() => setShippingMode('branch')}
+                >
+                  <div className="opt-card-top">
+                    <span className="opt-card-icon">🏢</span>
+                    <strong className="opt-card-name">En Sucursal</strong>
+                  </div>
+                  <span className="opt-card-eta">{branchQuote?.estimatedDays || '24 a 48 hs'}</span>
+                  <span className="opt-card-price">
+                    {branchQuote?.price === 0 ? '¡GRATIS!' : `+${formatPrice(branchQuote?.price || 4600)}`}
+                  </span>
+                </button>
+
+                {/* 3. Retiro en San Martín */}
+                <button
+                  type="button"
+                  className={`shipping-opt-card ${shippingMode === 'pickup' ? 'active' : ''}`}
+                  onClick={() => setShippingMode('pickup')}
+                >
+                  <div className="opt-card-top">
+                    <span className="opt-card-icon">🚶</span>
+                    <strong className="opt-card-name">Retiro Local</strong>
+                  </div>
+                  <span className="opt-card-eta">San Martín</span>
+                  <span className="opt-card-price opt-card-price--free">GRATIS</span>
+                </button>
               </div>
             </div>
 
-            {/* CTAs DE ALTO IMPACTO */}
+            {/* BANNER DE TOTAL FINAL SUMADO */}
+            <div className="modal-total-banner">
+              <div className="total-banner-left">
+                <span className="total-calc-breakdown">
+                  Prenda ({formatPrice(itemSubtotal)}) + Flete ({activeQuote.price === 0 ? 'Gratis' : formatPrice(activeQuote.price)})
+                </span>
+                <span className="total-banner-label">TOTAL A ABONAR:</span>
+              </div>
+              <div className="total-banner-price">
+                {formatPrice(grandTotal)}
+              </div>
+            </div>
+
+            {/* BOTONES DE COMPRA Y CARRITO */}
             <div className="modal-cta-buttons">
               <button
                 type="button"
@@ -452,8 +451,8 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 onClick={handleDirectBuyWhatsApp}
                 disabled={isOutOfStock}
               >
-                <FaWhatsapp size={20} />
-                <span>Comprar por WhatsApp ({formatPrice(grandTotal)})</span>
+                <FaWhatsapp size={19} />
+                <span>Comprar por WhatsApp • {formatPrice(grandTotal)}</span>
               </button>
 
               <button
@@ -462,61 +461,28 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
-                <FiShoppingBag size={18} />
+                <FiShoppingBag size={17} />
                 <span>Agregar al Carrito</span>
               </button>
             </div>
 
-            {/* Consulta previa */}
-            <button
-              type="button"
-              className="modal-inquiry-link"
-              onClick={handleGeneralInquiry}
-            >
-              <FiHelpCircle size={14} /> ¿Tenés alguna duda previa sobre talle o tela? Consultanos acá
-            </button>
-
-            {/* Assurances */}
-            <div className="modal-assurances">
-              <div className="assurance-card">
-                <FiTruck className="assurance-icon" />
-                <span>Envíos Andreani Express</span>
-              </div>
-              <div className="assurance-card">
-                <FiMapPin className="assurance-icon" />
-                <span>Retiro en San Martín</span>
-              </div>
-              <div className="assurance-card">
-                <FiAward className="assurance-icon" />
-                <span>Prendas 100% calidad</span>
-              </div>
-            </div>
-
-            {/* Return policy */}
-            <div className={`modal-policy ${policyOpen ? 'is-open' : ''}`}>
+            {/* Link de consulta directa & badges */}
+            <div className="modal-footer-strip">
               <button
                 type="button"
-                className="modal-policy__toggle"
-                onClick={() => setPolicyOpen(!policyOpen)}
-                aria-expanded={policyOpen}
+                className="modal-inquiry-link"
+                onClick={handleGeneralInquiry}
               >
-                <span className="modal-policy__title">
-                  <FiRefreshCw size={15} /> Cambios y devoluciones
-                </span>
-                <FiChevronDown size={16} className="modal-policy__chevron" />
+                <FiHelpCircle size={13} /> ¿Dudas con talle o tela? Consultá acá
               </button>
-              {policyOpen && (
-                <div className="modal-policy__body">
-                  <ul>
-                    {returnPolicy.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                  <Link to={RETURN_POLICY_PATH} onClick={onClose} className="modal-policy__link">
-                    Ver condiciones completas →
-                  </Link>
-                </div>
-              )}
+
+              <div className="modal-assurances-clean">
+                <span>🚚 Andreani Express</span>
+                <span>•</span>
+                <span>📍 Retiro en San Martín</span>
+                <span>•</span>
+                <span>🔒 Garantía 7 días</span>
+              </div>
             </div>
           </div>
         </div>
