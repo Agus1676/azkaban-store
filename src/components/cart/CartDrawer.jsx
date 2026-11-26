@@ -15,7 +15,7 @@ import {
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
-import { calculateShippingQuotes, resolveZoneByPostalCode } from '../../utils/shipping'
+import { calculateShippingQuotes, SHIPPING_ZONES } from '../../utils/shipping'
 import toast from 'react-hot-toast'
 import './CartDrawer.css'
 
@@ -29,6 +29,7 @@ const CartDrawer = () => {
     totalItems,
     totalPrice,
     checkoutWhatsApp,
+    shippingPreference,
   } = useCart()
 
   const [customer, setCustomer] = useState({
@@ -40,16 +41,53 @@ const CartDrawer = () => {
     notes: '',
   })
 
-  const [postalCode, setPostalCode] = useState('')
-  const [selectedQuoteId, setSelectedQuoteId] = useState('pickup')
+  // Sincronizar con preferencia del usuario si viene del modal de producto
+  const [selectedZoneKey, setSelectedZoneKey] = useState(shippingPreference?.zoneKey || 'amba')
+  const [postalCode, setPostalCode] = useState(shippingPreference?.postalCode || '')
+  const [selectedQuoteId, setSelectedQuoteId] = useState(shippingPreference?.quoteId || 'andreani_home')
 
-  // Calcular cotizaciones de Andreani en base al CP ingresado y el subtotal
+  useEffect(() => {
+    if (shippingPreference?.zoneKey) setSelectedZoneKey(shippingPreference.zoneKey)
+    if (shippingPreference?.postalCode) setPostalCode(shippingPreference.postalCode)
+    if (shippingPreference?.quoteId) setSelectedQuoteId(shippingPreference.quoteId)
+  }, [shippingPreference])
+
+  // Calcular cotizaciones de Andreani en base a la Zona o CP ingresado y el subtotal
   const shippingCalculation = useMemo(() => {
-    if (!postalCode || postalCode.trim().length < 3) return null
-    return calculateShippingQuotes(postalCode, totalPrice)
-  }, [postalCode, totalPrice])
+    const input = (postalCode && postalCode.trim().length >= 3) ? postalCode.trim() : selectedZoneKey
+    return calculateShippingQuotes(input, totalPrice)
+  }, [postalCode, selectedZoneKey, totalPrice])
+
+  // Si el usuario ingresa un CP que resuelve a una zona, sincronizamos el selector visual
+  useEffect(() => {
+    if (shippingCalculation?.zoneInfo?.zoneKey && shippingCalculation.zoneInfo.zoneKey !== selectedZoneKey) {
+      setSelectedZoneKey(shippingCalculation.zoneInfo.zoneKey)
+    }
+  }, [shippingCalculation?.zoneInfo?.zoneKey])
 
   const availableQuotes = shippingCalculation?.quotes || [
+    {
+      id: 'andreani_home',
+      carrier: 'Andreani Express',
+      type: 'Domicilio',
+      name: 'Andreani a Domicilio',
+      price: 5900,
+      isFree: false,
+      estimatedDays: '24 a 48 hs hábiles',
+      icon: '🏠',
+      description: 'Llega directo a la puerta de tu domicilio.',
+    },
+    {
+      id: 'andreani_branch',
+      carrier: 'Andreani Express',
+      type: 'Sucursal',
+      name: 'Andreani Retiro en Sucursal',
+      price: 4600,
+      isFree: false,
+      estimatedDays: '24 a 48 hs hábiles',
+      icon: '🏢',
+      description: 'Retiro en la sucursal Andreani más cercana.',
+    },
     {
       id: 'pickup',
       carrier: 'AzkabanStore',
@@ -60,17 +98,6 @@ const CartDrawer = () => {
       estimatedDays: 'Inmediato',
       icon: '🚶',
       description: 'Dr. marcos zimmermann 3339, San Martín.',
-    },
-    {
-      id: 'andreani_home',
-      carrier: 'Andreani',
-      type: 'Domicilio',
-      name: 'Andreani a Domicilio',
-      price: 5900,
-      isFree: false,
-      estimatedDays: '24 a 72 hs hábiles',
-      icon: '📦',
-      description: 'Ingresá tu código postal para cotizar exacto a tu ciudad.',
     },
   ]
 
@@ -120,6 +147,7 @@ const CartDrawer = () => {
       {
         ...activeQuote,
         postalCode: postalCode.trim(),
+        zoneName: shippingCalculation?.zoneInfo?.location || '',
       }
     )
   }
@@ -239,31 +267,53 @@ const CartDrawer = () => {
                 <div className="cart-shipping-section">
                   <label className="shipping-section-label">
                     <FiTruck className="text-orange" size={16} />
-                    <span>Método de Entrega & Envíos</span>
+                    <span>Método de Entrega &amp; Logística</span>
                   </label>
 
-                  {/* Postal code input for automatic Andreani rate resolution */}
-                  <div className="cart-cp-box">
-                    <div className="cart-cp-input-row">
-                      <FiMapPin size={15} className="cart-cp-icon" />
-                      <input
-                        type="text"
-                        maxLength="5"
-                        placeholder="Ingresá tu CP (ej: 1650, 1425, 2000)"
-                        value={postalCode}
-                        onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
-                        className="cart-cp-input"
-                      />
+                  {/* Selector Dual: Región / CP */}
+                  <div className="cart-zone-control-box">
+                    <div className="cart-zone-field">
+                      <label className="cart-field-label">Provincia / Región de Destino:</label>
+                      <select
+                        value={selectedZoneKey}
+                        onChange={(e) => {
+                          setSelectedZoneKey(e.target.value)
+                          setPostalCode('')
+                        }}
+                        className="cart-zone-select"
+                      >
+                        {SHIPPING_ZONES.map((z) => (
+                          <option key={z.key} value={z.key}>
+                            {z.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                    {shippingCalculation?.zoneInfo && (
-                      <div className="cart-cp-zone-tag">
-                        <span>📍 {shippingCalculation.zoneInfo.location}</span>
-                        <span className="cart-zone-badge">{shippingCalculation.zoneInfo.zone}</span>
+
+                    <div className="cart-cp-field">
+                      <label className="cart-field-label">O tu CP (Opcional):</label>
+                      <div className="cart-cp-input-row">
+                        <FiMapPin size={14} className="cart-cp-icon" />
+                        <input
+                          type="text"
+                          maxLength="5"
+                          placeholder="Ej: 1650"
+                          value={postalCode}
+                          onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
+                          className="cart-cp-input"
+                        />
                       </div>
-                    )}
+                    </div>
                   </div>
 
-                  {/* Free shipping banner / progress if applicable */}
+                  {shippingCalculation?.zoneInfo && (
+                    <div className="cart-cp-zone-tag">
+                      <span>📍 Destino: <strong>{shippingCalculation.zoneInfo.location}</strong></span>
+                      <span className="cart-zone-badge">{shippingCalculation.zoneInfo.zone}</span>
+                    </div>
+                  )}
+
+                  {/* Free shipping banner / progress */}
                   {shippingCalculation?.isFreeEligible ? (
                     <div className="cart-free-shipping-pill">
                       🎉 ¡Felicidades! Tenés <strong>ENVÍO ANDREANI GRATIS</strong> en este pedido.
@@ -308,7 +358,7 @@ const CartDrawer = () => {
                             {q.price === 0 ? (
                               <span className="free-price-badge">GRATIS</span>
                             ) : (
-                              <strong>{formatPrice(q.price)}</strong>
+                              <strong>+{formatPrice(q.price)}</strong>
                             )}
                           </div>
                         </div>
@@ -320,7 +370,7 @@ const CartDrawer = () => {
                 {isDelivery && (
                   <div className="cart-delivery-details">
                     <div className="form-field">
-                      <label>Localidad y Provincia *</label>
+                      <label>Localidad y Provincia de Entrega *</label>
                       <input
                         type="text"
                         required={isDelivery}
@@ -345,7 +395,7 @@ const CartDrawer = () => {
                         required={isDelivery && activeQuote.type === 'Domicilio'}
                         placeholder={
                           activeQuote.type === 'Sucursal'
-                            ? 'Ej: Sucursal San Martín o Centro'
+                            ? 'Ej: Sucursal San Martín o Sucursal Centro'
                             : 'Ej: Av. San Martín 1540 2do B'
                         }
                         value={customer.address}
@@ -377,7 +427,7 @@ const CartDrawer = () => {
                   />
                 </div>
 
-                {/* Subtotal & Total Box */}
+                {/* Subtotal & Total Box CON EL ENVÍO SUMADO */}
                 <div className="cart-summary-box">
                   <div className="summary-row">
                     <span>Subtotal Prendas:</span>
@@ -385,22 +435,22 @@ const CartDrawer = () => {
                   </div>
                   <div className="summary-row">
                     <span>Envío ({activeQuote.name}):</span>
-                    <strong className={shippingCost === 0 ? 'text-green' : ''}>
-                      {shippingCost === 0 ? '¡GRATIS!' : formatPrice(shippingCost)}
+                    <strong className={shippingCost === 0 ? 'text-green' : 'text-orange'}>
+                      {shippingCost === 0 ? '¡GRATIS!' : `+${formatPrice(shippingCost)}`}
                     </strong>
                   </div>
                   <div className="summary-row total-row">
-                    <span>Total Final:</span>
+                    <span>Total a Abonar:</span>
                     <span className="total-highlight-price">{formatPrice(finalTotal)}</span>
                   </div>
                 </div>
 
                 <button type="submit" className="btn-whatsapp checkout-btn">
                   <FaWhatsapp size={19} />
-                  <span>Finalizar Pedido por WhatsApp</span>
+                  <span>Finalizar Pedido por WhatsApp ({formatPrice(finalTotal)})</span>
                 </button>
                 <p className="checkout-disclaimer">
-                  Se abrirá WhatsApp con el resumen de tu pedido para coordinar pago y entrega directamente.
+                  Se abrirá WhatsApp con el desglose del pedido (prendas + envío sumado) para coordinar pago y entrega.
                 </p>
               </form>
             </>

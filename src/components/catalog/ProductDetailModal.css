@@ -623,3 +623,316 @@
     width: 100%;
   }
 }
+
+/* Delivery & Shipping Card */
+.modal-delivery-card {
+  margin-top: 14px;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.modal-delivery-card__header {
+  margin-bottom: 12px;
+}
+
+.delivery-card-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.delivery-card-title h4 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+}
+
+.delivery-card-title span {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.modal-delivery-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.delivery-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delivery-tab:hover {
+  border-color: #cbd5e1;
+}
+
+.delivery-tab.active {
+  background: rgba(255, 85, 0, 0.08);
+  border-color: #ff5500;
+  color: #ff5500;
+}
+
+/* Zone Picker */
+.modal-zone-picker {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.zone-picker-field label,
+.zone-cp-field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.modal-zone-select,
+.modal-cp-input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.modal-zone-select:focus,
+.modal-cp-input:focus {
+  border-color: #ff5500;
+  box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.15);
+}
+
+.modal-detected-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(255, 85, 0, 0.06);
+  border: 1px dashed rgba(255, 85, 0, 0.3);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.zone-tag-badge {
+  background: #ff5500;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* Andreani Quote Pills */
+.modal-andreani-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-quote-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-quote-pill:hover {
+  border-color: #cbd5e1;
+}
+
+.modal-quote-pill.selected {
+  border-color: #ff5500;
+  background: #fffbf9;
+  box-shadow: 0 2px 8px rgba(255, 85, 0, 0.08);
+}
+
+.modal-quote-pill__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-quote-pill__left input {
+  accent-color: #ff5500;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.quote-pill-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+.quote-pill-eta {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.modal-quote-pill__price strong {
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.free-tag {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Pickup Box */
+.modal-pickup-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #ffffff;
+  border: 1.5px solid #86efac;
+  border-radius: 8px;
+}
+
+.pickup-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+  color: #0f172a;
+}
+
+.pickup-subtitle {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.free-badge {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Live Pricing Summary Box */
+.modal-live-pricing-summary {
+  margin-top: 14px;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.live-pricing-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.live-pricing-line strong {
+  color: #f8fafc;
+  font-size: 0.88rem;
+}
+
+.live-pricing-total {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.total-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-number {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ff5500;
+}
+
+.modal-inquiry-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.2s ease;
+  text-decoration: underline;
+  text-decoration-color: #cbd5e1;
+}
+
+.modal-inquiry-link:hover {
+  color: #ff5500;
+  text-decoration-color: #ff5500;
+}
+
+@media (max-width: 600px) {
+  .modal-zone-picker {
+    grid-template-columns: 1fr;
+  }
+  .modal-delivery-tabs {
+    grid-template-columns: 1fr;
+  }
+  .modal-live-pricing-summary {
+    padding: 12px 14px;
+  }
+  .total-number {
+    font-size: 1.2rem;
+  }
+}

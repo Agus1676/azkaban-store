@@ -15,6 +15,7 @@ import {
   DEFAULT_SHIPPING_CONFIG,
   calculateShippingQuotes,
   resolveZoneByPostalCode,
+  SHIPPING_ZONES,
 } from '../../utils/shipping'
 import { formatPrice } from '../../utils/formatPrice'
 
@@ -26,8 +27,9 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
     }
   })
 
-  // Simulador de Cotización en vivo para probar cualquier CP
+  // Simulador de Cotización en vivo para probar cualquier CP o Zona
   const [testCp, setTestCp] = useState('1650')
+  const [testZoneKey, setTestZoneKey] = useState('amba')
   const [testCartTotal, setTestCartTotal] = useState(75000)
   const [simulationResult, setSimulationResult] = useState(() => {
     return calculateShippingQuotes('1650', 75000, {
@@ -38,9 +40,10 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
 
   const handleRunSimulation = (e) => {
     e?.preventDefault()
-    const res = calculateShippingQuotes(testCp, Number(testCartTotal) || 0, shippingConfig)
+    const input = testCp.trim().length >= 3 ? testCp.trim() : testZoneKey
+    const res = calculateShippingQuotes(input, Number(testCartTotal) || 0, shippingConfig)
     setSimulationResult(res)
-    toast.success(`Cotización calculada para CP ${testCp}`)
+    toast.success(`Cotización calculada para ${input}`)
   }
 
   const handleSave = (e) => {
@@ -48,12 +51,24 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
     onSaveConfig({
       ...storeConfig,
       shippingConfig,
+      andreaniAmbaHome: shippingConfig.andreaniAmbaHome,
+      andreaniAmbaBranch: shippingConfig.andreaniAmbaBranch,
+      andreaniBsasInteriorHome: shippingConfig.andreaniBsasInteriorHome,
+      andreaniBsasInteriorBranch: shippingConfig.andreaniBsasInteriorBranch,
+      andreaniCentroHome: shippingConfig.andreaniCentroHome,
+      andreaniCentroBranch: shippingConfig.andreaniCentroBranch,
+      andreaniCuyoNorteHome: shippingConfig.andreaniCuyoNorteHome,
+      andreaniCuyoNorteBranch: shippingConfig.andreaniCuyoNorteBranch,
+      andreaniPatagoniaHome: shippingConfig.andreaniPatagoniaHome,
+      andreaniPatagoniaBranch: shippingConfig.andreaniPatagoniaBranch,
+      freeShippingThreshold: shippingConfig.freeShippingMinAmount,
+      freeShippingEnabled: shippingConfig.freeShippingEnabled,
     })
-    toast.success('¡Tarifas y configuración de Andreani guardadas!')
+    toast.success('¡Tarifas y zonificación de Andreani guardadas con éxito!')
   }
 
   const handleRestoreDefaults = () => {
-    if (window.confirm('¿Restaurar las tarifas y zonas recomendadas por defecto?')) {
+    if (window.confirm('¿Restaurar las tarifas y zonas oficiales recomendadas por defecto?')) {
       setShippingConfig(DEFAULT_SHIPPING_CONFIG)
       toast.success('Tarifas por defecto restauradas')
     }
@@ -66,7 +81,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
         <div>
           <h3>Logística y Calculador Automático de Envíos (Andreani Express)</h3>
           <p>
-            Automatizá el cálculo de envíos en base al Código Postal del cliente para AMBA e Interior del país.
+            Configurá las tarifas de cada zona del país. El carrito y la ficha del producto sumarán el envío al total automáticamente.
           </p>
         </div>
         <div className="header-buttons">
@@ -85,15 +100,15 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
         {/* Left Column: Rates & Free shipping settings */}
         <div className="settings-main-form-box">
           <form onSubmit={handleSave}>
-            {/* 1. Tarifas Andreani AMBA */}
+            {/* 1. Zona AMBA */}
             <div className="settings-card-section">
               <div className="settings-card-section__header">
                 <div className="settings-icon-pill" style={{ background: 'rgba(255, 85, 0, 0.12)', color: '#ff5500' }}>
                   <FiTruck size={18} />
                 </div>
                 <div>
-                  <h4>1. Tarifas Andreani - Zona AMBA (CABA y GBA)</h4>
-                  <span>Códigos Postales 1000 al 1899 (San Martín, Tres de Febrero, Vicente López, Capital, etc.)</span>
+                  <h4>1. Zona AMBA (CABA y Gran Buenos Aires)</h4>
+                  <span>CP 1000 al 1899 (San Martín, Tres de Febrero, Vicente López, Capital, Zona Sur, Oeste, Norte)</span>
                 </div>
               </div>
 
@@ -136,65 +151,218 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
               </div>
             </div>
 
-            {/* 2. Tarifas Andreani Interior / Nacional */}
+            {/* 2. Zona Buenos Aires Interior */}
             <div className="settings-card-section">
               <div className="settings-card-section__header">
-                <div className="settings-icon-pill" style={{ background: 'rgba(37, 211, 102, 0.12)', color: '#128c7e' }}>
+                <div className="settings-icon-pill" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#2563eb' }}>
                   <FiMapPin size={18} />
                 </div>
                 <div>
-                  <h4>2. Tarifas Andreani - Interior y Provincias</h4>
-                  <span>Buenos Aires Interior, Santa Fe, Córdoba, Cuyo, NOA, NEA y Patagonia</span>
+                  <h4>2. Zona Buenos Aires Interior (Costa Atlántica &amp; Prov.)</h4>
+                  <span>Mar del Plata, Bahía Blanca, Tandil, San Nicolás, Pergamino, Junín, etc.</span>
                 </div>
               </div>
 
               <div className="form-grid-2">
                 <div className="form-group">
-                  <label>Andreani a Domicilio Interior ($ ARS) *</label>
+                  <label>Andreani a Domicilio Bs. As. Interior ($ ARS) *</label>
                   <input
                     type="number"
                     min="0"
                     step="100"
                     required
-                    value={shippingConfig.andreaniInteriorHome}
+                    value={shippingConfig.andreaniBsasInteriorHome ?? 7900}
                     onChange={(e) =>
                       setShippingConfig({
                         ...shippingConfig,
-                        andreaniInteriorHome: Number(e.target.value) || 0,
+                        andreaniBsasInteriorHome: Number(e.target.value) || 0,
                       })
                     }
                   />
-                  <span className="text-xs text-muted">Entrega a domicilio en 48 a 96 hs</span>
+                  <span className="text-xs text-muted">Entrega a domicilio en 48 a 72 hs</span>
                 </div>
 
                 <div className="form-group">
-                  <label>Andreani Retiro en Sucursal Interior ($ ARS) *</label>
+                  <label>Andreani Retiro en Sucursal Bs. As. Interior ($ ARS) *</label>
                   <input
                     type="number"
                     min="0"
                     step="100"
                     required
-                    value={shippingConfig.andreaniInteriorBranch}
+                    value={shippingConfig.andreaniBsasInteriorBranch ?? 6200}
                     onChange={(e) =>
                       setShippingConfig({
                         ...shippingConfig,
-                        andreaniInteriorBranch: Number(e.target.value) || 0,
+                        andreaniBsasInteriorBranch: Number(e.target.value) || 0,
                       })
                     }
                   />
-                  <span className="text-xs text-muted">Retiro en sucursales del interior del país</span>
+                  <span className="text-xs text-muted">Retiro en sucursales del interior bonaerense</span>
                 </div>
               </div>
             </div>
 
-            {/* 3. Beneficio de Envío Gratis */}
+            {/* 3. Región Centro (Córdoba & Santa Fe) */}
+            <div className="settings-card-section">
+              <div className="settings-card-section__header">
+                <div className="settings-icon-pill" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>
+                  <FiTruck size={18} />
+                </div>
+                <div>
+                  <h4>3. Región Centro (Córdoba y Santa Fe)</h4>
+                  <span>Córdoba Capital, Villa María, Río Cuarto, Rosario, Santa Fe Capital, Rafaela, etc.</span>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label>Andreani a Domicilio Centro ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniCentroHome ?? 8500}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniCentroHome: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Entrega a domicilio en 48 a 72 hs</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Andreani Retiro en Sucursal Centro ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniCentroBranch ?? 6700}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniCentroBranch: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Retiro en sucursales de Córdoba y Santa Fe</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Cuyo, NOA y NEA */}
+            <div className="settings-card-section">
+              <div className="settings-card-section__header">
+                <div className="settings-icon-pill" style={{ background: 'rgba(217, 119, 6, 0.12)', color: '#d97706' }}>
+                  <FiMapPin size={18} />
+                </div>
+                <div>
+                  <h4>4. Cuyo, NOA y NEA (Mendoza, Salta, Tucumán, etc.)</h4>
+                  <span>Mendoza, San Juan, San Luis, Tucumán, Salta, Jujuy, Chaco, Corrientes, Misiones, Entre Ríos</span>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label>Andreani a Domicilio Cuyo/Norte ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniCuyoNorteHome ?? 9400}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniCuyoNorteHome: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Plazo 3 a 5 días hábiles</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Andreani Retiro en Sucursal Cuyo/Norte ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniCuyoNorteBranch ?? 7400}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniCuyoNorteBranch: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Retiro en sucursal oficial</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Patagonia */}
+            <div className="settings-card-section">
+              <div className="settings-card-section__header">
+                <div className="settings-icon-pill" style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#7c3aed' }}>
+                  <FiTruck size={18} />
+                </div>
+                <div>
+                  <h4>5. Patagonia Argentina y Tierra del Fuego</h4>
+                  <span>Neuquén, Bariloche, Río Negro, Chubut, Comodoro Rivadavia, Santa Cruz, Ushuaia</span>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label>Andreani a Domicilio Patagonia ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniPatagoniaHome ?? 11800}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniPatagoniaHome: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Plazo 4 a 6 días hábiles</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Andreani Retiro en Sucursal Patagonia ($ ARS) *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    required
+                    value={shippingConfig.andreaniPatagoniaBranch ?? 9200}
+                    onChange={(e) =>
+                      setShippingConfig({
+                        ...shippingConfig,
+                        andreaniPatagoniaBranch: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                  <span className="text-xs text-muted">Retiro en sucursal patagónica</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Beneficio de Envío Gratis */}
             <div className="settings-card-section">
               <div className="settings-card-section__header">
                 <div className="settings-icon-pill" style={{ background: 'rgba(255, 193, 7, 0.15)', color: '#d97706' }}>
                   <FiAward size={18} />
                 </div>
                 <div>
-                  <h4>3. Envío Gratis por Monto de Compra</h4>
+                  <h4>6. Envío Gratis por Monto de Compra</h4>
                   <span>Incentivá a tus clientes a comprar más prendas bonificando el costo del envío</span>
                 </div>
               </div>
@@ -241,100 +409,6 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
               )}
             </div>
 
-            {/* 4. Conexión de API Corporativa Andreani (Opcional) */}
-            <div className="settings-card-section">
-              <div className="settings-card-section__header">
-                <div className="settings-icon-pill" style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
-                  <FiKey size={18} />
-                </div>
-                <div>
-                  <h4>4. Credenciales de Cuenta Corporativa Andreani (Opcional)</h4>
-                  <span>Si tenés contrato oficial con Andreani e-logistics podés cargar tus credenciales</span>
-                </div>
-              </div>
-
-              <label className="switch-row" style={{ marginBottom: '14px' }}>
-                <div>
-                  <strong>Habilitar Integración con Contrato Andreani API</strong>
-                  <span className="text-xs text-muted">
-                    Usa las tarifas directas contratadas en lugar del calculador inteligente zonal
-                  </span>
-                </div>
-                <input
-                  type="checkbox"
-                  className="switch-input"
-                  checked={shippingConfig.andreaniApiEnabled}
-                  onChange={(e) =>
-                    setShippingConfig({
-                      ...shippingConfig,
-                      andreaniApiEnabled: e.target.checked,
-                    })
-                  }
-                />
-              </label>
-
-              {shippingConfig.andreaniApiEnabled && (
-                <div className="form-grid-2">
-                  <div className="form-group">
-                    <label>Número de Contrato Andreani</label>
-                    <input
-                      type="text"
-                      placeholder="Ej: 400012345"
-                      value={shippingConfig.andreaniContractNumber}
-                      onChange={(e) =>
-                        setShippingConfig({
-                          ...shippingConfig,
-                          andreaniContractNumber: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Código de Cliente</label>
-                    <input
-                      type="text"
-                      placeholder="Ej: CL001234"
-                      value={shippingConfig.andreaniCustomerCode}
-                      onChange={(e) =>
-                        setShippingConfig({
-                          ...shippingConfig,
-                          andreaniCustomerCode: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Usuario API / e-logistics</label>
-                    <input
-                      type="text"
-                      placeholder="Usuario Andreani"
-                      value={shippingConfig.andreaniUsername}
-                      onChange={(e) =>
-                        setShippingConfig({
-                          ...shippingConfig,
-                          andreaniUsername: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Contraseña API</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      value={shippingConfig.andreaniPassword}
-                      onChange={(e) =>
-                        setShippingConfig({
-                          ...shippingConfig,
-                          andreaniPassword: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
             <div className="settings-submit-row">
               <button type="submit" className="btn-primary btn-save-config">
                 <FiCheck size={18} />
@@ -344,7 +418,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
           </form>
         </div>
 
-        {/* Right Column: Live Postal Code Simulator */}
+        {/* Right Column: Live Postal Code / Zone Simulator */}
         <div className="settings-side-box">
           <div className="settings-side-card">
             <div className="settings-card-section__header">
@@ -359,7 +433,25 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
               <div className="form-group">
-                <label>Código Postal a Simular</label>
+                <label>Seleccionar Región / Zona</label>
+                <select
+                  value={testZoneKey}
+                  onChange={(e) => {
+                    setTestZoneKey(e.target.value)
+                    setTestCp('')
+                  }}
+                  style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                >
+                  {SHIPPING_ZONES.map((z) => (
+                    <option key={z.key} value={z.key}>
+                      {z.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>O ingresar Código Postal (CP)</label>
                 <input
                   type="text"
                   maxLength="5"
@@ -392,7 +484,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                 <div style={{ background: '#181924', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '14px', marginTop: '6px' }}>
                   {simulationResult.zoneInfo ? (
                     <>
-                      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0f172a', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#f8fafc', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                           <FiMapPin size={14} style={{ color: '#ff5500' }} />
                           {simulationResult.zoneInfo.location}
@@ -414,7 +506,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                               color: '#1e293b',
                             }}
                           >
-                            <span>{q.name}</span>
+                            <span>{q.icon} {q.name} ({q.estimatedDays})</span>
                             <strong style={{ color: q.price === 0 ? '#15803d' : '#0f172a' }}>
                               {q.price === 0 ? '¡GRATIS!' : formatPrice(q.price)}
                             </strong>
@@ -423,7 +515,7 @@ const AdminShippingTab = ({ storeConfig, onSaveConfig }) => {
                       </div>
                       {simulationResult.isFreeEligible && (
                         <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#15803d', fontWeight: 700, textAlign: 'center', background: '#dcfce7', border: '1px solid #bbf7d0', padding: '7px', borderRadius: '6px' }}>
-                          ¡Aplica Envío Andreani Gratis!
+                          🎉 ¡Aplica Envío Andreani Gratis!
                         </div>
                       )}
                     </>

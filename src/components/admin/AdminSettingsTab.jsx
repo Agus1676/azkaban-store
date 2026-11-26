@@ -44,10 +44,18 @@ const AdminSettingsTab = ({
     announcementText: '🔥 Envíos a todo el país por Andreani Express • Punto de Retiro en San Martín',
 
     // Andreani & Shipping rates
-    andreaniAmbaHome: 7500,
-    andreaniAmbaBranch: 5200,
-    andreaniInteriorHome: 11800,
-    andreaniInteriorBranch: 8900,
+    andreaniAmbaHome: 5900,
+    andreaniAmbaBranch: 4600,
+    andreaniBsasInteriorHome: 7900,
+    andreaniBsasInteriorBranch: 6200,
+    andreaniCentroHome: 8500,
+    andreaniCentroBranch: 6700,
+    andreaniCuyoNorteHome: 9400,
+    andreaniCuyoNorteBranch: 7400,
+    andreaniPatagoniaHome: 11800,
+    andreaniPatagoniaBranch: 9200,
+    andreaniInteriorHome: 8900,
+    andreaniInteriorBranch: 6900,
     freeShippingThreshold: 120000,
     freeShippingEnabled: true,
 
@@ -458,11 +466,11 @@ const AdminSettingsTab = ({
       {activeSubTab === 'shipping' && (
         <div className="pf__card">
           <h3>🚚 Tarifas de Envíos &amp; Logística Oficial Andreani</h3>
-          <p>Configurá las tarifas zonales para el cotizador automático del carrito y envíos gratis.</p>
+          <p>Configurá las tarifas zonales para el cotizador automático del carrito y la ficha de producto.</p>
 
           <div className="pf__grid-2">
             <div className="pf__form-group">
-              <label>Andreani AMBA a Domicilio ($)</label>
+              <label>1. Andreani AMBA a Domicilio ($)</label>
               <input
                 type="number"
                 value={formData.andreaniAmbaHome}
@@ -471,7 +479,7 @@ const AdminSettingsTab = ({
             </div>
 
             <div className="pf__form-group">
-              <label>Andreani AMBA a Sucursal ($)</label>
+              <label>1. Andreani AMBA a Sucursal ($)</label>
               <input
                 type="number"
                 value={formData.andreaniAmbaBranch}
@@ -480,25 +488,79 @@ const AdminSettingsTab = ({
             </div>
 
             <div className="pf__form-group">
-              <label>Andreani Interior a Domicilio ($)</label>
+              <label>2. Bs. As. Interior a Domicilio ($)</label>
               <input
                 type="number"
-                value={formData.andreaniInteriorHome}
-                onChange={(e) => handleFieldChange('andreaniInteriorHome', Number(e.target.value))}
+                value={formData.andreaniBsasInteriorHome ?? 7900}
+                onChange={(e) => handleFieldChange('andreaniBsasInteriorHome', Number(e.target.value))}
               />
             </div>
 
             <div className="pf__form-group">
-              <label>Andreani Interior a Sucursal ($)</label>
+              <label>2. Bs. As. Interior a Sucursal ($)</label>
               <input
                 type="number"
-                value={formData.andreaniInteriorBranch}
-                onChange={(e) => handleFieldChange('andreaniInteriorBranch', Number(e.target.value))}
+                value={formData.andreaniBsasInteriorBranch ?? 6200}
+                onChange={(e) => handleFieldChange('andreaniBsasInteriorBranch', Number(e.target.value))}
               />
             </div>
 
             <div className="pf__form-group">
-              <label>Monto Mínimo para Envío Gratis ($)</label>
+              <label>3. Región Centro (Cba/Sta Fe) Domicilio ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniCentroHome ?? 8500}
+                onChange={(e) => handleFieldChange('andreaniCentroHome', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group">
+              <label>3. Región Centro a Sucursal ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniCentroBranch ?? 6700}
+                onChange={(e) => handleFieldChange('andreaniCentroBranch', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group">
+              <label>4. Cuyo / Norte / Litoral Domicilio ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniCuyoNorteHome ?? 9400}
+                onChange={(e) => handleFieldChange('andreaniCuyoNorteHome', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group">
+              <label>4. Cuyo / Norte / Litoral Sucursal ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniCuyoNorteBranch ?? 7400}
+                onChange={(e) => handleFieldChange('andreaniCuyoNorteBranch', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group">
+              <label>5. Patagonia y Sur Domicilio ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniPatagoniaHome ?? 11800}
+                onChange={(e) => handleFieldChange('andreaniPatagoniaHome', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group">
+              <label>5. Patagonia y Sur Sucursal ($)</label>
+              <input
+                type="number"
+                value={formData.andreaniPatagoniaBranch ?? 9200}
+                onChange={(e) => handleFieldChange('andreaniPatagoniaBranch', Number(e.target.value))}
+              />
+            </div>
+
+            <div className="pf__form-group" style={{ gridColumn: 'span 2' }}>
+              <label>Monto Mínimo de Compra para Envío Gratis ($)</label>
               <input
                 type="number"
                 value={formData.freeShippingThreshold}

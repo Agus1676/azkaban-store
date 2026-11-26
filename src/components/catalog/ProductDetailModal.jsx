@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FiX,
@@ -12,14 +12,16 @@ import {
   FiPlay,
   FiRefreshCw,
   FiChevronDown,
+  FiCheck,
+  FiHelpCircle,
 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice } from '../../utils/formatPrice'
-import { generateProductInquiryLink } from '../../utils/whatsapp'
+import { generateProductBuyLink, generateProductInquiryLink } from '../../utils/whatsapp'
 import { parseVideoUrl } from '../../utils/video'
 import { getReturnPolicy, RETURN_POLICY_PATH } from '../../data/policies'
-import { calculateShippingQuotes } from '../../utils/shipping'
+import { calculateShippingQuotes, SHIPPING_ZONES } from '../../utils/shipping'
 import { updatePageSEO, createProductSchema } from '../../utils/seo'
 import './ProductDetailModal.css'
 
@@ -48,7 +50,8 @@ const ProductVideo = ({ video, title }) => {
 }
 
 const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
-  const { addToCart } = useCart()
+  const { addToCart, shippingPreference } = useCart()
+
   const [selectedSize, setSelectedSize] = useState(
     product?.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Único'
   )
@@ -57,6 +60,12 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
   const [view, setView] = useState(initialView === 'video' && video ? 'video' : 'photo')
   const [policyOpen, setPolicyOpen] = useState(false)
   const returnPolicy = getReturnPolicy()
+
+  // Delivery & Shipping state
+  const [deliveryMethod, setDeliveryMethod] = useState('andreani') // 'andreani' | 'pickup'
+  const [selectedZoneKey, setSelectedZoneKey] = useState(shippingPreference?.zoneKey || 'amba')
+  const [postalCode, setPostalCode] = useState(shippingPreference?.postalCode || '')
+  const [selectedQuoteId, setSelectedQuoteId] = useState(shippingPreference?.quoteId || 'andreani_home') // 'andreani_home' | 'andreani_branch'
 
   const allImages = Array.isArray(product?.images) && product.images.length > 0
     ? product.images
@@ -75,7 +84,7 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
-  // SEO dinámico y Rich Snippet JSON-LD para Google Shopping
+  // SEO dinámico y Rich Snippet JSON-LD
   useEffect(() => {
     if (product) {
       updatePageSEO({
@@ -87,31 +96,73 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
       })
     }
     return () => {
-      // Limpiar rich snippet al cerrar el modal
       updatePageSEO({ schemaJson: null })
     }
   }, [product])
 
-  const [shippingCp, setShippingCp] = useState('')
-  const [shippingCalcResult, setShippingCalcResult] = useState(null)
-  const [shippingOpen, setShippingOpen] = useState(false)
-
-  const handleCalcShipping = (e) => {
-    e?.preventDefault()
-    if (!shippingCp || shippingCp.trim().length < 3) return
-    const res = calculateShippingQuotes(shippingCp, (product.priceOffer || product.price || 0) * quantity)
-    setShippingCalcResult(res)
-  }
-
   const price = product.priceOffer || product.price || 0
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
+  const itemSubtotal = price * quantity
+
+  // Cálculo de envíos reactivo según el Código Postal o Zona y el subtotal
+  const shippingCalculation = useMemo(() => {
+    const input = (postalCode && postalCode.trim().length >= 3) ? postalCode.trim() : selectedZoneKey
+    return calculateShippingQuotes(input, itemSubtotal)
+  }, [postalCode, selectedZoneKey, itemSubtotal])
+
+  // Si el usuario ingresa un CP que resuelve a una zona, sincronizamos el selector visual
+  useEffect(() => {
+    if (shippingCalculation?.zoneInfo?.zoneKey && shippingCalculation.zoneInfo.zoneKey !== selectedZoneKey) {
+      setSelectedZoneKey(shippingCalculation.zoneInfo.zoneKey)
+    }
+  }, [shippingCalculation?.zoneInfo?.zoneKey])
+
+  // Determinar la cotización activa
+  const activeQuote = useMemo(() => {
+    if (deliveryMethod === 'pickup') {
+      return {
+        id: 'pickup',
+        carrier: 'AzkabanStore',
+        type: 'Punto de Retiro',
+        name: 'Retiro en San Martín',
+        zoneName: 'San Martín, Buenos Aires',
+        price: 0,
+        isFree: true,
+        estimatedDays: 'Inmediato (Coordinar por WhatsApp)',
+        icon: '🚶',
+        description: 'Dr. marcos zimmermann 3339, San Martín. Sin costo de flete.',
+      }
+    }
+
+    const available = shippingCalculation?.quotes?.filter((q) => q.id !== 'pickup') || []
+    const match = available.find((q) => q.id === selectedQuoteId)
+    return match || available[0] || {
+      id: 'andreani_home',
+      name: 'Andreani a Domicilio',
+      price: 5900,
+      icon: '🏠',
+      estimatedDays: '24 a 48 hs',
+    }
+  }, [deliveryMethod, shippingCalculation, selectedQuoteId])
+
+  const shippingCost = Number(activeQuote?.price) || 0
+  const grandTotal = itemSubtotal + shippingCost
 
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedSize)
+    addToCart(product, quantity, selectedSize, {
+      zoneKey: selectedZoneKey,
+      postalCode: postalCode.trim(),
+      quoteId: activeQuote.id,
+    })
     onClose()
   }
 
-  const handleWhatsApp = () => {
+  const handleDirectBuyWhatsApp = () => {
+    const url = generateProductBuyLink(product, selectedSize, quantity, activeQuote)
+    window.open(url, '_blank')
+  }
+
+  const handleGeneralInquiry = () => {
     const url = generateProductInquiryLink(product, selectedSize)
     window.open(url, '_blank')
   }
@@ -190,7 +241,7 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
             )}
           </div>
 
-          {/* Info */}
+          {/* Info & Checkout configuration */}
           <div className="modal-content">
             <div className="modal-heading">
               {product.brand && <span className="modal-brand-label">{product.brand}</span>}
@@ -207,18 +258,6 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 {isOutOfStock ? 'Agotado' : `Stock disponible: ${product.stock} un.`}
               </span>
             </div>
-
-            <p className="modal-payment-note">
-              💳 Pago por transferencia bancaria, Mercado Pago o efectivo al retirar.
-            </p>
-
-            {/* Description */}
-            {product.description && (
-              <div className="modal-desc-box">
-                <h4>Descripción de la prenda:</h4>
-                <p>{product.description}</p>
-              </div>
-            )}
 
             {/* Sizes */}
             {product.sizes && product.sizes.length > 0 && (
@@ -263,8 +302,160 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
               </div>
             </div>
 
-            {/* CTAs */}
+            {/* CONFIGURACIÓN DE ENVÍO Y ZONA */}
+            <div className="modal-delivery-card">
+              <div className="modal-delivery-card__header">
+                <div className="delivery-card-title">
+                  <FiTruck size={17} className="text-orange" />
+                  <div>
+                    <h4>Método de Entrega &amp; Cotización</h4>
+                    <span>Elegí tu zona para sumar el costo exacto del flete</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Selector de Método: Andreani vs Retiro */}
+              <div className="modal-delivery-tabs">
+                <button
+                  type="button"
+                  className={`delivery-tab ${deliveryMethod === 'andreani' ? 'active' : ''}`}
+                  onClick={() => setDeliveryMethod('andreani')}
+                >
+                  <FiTruck size={15} />
+                  <span>Envío Andreani Express</span>
+                </button>
+                <button
+                  type="button"
+                  className={`delivery-tab ${deliveryMethod === 'pickup' ? 'active' : ''}`}
+                  onClick={() => setDeliveryMethod('pickup')}
+                >
+                  <FiMapPin size={15} />
+                  <span>Retiro en San Martín (Gratis)</span>
+                </button>
+              </div>
+
+              {deliveryMethod === 'andreani' ? (
+                <div className="modal-andreani-box">
+                  {/* Selector de Región / CP */}
+                  <div className="modal-zone-picker">
+                    <div className="zone-picker-field">
+                      <label>Provincia / Región de Entrega:</label>
+                      <select
+                        value={selectedZoneKey}
+                        onChange={(e) => {
+                          setSelectedZoneKey(e.target.value)
+                          setPostalCode('')
+                        }}
+                        className="modal-zone-select"
+                      >
+                        {SHIPPING_ZONES.map((z) => (
+                          <option key={z.key} value={z.key}>
+                            {z.name} ({z.estimatedDays})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="zone-cp-field">
+                      <label>O tu Código Postal (CP):</label>
+                      <input
+                        type="text"
+                        maxLength="5"
+                        placeholder="Ej: 1650"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
+                        className="modal-cp-input"
+                      />
+                    </div>
+                  </div>
+
+                  {shippingCalculation?.zoneInfo && (
+                    <div className="modal-detected-zone">
+                      <span>📍 Destino: <strong>{shippingCalculation.zoneInfo.location}</strong></span>
+                      <span className="zone-tag-badge">{shippingCalculation.zoneInfo.zone}</span>
+                    </div>
+                  )}
+
+                  {/* Opciones de Andreani: Domicilio vs Sucursal */}
+                  <div className="modal-andreani-options">
+                    {shippingCalculation?.quotes
+                      ?.filter((q) => q.id !== 'pickup')
+                      ?.map((q) => {
+                        const isSelected = selectedQuoteId === q.id
+                        return (
+                          <div
+                            key={q.id}
+                            className={`modal-quote-pill ${isSelected ? 'selected' : ''}`}
+                            onClick={() => setSelectedQuoteId(q.id)}
+                          >
+                            <div className="modal-quote-pill__left">
+                              <input
+                                type="radio"
+                                name="modal_shipping_quote"
+                                checked={isSelected}
+                                onChange={() => setSelectedQuoteId(q.id)}
+                              />
+                              <div>
+                                <div className="quote-pill-name">
+                                  <span>{q.icon}</span>
+                                  <strong>{q.name}</strong>
+                                </div>
+                                <span className="quote-pill-eta">⏱️ {q.estimatedDays}</span>
+                              </div>
+                            </div>
+                            <div className="modal-quote-pill__price">
+                              {q.price === 0 ? (
+                                <span className="free-tag">¡GRATIS!</span>
+                              ) : (
+                                <strong>+{formatPrice(q.price)}</strong>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                </div>
+              ) : (
+                <div className="modal-pickup-info">
+                  <div className="pickup-info-content">
+                    <span>📍 <strong>Dr. marcos zimmermann 3339</strong>, San Martín, Bs. As.</span>
+                    <span className="pickup-subtitle">Lunes a Viernes de 10:00 a 20:00 hs • Retiro sin costo de flete.</span>
+                  </div>
+                  <span className="free-badge">COSTO $0</span>
+                </div>
+              )}
+            </div>
+
+            {/* DESGLOSE EN VIVO CON ENVÍO SUMADO */}
+            <div className="modal-live-pricing-summary">
+              <div className="live-pricing-line">
+                <span>Prenda ({quantity} {quantity === 1 ? 'unidad' : 'unidades'}):</span>
+                <strong>{formatPrice(itemSubtotal)}</strong>
+              </div>
+              <div className="live-pricing-line">
+                <span>Flete ({activeQuote.name}):</span>
+                <strong className={shippingCost === 0 ? 'text-green' : 'text-orange'}>
+                  {shippingCost === 0 ? '¡GRATIS!' : `+${formatPrice(shippingCost)}`}
+                </strong>
+              </div>
+              <div className="live-pricing-line live-pricing-total">
+                <span className="total-label">Total a Abonar:</span>
+                <span className="total-number">{formatPrice(grandTotal)}</span>
+              </div>
+            </div>
+
+            {/* CTAs DE ALTO IMPACTO */}
             <div className="modal-cta-buttons">
+              <button
+                type="button"
+                className="btn-whatsapp modal-cta-wa"
+                onClick={handleDirectBuyWhatsApp}
+                disabled={isOutOfStock}
+              >
+                <FaWhatsapp size={20} />
+                <span>Comprar por WhatsApp ({formatPrice(grandTotal)})</span>
+              </button>
+
               <button
                 type="button"
                 className="btn-primary modal-cta-add"
@@ -274,16 +465,16 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 <FiShoppingBag size={18} />
                 <span>Agregar al Carrito</span>
               </button>
-
-              <button
-                type="button"
-                className="btn-whatsapp modal-cta-wa"
-                onClick={handleWhatsApp}
-              >
-                <FaWhatsapp size={18} />
-                <span>Consultar por WhatsApp</span>
-              </button>
             </div>
+
+            {/* Consulta previa */}
+            <button
+              type="button"
+              className="modal-inquiry-link"
+              onClick={handleGeneralInquiry}
+            >
+              <FiHelpCircle size={14} /> ¿Tenés alguna duda previa sobre talle o tela? Consultanos acá
+            </button>
 
             {/* Assurances */}
             <div className="modal-assurances">
@@ -299,61 +490,6 @@ const ProductDetailModal = ({ product, onClose, initialView = 'photo' }) => {
                 <FiAward className="assurance-icon" />
                 <span>Prendas 100% calidad</span>
               </div>
-            </div>
-
-            {/* Calculador de Envíos Andreani */}
-            <div className={`modal-shipping-calc ${shippingOpen ? 'is-open' : ''}`}>
-              <button
-                type="button"
-                className="modal-shipping-calc__toggle"
-                onClick={() => setShippingOpen(!shippingOpen)}
-                aria-expanded={shippingOpen}
-              >
-                <span className="modal-shipping-calc__title">
-                  <FiTruck size={15} className="text-orange" />
-                  <span>Calculá tu envío Andreani por Código Postal</span>
-                </span>
-                <FiChevronDown size={16} className={`modal-policy__chevron ${shippingOpen ? 'open' : ''}`} />
-              </button>
-
-              {shippingOpen && (
-                <div className="modal-shipping-calc__body">
-                  <form onSubmit={handleCalcShipping} className="modal-shipping-calc__form">
-                    <input
-                      type="text"
-                      maxLength="5"
-                      placeholder="Tu CP (ej: 1650, 1425, 2000)"
-                      value={shippingCp}
-                      onChange={(e) => setShippingCp(e.target.value.replace(/\D/g, ''))}
-                    />
-                    <button type="submit" className="btn-calc-cp">
-                      Calcular
-                    </button>
-                  </form>
-
-                  {shippingCalcResult?.zoneInfo && (
-                    <div className="modal-shipping-calc__results">
-                      <div className="modal-shipping-zone-badge">
-                        📍 <strong>{shippingCalcResult.zoneInfo.location}</strong>
-                      </div>
-                      <div className="modal-shipping-quotes-list">
-                        {shippingCalcResult.quotes
-                          .filter((q) => q.id !== 'pickup')
-                          .map((q) => (
-                            <div key={q.id} className="modal-shipping-quote-row">
-                              <span>{q.icon} {q.name} ({q.estimatedDays})</span>
-                              <strong>{q.price === 0 ? '¡GRATIS!' : formatPrice(q.price)}</strong>
-                            </div>
-                          ))}
-                        <div className="modal-shipping-quote-row">
-                          <span>🚶 Retiro en San Martín</span>
-                          <strong className="text-green">GRATIS</strong>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Return policy */}

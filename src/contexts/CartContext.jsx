@@ -35,6 +35,11 @@ export const CartProvider = ({ children }) => {
   })
 
   const [isOpen, setIsOpen] = useState(false)
+  const [shippingPreference, setShippingPreference] = useState({
+    zoneKey: 'amba',
+    postalCode: '',
+    quoteId: 'andreani_home',
+  })
 
   useEffect(() => {
     try {
@@ -44,8 +49,12 @@ export const CartProvider = ({ children }) => {
     }
   }, [cart])
 
-  const addToCart = (product, quantity = 1, selectedSize = null) => {
+  const addToCart = (product, quantity = 1, selectedSize = null, shippingPref = null) => {
     if (!product) return
+
+    if (shippingPref) {
+      setShippingPreference((prev) => ({ ...prev, ...shippingPref }))
+    }
 
     // If product has sizes and none selected, pick the first available
     const finalSize = selectedSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Único')
@@ -242,6 +251,8 @@ export const CartProvider = ({ children }) => {
         totalItems,
         totalPrice,
         checkoutWhatsApp,
+        shippingPreference,
+        setShippingPreference,
       }}
     >
       {children}
