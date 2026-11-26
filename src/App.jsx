@@ -59,6 +59,7 @@ function App() {
             <Route path="/catalogo" element={<CatalogPage />} />
             <Route path="/nosotros" element={<AboutPage />} />
             <Route path="/cambios-y-devoluciones" element={<ReturnPolicyPage />} />
+            <Route path="/politica-de-cambios" element={<ReturnPolicyPage />} />
             <Route path="/admin/*" element={<AdminPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
